@@ -1,1 +1,1 @@
-# cypress-parallell-api
+# cypress-parallel-api
