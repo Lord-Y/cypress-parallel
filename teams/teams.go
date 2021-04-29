@@ -4,6 +4,7 @@ package teams
 import (
 	"net/http"
 
+	"github.com/Lord-Y/cypress-parallel-api/commons"
 	"github.com/Lord-Y/cypress-parallel-api/tools"
 	"github.com/gin-gonic/gin"
 	"github.com/rs/zerolog/log"
@@ -15,7 +16,7 @@ type Teams struct {
 
 type GetTeams struct {
 	Page       int `form:"page,default=1" json:"page"`
-	RangeLimit int `form:"rangeLimit,default=25" json:"rangeLimit"`
+	RangeLimit int
 	StartLimit int
 	EndLimit   int
 }
@@ -46,7 +47,7 @@ func Read(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	p.StartLimit, p.EndLimit = tools.GetPagination(p.Page, 0, p.RangeLimit, p.RangeLimit)
+	p.StartLimit, p.EndLimit = tools.GetPagination(p.Page, 0, commons.GetRangeLimit(), commons.GetRangeLimit())
 
 	result, err := p.read()
 	if err != nil {

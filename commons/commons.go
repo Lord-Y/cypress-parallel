@@ -15,3 +15,8 @@ func BuildDSN() string {
 func GetRedisURI() string {
 	return strings.TrimSpace(os.Getenv("CYPRESS_PARALLEL_REDIS_URI"))
 }
+
+// GetRangeLimit return de max range limit for postgresSQL queries
+func GetRangeLimit() int {
+	return 25
+}
