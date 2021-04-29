@@ -10,6 +10,7 @@ import (
 	"github.com/syyongx/php2go"
 )
 
+// create will insert projects in DB
 func (p *Projects) create() (z int64, err error) {
 	db, err := sql.Open(
 		"postgres",
@@ -21,12 +22,15 @@ func (p *Projects) create() (z int64, err error) {
 	}
 	defer db.Close()
 
-	stmt, err := db.Prepare("INSERT INTO projects(project_name) VALUES($1) RETURNING project_id")
+	stmt, err := db.Prepare("INSERT INTO projects(project_name, team_id, repository, branch) VALUES($1, $2, $3, $4) RETURNING project_id")
 	if err != nil && err != sql.ErrNoRows {
 		return z, err
 	}
 	err = stmt.QueryRow(
 		php2go.Addslashes(p.Name),
+		p.TeamID,
+		php2go.Addslashes(p.Repository),
+		php2go.Addslashes(p.Branch),
 	).Scan(&z)
 	if err != nil && err != sql.ErrNoRows {
 		return z, err
@@ -35,6 +39,7 @@ func (p *Projects) create() (z int64, err error) {
 	return z, nil
 }
 
+// read will return all teams with range limit settings
 func (p *GetProjects) read() (z []map[string]interface{}, err error) {
 	db, err := sql.Open(
 		"postgres",

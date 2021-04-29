@@ -10,10 +10,15 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
+// Projects struct handle requirements to create projects
 type Projects struct {
-	Name string `form:"name" json:"name" binding:"required,max=100"`
+	TeamID     int    `form:"teamId" json:"teamId" binding:"required"`
+	Name       string `form:"name" json:"name" binding:"required,max=100"`
+	Repository string `form:"repository" json:"repository" binding:"required"`
+	Branch     string `form:"branch" json:"branch" binding:"required"`
 }
 
+// GetProjects struct handle requirements to get projects
 type GetProjects struct {
 	Page       int `form:"page,default=1" json:"page"`
 	RangeLimit int
@@ -21,6 +26,7 @@ type GetProjects struct {
 	EndLimit   int
 }
 
+// Create handle requirements to create projects with Projects struct
 func Create(c *gin.Context) {
 	var (
 		p Projects
@@ -39,6 +45,7 @@ func Create(c *gin.Context) {
 	}
 }
 
+// Read handle requirements to read projects with GetProjects struct
 func Read(c *gin.Context) {
 	var (
 		p GetProjects
