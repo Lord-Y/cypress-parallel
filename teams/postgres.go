@@ -10,6 +10,7 @@ import (
 	"github.com/syyongx/php2go"
 )
 
+// create will insert teams in DB
 func (p *Teams) create() (z int64, err error) {
 	db, err := sql.Open(
 		"postgres",
@@ -35,19 +36,21 @@ func (p *Teams) create() (z int64, err error) {
 	return z, nil
 }
 
+// read will return all teams with range limit settings
 func (p *GetTeams) read() (z []map[string]interface{}, err error) {
 	db, err := sql.Open(
 		"postgres",
 		commons.BuildDSN(),
 	)
 	if err != nil {
-		return
+		log.Error().Err(err).Msg("Failed to connect to DB")
+		return z, err
 	}
 	defer db.Close()
 
 	stmt, err := db.Prepare("SELECT *, (SELECT count(team_id) FROM teams) total FROM teams ORDER BY date DESC OFFSET $1 LIMIT $2")
 	if err != nil && err != sql.ErrNoRows {
-		return
+		return z, err
 	}
 	defer stmt.Close()
 
@@ -56,12 +59,12 @@ func (p *GetTeams) read() (z []map[string]interface{}, err error) {
 		p.EndLimit,
 	)
 	if err != nil && err != sql.ErrNoRows {
-		return
+		return z, err
 	}
 
 	columns, err := rows.Columns()
 	if err != nil {
-		return
+		return z, err
 	}
 
 	values := make([]sql.RawBytes, len(columns))
@@ -74,7 +77,7 @@ func (p *GetTeams) read() (z []map[string]interface{}, err error) {
 	for rows.Next() {
 		err = rows.Scan(scanArgs...)
 		if err != nil {
-			return
+			return z, err
 		}
 		var value string
 		sub := make(map[string]interface{})
@@ -89,7 +92,63 @@ func (p *GetTeams) read() (z []map[string]interface{}, err error) {
 		m = append(m, sub)
 	}
 	if err = rows.Err(); err != nil {
-		return
+		return z, err
+	}
+	return m, nil
+}
+
+// GetTeamIDForUnitTesting in only for unit testing purpose and will return team_id field
+func GetTeamIDForUnitTesting() (z map[string]string, err error) {
+	db, err := sql.Open(
+		"postgres",
+		commons.BuildDSN(),
+	)
+	if err != nil {
+		log.Error().Err(err).Msg("Failed to connect to DB")
+		return z, err
+	}
+	defer db.Close()
+
+	stmt, err := db.Prepare("SELECT team_id FROM teams LIMIT 1")
+	if err != nil && err != sql.ErrNoRows {
+		return z, err
+	}
+	defer stmt.Close()
+
+	rows, err := stmt.Query()
+	if err != nil && err != sql.ErrNoRows {
+		return z, err
+	}
+
+	columns, err := rows.Columns()
+	if err != nil {
+		return z, err
+	}
+
+	values := make([]sql.RawBytes, len(columns))
+	scanArgs := make([]interface{}, len(values))
+	for i := range values {
+		scanArgs[i] = &values[i]
+	}
+
+	m := make(map[string]string)
+	for rows.Next() {
+		err = rows.Scan(scanArgs...)
+		if err != nil {
+			return
+		}
+		var value string
+		for i, col := range values {
+			if col == nil {
+				value = "NULL"
+			} else {
+				value = php2go.Stripslashes(string(col))
+			}
+			m[columns[i]] = value
+		}
+	}
+	if err = rows.Err(); err != nil {
+		return z, err
 	}
 	return m, nil
 }

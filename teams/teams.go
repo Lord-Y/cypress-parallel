@@ -10,10 +10,12 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
+// Teams struct handle requirements to create teams
 type Teams struct {
 	Name string `form:"name" json:"name" binding:"required,max=100"`
 }
 
+// GetTeams struct handle requirements to get teams
 type GetTeams struct {
 	Page       int `form:"page,default=1" json:"page"`
 	RangeLimit int
@@ -21,6 +23,7 @@ type GetTeams struct {
 	EndLimit   int
 }
 
+// Create handle requirements to create teams with Teams struct
 func Create(c *gin.Context) {
 	var (
 		p Teams
@@ -39,6 +42,7 @@ func Create(c *gin.Context) {
 	}
 }
 
+// Read handle requirements to read teams with GetTeams struct
 func Read(c *gin.Context) {
 	var (
 		p GetTeams
