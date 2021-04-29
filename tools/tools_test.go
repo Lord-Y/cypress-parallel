@@ -143,7 +143,6 @@ func TestGetPagination(t *testing.T) {
 
 	for _, tc := range tests {
 		sl, el := GetPagination(tc.page, tc.start, tc.end, tc.rangeLimit)
-		log.Println("sl", sl, "el", el)
 		assert.Equal(sl, tc.actualStartLimit)
 		assert.Equal(el, tc.actualEndLimit)
 	}
