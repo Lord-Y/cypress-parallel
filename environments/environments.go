@@ -35,7 +35,7 @@ type GetEnvironments struct {
 	EndLimit   int
 }
 
-// DeleteEnvironments struct handle requirements to create environments
+// DeleteEnvironment struct handle requirements to delete environment
 type DeleteEnvironment struct {
 	EnvironmentID int `form:"environmentId" json:"environmentId" binding:"required"`
 }
