@@ -89,7 +89,7 @@ func Read(c *gin.Context) {
 	}
 }
 
-// Update handle requirements to update projects with Updateprojects struct
+// Update handle requirements to update projects with updateProjects struct
 func Update(c *gin.Context) {
 	var (
 		p updateProjects
