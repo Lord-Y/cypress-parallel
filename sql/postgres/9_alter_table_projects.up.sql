@@ -1,0 +1,1 @@
+ALTER TABLE projects ADD specs TEXT, ADD scheduling VARCHAR(15), ADD scheduling_enabled BOOL DEFAULT false, ADD max_pods INT NOT NULL DEFAULT 1;

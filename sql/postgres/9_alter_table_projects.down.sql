@@ -1,0 +1,1 @@
+ALTER TABLE projects DROP COLUMN specs, DROP COLUMN scheduling, DROP COLUMN scheduling_enabled, DROP COLUMN max_pods;

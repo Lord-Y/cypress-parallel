@@ -99,7 +99,7 @@ func (p *GetProjects) read() (z []map[string]interface{}, err error) {
 	return m, nil
 }
 
-// GetProjectIDForUnitTesting in only for unit testing purpose and will return project_id field
+// GetProjectIDForUnitTesting in only for unit testing purpose and will return project_id and team_id field
 func GetProjectIDForUnitTesting() (z map[string]string, err error) {
 	db, err := sql.Open(
 		"postgres",
@@ -111,7 +111,7 @@ func GetProjectIDForUnitTesting() (z map[string]string, err error) {
 	}
 	defer db.Close()
 
-	stmt, err := db.Prepare("SELECT project_id FROM projects LIMIT 1")
+	stmt, err := db.Prepare("SELECT project_id,team_id FROM projects LIMIT 1")
 	if err != nil && err != sql.ErrNoRows {
 		return z, err
 	}
@@ -153,4 +153,64 @@ func GetProjectIDForUnitTesting() (z map[string]string, err error) {
 		return z, err
 	}
 	return m, nil
+}
+
+// update will insert environments in DB
+func (p *UpdateProjects) update() (err error) {
+	db, err := sql.Open(
+		"postgres",
+		commons.BuildDSN(),
+	)
+	if err != nil {
+		log.Error().Err(err).Msg("Failed to connect to DB")
+		return err
+	}
+	defer db.Close()
+
+	stmt, err := db.Prepare("UPDATE projects SET project_name = $1, team_id = $2, repository = $3, branch = $4, specs = $5, scheduling = $6, scheduling_enabled = $7, max_pods = $8 WHERE project_id = $9")
+	if err != nil && err != sql.ErrNoRows {
+		return err
+	}
+	err = stmt.QueryRow(
+		php2go.Addslashes(p.Name),
+		p.TeamID,
+		php2go.Addslashes(p.Repository),
+		php2go.Addslashes(p.Branch),
+		php2go.Addslashes(p.Specs),
+		php2go.Addslashes(p.Scheduling),
+		p.SchedulingEnabled,
+		p.MaxPods,
+		p.ProjectID,
+	).Scan()
+	if err != nil && err != sql.ErrNoRows {
+		return err
+	}
+	defer stmt.Close()
+	return nil
+}
+
+// delete will delete project in DB
+func (p *DeleteProject) delete() (err error) {
+	db, err := sql.Open(
+		"postgres",
+		commons.BuildDSN(),
+	)
+	if err != nil {
+		log.Error().Err(err).Msg("Failed to connect to DB")
+		return err
+	}
+	defer db.Close()
+
+	stmt, err := db.Prepare("DELETE FROM projects WHERE project_id = $1")
+	if err != nil && err != sql.ErrNoRows {
+		return err
+	}
+	err = stmt.QueryRow(
+		p.ProjectID,
+	).Scan()
+	if err != nil && err != sql.ErrNoRows {
+		return err
+	}
+	defer stmt.Close()
+	return nil
 }
