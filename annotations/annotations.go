@@ -13,8 +13,8 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
-// Annotations struct handle requirements to create annotations
-type Annotations struct {
+// annotations struct handle requirements to create annotations
+type annotations struct {
 	ProjectID   int    `form:"projectId" json:"projectId" binding:"required"`
 	Annotations string `form:"annotations" json:"annotations" binding:"required"`
 	annotation  []annotation
@@ -27,23 +27,23 @@ type annotation struct {
 	Value         string
 }
 
-// GetAnnotations struct handle requirements to get annotations
-type GetAnnotations struct {
+// getAnnotations struct handle requirements to get annotations
+type getAnnotations struct {
 	Page       int `form:"page,default=1" json:"page"`
 	RangeLimit int
 	StartLimit int
 	EndLimit   int
 }
 
-// DeleteAnnotations struct handle requirements to create annotations
-type DeleteAnnotation struct {
+// deleteAnnotations struct handle requirements to create annotations
+type deleteAnnotation struct {
 	AnnotationID int `form:"annotationId" json:"annotationId" binding:"required"`
 }
 
 // CreateOrUpdate handle requirements to create annotations with Annotations struct
 func CreateOrUpdate(c *gin.Context) {
 	var (
-		p Annotations
+		p annotations
 	)
 	if err := c.ShouldBind(&p); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -91,7 +91,7 @@ func CreateOrUpdate(c *gin.Context) {
 // Read handle requirements to read annotations with GetAnnotations struct
 func Read(c *gin.Context) {
 	var (
-		p GetAnnotations
+		p getAnnotations
 	)
 	if err := c.ShouldBind(&p); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -116,7 +116,7 @@ func Read(c *gin.Context) {
 // Delete handle deletion of annotation viariable with DeleteAnnotation struct
 func Delete(c *gin.Context) {
 	var (
-		p DeleteAnnotation
+		p deleteAnnotation
 	)
 	id := c.Params.ByName("annotationId")
 	if id == "" {

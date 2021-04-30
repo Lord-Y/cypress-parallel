@@ -11,7 +11,7 @@ import (
 )
 
 // selectBeforeAct will check if an insert or update must be done
-func (p *Annotations) selectBeforeAct(id int) (z map[string]string, err error) {
+func (p *annotations) selectBeforeAct(id int) (z map[string]string, err error) {
 	db, err := sql.Open(
 		"postgres",
 		commons.BuildDSN(),
@@ -71,7 +71,7 @@ func (p *Annotations) selectBeforeAct(id int) (z map[string]string, err error) {
 }
 
 // create will insert annotations in DB
-func (p *Annotations) create(id int) (err error) {
+func (p *annotations) create(id int) (err error) {
 	db, err := sql.Open(
 		"postgres",
 		commons.BuildDSN(),
@@ -99,7 +99,7 @@ func (p *Annotations) create(id int) (err error) {
 }
 
 // update will insert annotations in DB
-func (p *Annotations) update(id int) (err error) {
+func (p *annotations) update(id int) (err error) {
 	db, err := sql.Open(
 		"postgres",
 		commons.BuildDSN(),
@@ -128,7 +128,7 @@ func (p *Annotations) update(id int) (err error) {
 }
 
 // read will return all annotations with range limit settings
-func (p *GetAnnotations) read() (z []map[string]interface{}, err error) {
+func (p *getAnnotations) read() (z []map[string]interface{}, err error) {
 	db, err := sql.Open(
 		"postgres",
 		commons.BuildDSN(),
@@ -189,7 +189,7 @@ func (p *GetAnnotations) read() (z []map[string]interface{}, err error) {
 }
 
 // delete will insert annotations in DB
-func (p *DeleteAnnotation) delete() (err error) {
+func (p *deleteAnnotation) delete() (err error) {
 	db, err := sql.Open(
 		"postgres",
 		commons.BuildDSN(),
