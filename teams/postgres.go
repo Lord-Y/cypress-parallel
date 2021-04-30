@@ -180,7 +180,7 @@ func (p *updateTeam) update() (err error) {
 	return nil
 }
 
-// delete will delete team in DB
+// delete will delete teams in DB
 func (p *deleteTeam) delete() (err error) {
 	db, err := sql.Open(
 		"postgres",
