@@ -11,7 +11,7 @@ import (
 )
 
 // selectBeforeAct will check if an insert or update must be done
-func (p *Environments) selectBeforeAct(id int) (z map[string]string, err error) {
+func (p *environments) selectBeforeAct(id int) (z map[string]string, err error) {
 	db, err := sql.Open(
 		"postgres",
 		commons.BuildDSN(),
@@ -71,7 +71,7 @@ func (p *Environments) selectBeforeAct(id int) (z map[string]string, err error) 
 }
 
 // create will insert environments in DB
-func (p *Environments) create(id int) (err error) {
+func (p *environments) create(id int) (err error) {
 	db, err := sql.Open(
 		"postgres",
 		commons.BuildDSN(),
@@ -99,7 +99,7 @@ func (p *Environments) create(id int) (err error) {
 }
 
 // update will insert environments in DB
-func (p *Environments) update(id int) (err error) {
+func (p *environments) update(id int) (err error) {
 	db, err := sql.Open(
 		"postgres",
 		commons.BuildDSN(),
@@ -128,7 +128,7 @@ func (p *Environments) update(id int) (err error) {
 }
 
 // read will return all environments with range limit settings
-func (p *GetEnvironments) read() (z []map[string]interface{}, err error) {
+func (p *getEnvironments) read() (z []map[string]interface{}, err error) {
 	db, err := sql.Open(
 		"postgres",
 		commons.BuildDSN(),
@@ -189,7 +189,7 @@ func (p *GetEnvironments) read() (z []map[string]interface{}, err error) {
 }
 
 // delete will delete environments in DB
-func (p *DeleteEnvironment) delete() (err error) {
+func (p *deleteEnvironment) delete() (err error) {
 	db, err := sql.Open(
 		"postgres",
 		commons.BuildDSN(),

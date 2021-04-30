@@ -13,8 +13,8 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
-// Environments struct handle requirements to create environments
-type Environments struct {
+// environments struct handle requirements to create environments
+type environments struct {
 	ProjectID    int    `form:"projectId" json:"projectId" binding:"required"`
 	Environments string `form:"environments" json:"environments" binding:"required"`
 	environment  []environment
@@ -27,23 +27,23 @@ type environment struct {
 	Value          string
 }
 
-// GetEnvironments struct handle requirements to get environments
-type GetEnvironments struct {
+// getEnvironments struct handle requirements to get environments
+type getEnvironments struct {
 	Page       int `form:"page,default=1" json:"page"`
 	RangeLimit int
 	StartLimit int
 	EndLimit   int
 }
 
-// DeleteEnvironment struct handle requirements to delete environment
-type DeleteEnvironment struct {
+// deleteEnvironment struct handle requirements to delete environment
+type deleteEnvironment struct {
 	EnvironmentID int `form:"environmentId" json:"environmentId" binding:"required"`
 }
 
-// CreateOrUpdate handle requirements to create environments with Environments struct
+// CreateOrUpdate handle requirements to create environments with environments struct
 func CreateOrUpdate(c *gin.Context) {
 	var (
-		p Environments
+		p environments
 	)
 	if err := c.ShouldBind(&p); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -91,7 +91,7 @@ func CreateOrUpdate(c *gin.Context) {
 // Read handle requirements to read environments with GetEnvironments struct
 func Read(c *gin.Context) {
 	var (
-		p GetEnvironments
+		p getEnvironments
 	)
 	if err := c.ShouldBind(&p); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -116,7 +116,7 @@ func Read(c *gin.Context) {
 // Delete handle deletion of environment viariable with DeleteEnvironment struct
 func Delete(c *gin.Context) {
 	var (
-		p DeleteEnvironment
+		p deleteEnvironment
 	)
 	id := c.Params.ByName("environmentId")
 	if id == "" {
