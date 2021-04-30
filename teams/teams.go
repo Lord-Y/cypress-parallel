@@ -3,6 +3,7 @@ package teams
 
 import (
 	"net/http"
+	"strconv"
 
 	"github.com/Lord-Y/cypress-parallel-api/commons"
 	"github.com/Lord-Y/cypress-parallel-api/tools"
@@ -23,6 +24,17 @@ type getTeams struct {
 	EndLimit   int
 }
 
+// updateTeam struct handle requirements to update teams
+type updateTeam struct {
+	TeamID int    `form:"teamId" json:"teamId" binding:"required"`
+	Name   string `form:"name" json:"name" binding:"required,max=100"`
+}
+
+// deleteTeam struct handle requirements to delete team
+type deleteTeam struct {
+	TeamID int `form:"teamId" json:"teamId" binding:"required"`
+}
+
 // Create handle requirements to create teams with teams struct
 func Create(c *gin.Context) {
 	var (
@@ -38,7 +50,7 @@ func Create(c *gin.Context) {
 		log.Error().Err(err).Msg("Error occured while performing db query")
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
 	} else {
-		c.JSON(http.StatusCreated, gin.H{"projectId": result})
+		c.JSON(http.StatusCreated, gin.H{"teamId": result})
 	}
 }
 
@@ -65,4 +77,51 @@ func Read(c *gin.Context) {
 	} else {
 		c.JSON(http.StatusOK, result)
 	}
+}
+
+// Update handle requirements to update teams with updateTeam struct
+func Update(c *gin.Context) {
+	var (
+		p updateTeam
+	)
+	if err := c.ShouldBind(&p); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	err := p.update()
+	if err != nil {
+		log.Error().Err(err).Msg("Error occured while performing db query")
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
+	} else {
+		c.JSON(http.StatusOK, "OK")
+	}
+}
+
+// Delete handle deletion of project deleteTeam struct
+func Delete(c *gin.Context) {
+	var (
+		p deleteTeam
+	)
+	id := c.Params.ByName("teamId")
+	if id == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "teamId is missing in uri"})
+		return
+	}
+	convID, err := strconv.Atoi(id)
+	if err != nil {
+		log.Error().Err(err).Msg("Error occured while converting string to int")
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
+		return
+	}
+
+	p.TeamID = convID
+
+	err = p.delete()
+	if err != nil {
+		log.Error().Err(err).Msg("Error occured while performing db query")
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
+		return
+	}
+	c.JSON(http.StatusOK, "OK")
 }

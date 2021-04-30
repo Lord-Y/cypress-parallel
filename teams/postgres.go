@@ -152,3 +152,56 @@ func GetTeamIDForUnitTesting() (z map[string]string, err error) {
 	}
 	return m, nil
 }
+
+// update will update team name in DB
+func (p *updateTeam) update() (err error) {
+	db, err := sql.Open(
+		"postgres",
+		commons.BuildDSN(),
+	)
+	if err != nil {
+		log.Error().Err(err).Msg("Failed to connect to DB")
+		return err
+	}
+	defer db.Close()
+
+	stmt, err := db.Prepare("UPDATE teams SET team_name = $1 WHERE team_id = $2")
+	if err != nil && err != sql.ErrNoRows {
+		return err
+	}
+	err = stmt.QueryRow(
+		php2go.Addslashes(p.Name),
+		p.TeamID,
+	).Scan()
+	if err != nil && err != sql.ErrNoRows {
+		return err
+	}
+	defer stmt.Close()
+	return nil
+}
+
+// delete will delete team in DB
+func (p *deleteTeam) delete() (err error) {
+	db, err := sql.Open(
+		"postgres",
+		commons.BuildDSN(),
+	)
+	if err != nil {
+		log.Error().Err(err).Msg("Failed to connect to DB")
+		return err
+	}
+	defer db.Close()
+
+	stmt, err := db.Prepare("DELETE FROM teams WHERE team_id = $1")
+	if err != nil && err != sql.ErrNoRows {
+		return err
+	}
+	err = stmt.QueryRow(
+		p.TeamID,
+	).Scan()
+	if err != nil && err != sql.ErrNoRows {
+		return err
+	}
+	defer stmt.Close()
+	return nil
+}
