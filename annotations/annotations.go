@@ -40,7 +40,7 @@ type deleteAnnotation struct {
 	AnnotationID int `form:"annotationId" json:"annotationId" binding:"required"`
 }
 
-// CreateOrUpdate handle requirements to create annotations with Annotations struct
+// CreateOrUpdate handle requirements to create annotations with annotations struct
 func CreateOrUpdate(c *gin.Context) {
 	var (
 		p annotations
@@ -88,7 +88,7 @@ func CreateOrUpdate(c *gin.Context) {
 	c.JSON(http.StatusCreated, "OK")
 }
 
-// Read handle requirements to read annotations with GetAnnotations struct
+// Read handle requirements to read annotations with getAnnotations struct
 func Read(c *gin.Context) {
 	var (
 		p getAnnotations
@@ -113,7 +113,7 @@ func Read(c *gin.Context) {
 	}
 }
 
-// Delete handle deletion of annotation viariable with DeleteAnnotation struct
+// Delete handle deletion of annotation viariable with deleteAnnotation struct
 func Delete(c *gin.Context) {
 	var (
 		p deleteAnnotation
