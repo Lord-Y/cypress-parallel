@@ -155,7 +155,7 @@ func GetProjectIDForUnitTesting() (z map[string]string, err error) {
 	return m, nil
 }
 
-// update will insert environments in DB
+// update will update environments in DB
 func (p *updateProjects) update() (err error) {
 	db, err := sql.Open(
 		"postgres",
@@ -189,7 +189,7 @@ func (p *updateProjects) update() (err error) {
 	return nil
 }
 
-// delete will delete project in DB
+// delete will delete projects in DB
 func (p *deleteProject) delete() (err error) {
 	db, err := sql.Open(
 		"postgres",
