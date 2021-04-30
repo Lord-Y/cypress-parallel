@@ -98,7 +98,7 @@ func (p *environments) create(id int) (err error) {
 	return nil
 }
 
-// update will insert environments in DB
+// update will update environments in DB
 func (p *environments) update(id int) (err error) {
 	db, err := sql.Open(
 		"postgres",
