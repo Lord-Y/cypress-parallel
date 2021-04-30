@@ -188,7 +188,7 @@ func (p *getAnnotations) read() (z []map[string]interface{}, err error) {
 	return m, nil
 }
 
-// delete will delete annotation in DB
+// delete will delete annotations in DB
 func (p *deleteAnnotation) delete() (err error) {
 	db, err := sql.Open(
 		"postgres",
