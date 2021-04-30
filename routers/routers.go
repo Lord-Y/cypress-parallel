@@ -5,6 +5,7 @@ import (
 	"os"
 	"strings"
 
+	"github.com/Lord-Y/cypress-parallel-api/environments"
 	"github.com/Lord-Y/cypress-parallel-api/health"
 	customLogger "github.com/Lord-Y/cypress-parallel-api/logger"
 	"github.com/Lord-Y/cypress-parallel-api/projects"
@@ -57,10 +58,16 @@ func SetupRouter() *gin.Engine {
 	v1 := router.Group("/api/v1/cypress-parallel-api")
 	{
 		v1.GET("/health", health.Health)
+
 		v1.POST("/teams", teams.Create)
 		v1.GET("/teams", teams.Read)
+
 		v1.POST("/projects", projects.Create)
 		v1.GET("/projects", projects.Read)
+
+		v1.POST("/environments", environments.CreateOrUpdate)
+		v1.GET("/environments", environments.Read)
+		v1.DELETE("/environments/:environmentId", environments.Delete)
 	}
 	return router
 }
