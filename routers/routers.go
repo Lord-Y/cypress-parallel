@@ -3,7 +3,6 @@ package routers
 
 import (
 	"os"
-	"strings"
 
 	"github.com/Lord-Y/cypress-parallel-api/annotations"
 	"github.com/Lord-Y/cypress-parallel-api/environments"
@@ -29,11 +28,7 @@ func SetupRouter() *gin.Engine {
 	gin.SetMode(gin.ReleaseMode)
 	requestID := tools.RandStringInt(32)
 
-	if strings.TrimSpace(os.Getenv("CYPRESS_PARALLEL_API_LOG_LEVEL_WITH_CALLER")) != "" {
-		log.Logger = zerolog.New(os.Stdout).With().Timestamp().Caller().Logger()
-	} else {
-		log.Logger = zerolog.New(os.Stdout).With().Timestamp().Logger()
-	}
+	log.Logger = zerolog.New(os.Stdout).With().Timestamp().Caller().Logger()
 	subLog := zerolog.New(os.Stdout).With().Timestamp().Str("requestId", requestID).Logger()
 
 	router := gin.New()
