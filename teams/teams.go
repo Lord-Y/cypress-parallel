@@ -10,23 +10,23 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
-// Teams struct handle requirements to create teams
-type Teams struct {
+// teams struct handle requirements to create teams
+type teams struct {
 	Name string `form:"name" json:"name" binding:"required,max=100"`
 }
 
-// GetTeams struct handle requirements to get teams
-type GetTeams struct {
+// getTeams struct handle requirements to get teams
+type getTeams struct {
 	Page       int `form:"page,default=1" json:"page"`
 	RangeLimit int
 	StartLimit int
 	EndLimit   int
 }
 
-// Create handle requirements to create teams with Teams struct
+// Create handle requirements to create teams with teams struct
 func Create(c *gin.Context) {
 	var (
-		p Teams
+		p teams
 	)
 	if err := c.ShouldBind(&p); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -42,10 +42,10 @@ func Create(c *gin.Context) {
 	}
 }
 
-// Read handle requirements to read teams with GetTeams struct
+// Read handle requirements to read teams with getTeams struct
 func Read(c *gin.Context) {
 	var (
-		p GetTeams
+		p getTeams
 	)
 	if err := c.ShouldBind(&p); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})

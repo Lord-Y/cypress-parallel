@@ -11,7 +11,7 @@ import (
 )
 
 // create will insert teams in DB
-func (p *Teams) create() (z int64, err error) {
+func (p *teams) create() (z int64, err error) {
 	db, err := sql.Open(
 		"postgres",
 		commons.BuildDSN(),
@@ -37,7 +37,7 @@ func (p *Teams) create() (z int64, err error) {
 }
 
 // read will return all teams with range limit settings
-func (p *GetTeams) read() (z []map[string]interface{}, err error) {
+func (p *getTeams) read() (z []map[string]interface{}, err error) {
 	db, err := sql.Open(
 		"postgres",
 		commons.BuildDSN(),
