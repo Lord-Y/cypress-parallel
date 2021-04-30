@@ -98,7 +98,7 @@ func (p *annotations) create(id int) (err error) {
 	return nil
 }
 
-// update will insert annotations in DB
+// update will update annotations in DB
 func (p *annotations) update(id int) (err error) {
 	db, err := sql.Open(
 		"postgres",
@@ -188,7 +188,7 @@ func (p *getAnnotations) read() (z []map[string]interface{}, err error) {
 	return m, nil
 }
 
-// delete will insert annotations in DB
+// delete will delete annotation in DB
 func (p *deleteAnnotation) delete() (err error) {
 	db, err := sql.Open(
 		"postgres",
