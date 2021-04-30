@@ -88,7 +88,7 @@ func CreateOrUpdate(c *gin.Context) {
 	c.JSON(http.StatusCreated, "OK")
 }
 
-// Read handle requirements to read environments with GetEnvironments struct
+// Read handle requirements to read environments with getEnvironments struct
 func Read(c *gin.Context) {
 	var (
 		p getEnvironments
@@ -113,7 +113,7 @@ func Read(c *gin.Context) {
 	}
 }
 
-// Delete handle deletion of environment viariable with DeleteEnvironment struct
+// Delete handle deletion of environment viariable with deleteEnvironment struct
 func Delete(c *gin.Context) {
 	var (
 		p deleteEnvironment
