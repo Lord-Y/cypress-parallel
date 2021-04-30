@@ -9,6 +9,12 @@ Our api is developped with PostgresSQL database so the environment variable CYPR
 export CYPRESS_PARALLEL_DB_URI="postgres://USERNAME:PASSWORD@HOST:PORT/DB_NAME?sslmode=disable"
 ```
 
+## Content types
+
+Supported content types are:
+- application/x-www-form-urlencoded
+- application/json
+
 ## Unit testing
 
 Unit testing must be close to 100% to avoid any shitty bug as the application will continue to grow. By reaching this percentage, we make sure that when a bug is discovered, that's not a dummy one.
