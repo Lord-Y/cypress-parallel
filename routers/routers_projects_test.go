@@ -27,8 +27,6 @@ func TestProjectsCreate(t *testing.T) {
 	payload += "&repository=https://github.com/cypress-io/cypress.git"
 	payload += "&branch=master"
 
-	log.Info().Msgf("payload %s", payload)
-
 	router := SetupRouter()
 	w, _ := performRequest(router, headers, "POST", "/api/v1/cypress-parallel-api/projects", payload)
 	assert.Equal(201, w.Code)
