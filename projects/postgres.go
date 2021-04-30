@@ -11,7 +11,7 @@ import (
 )
 
 // create will insert projects in DB
-func (p *Projects) create() (z int64, err error) {
+func (p *projects) create() (z int64, err error) {
 	db, err := sql.Open(
 		"postgres",
 		commons.BuildDSN(),
@@ -40,7 +40,7 @@ func (p *Projects) create() (z int64, err error) {
 }
 
 // read will return all teams with range limit settings
-func (p *GetProjects) read() (z []map[string]interface{}, err error) {
+func (p *getProjects) read() (z []map[string]interface{}, err error) {
 	db, err := sql.Open(
 		"postgres",
 		commons.BuildDSN(),
@@ -156,7 +156,7 @@ func GetProjectIDForUnitTesting() (z map[string]string, err error) {
 }
 
 // update will insert environments in DB
-func (p *UpdateProjects) update() (err error) {
+func (p *updateProjects) update() (err error) {
 	db, err := sql.Open(
 		"postgres",
 		commons.BuildDSN(),
@@ -190,7 +190,7 @@ func (p *UpdateProjects) update() (err error) {
 }
 
 // delete will delete project in DB
-func (p *DeleteProject) delete() (err error) {
+func (p *deleteProject) delete() (err error) {
 	db, err := sql.Open(
 		"postgres",
 		commons.BuildDSN(),

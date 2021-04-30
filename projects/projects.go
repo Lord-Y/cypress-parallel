@@ -11,24 +11,24 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
-// Projects struct handle requirements to create projects
-type Projects struct {
+// projects struct handle requirements to create projects
+type projects struct {
 	TeamID     int    `form:"teamId" json:"teamId" binding:"required"`
 	Name       string `form:"name" json:"name" binding:"required,max=100"`
 	Repository string `form:"repository" json:"repository" binding:"required"`
 	Branch     string `form:"branch" json:"branch" binding:"required"`
 }
 
-// GetProjects struct handle requirements to get projects
-type GetProjects struct {
+// getProjects struct handle requirements to get projects
+type getProjects struct {
 	Page       int `form:"page,default=1" json:"page"`
 	RangeLimit int
 	StartLimit int
 	EndLimit   int
 }
 
-// UpdateProjects struct handle requirements to update projects
-type UpdateProjects struct {
+// updateProjects struct handle requirements to update projects
+type updateProjects struct {
 	ProjectID         int    `form:"projectId" json:"projectId" binding:"required"`
 	TeamID            int    `form:"teamId" json:"teamId" binding:"required"`
 	Name              string `form:"name" json:"name" binding:"required,max=100"`
@@ -40,15 +40,15 @@ type UpdateProjects struct {
 	MaxPods           int    `form:"maxPods,default=10" json:"maxPods"`
 }
 
-// DeleteProject struct handle requirements to delete project
-type DeleteProject struct {
+// deleteProject struct handle requirements to delete project
+type deleteProject struct {
 	ProjectID int `form:"projectId" json:"projectId" binding:"required"`
 }
 
-// Create handle requirements to create projects with Projects struct
+// Create handle requirements to create projects with projects struct
 func Create(c *gin.Context) {
 	var (
-		p Projects
+		p projects
 	)
 	if err := c.ShouldBind(&p); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -64,10 +64,10 @@ func Create(c *gin.Context) {
 	}
 }
 
-// Read handle requirements to read projects with GetProjects struct
+// Read handle requirements to read projects with getProjects struct
 func Read(c *gin.Context) {
 	var (
-		p GetProjects
+		p getProjects
 	)
 	if err := c.ShouldBind(&p); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -89,10 +89,10 @@ func Read(c *gin.Context) {
 	}
 }
 
-// Update handle requirements to update projects with UpdateProjects struct
+// Update handle requirements to update projects with Updateprojects struct
 func Update(c *gin.Context) {
 	var (
-		p UpdateProjects
+		p updateProjects
 	)
 	if err := c.ShouldBind(&p); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -108,10 +108,10 @@ func Update(c *gin.Context) {
 	}
 }
 
-// Delete handle deletion of project DeleteProject struct
+// Delete handle deletion of project deleteProject struct
 func Delete(c *gin.Context) {
 	var (
-		p DeleteProject
+		p deleteProject
 	)
 	id := c.Params.ByName("projectId")
 	if id == "" {
