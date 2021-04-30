@@ -1,5 +1,0 @@
-export CYPRESS_PARALLEL_DB_URI="postgres://cypress_parallel:cypress_parallel@127.0.0.1:5432/cypress_parallel?sslmode=disable"
-
-curl http://0:8080/api/v1/cypress-parallel-api/projects
-
-curl -XPOST http://0:8080/api/v1/cypress-parallel-api/projects -d "name=yohann"

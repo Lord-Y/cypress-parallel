@@ -98,3 +98,59 @@ func (p *GetProjects) read() (z []map[string]interface{}, err error) {
 	}
 	return m, nil
 }
+
+// GetProjectIDForUnitTesting in only for unit testing purpose and will return project_id field
+func GetProjectIDForUnitTesting() (z map[string]string, err error) {
+	db, err := sql.Open(
+		"postgres",
+		commons.BuildDSN(),
+	)
+	if err != nil {
+		log.Error().Err(err).Msg("Failed to connect to DB")
+		return z, err
+	}
+	defer db.Close()
+
+	stmt, err := db.Prepare("SELECT project_id FROM projects LIMIT 1")
+	if err != nil && err != sql.ErrNoRows {
+		return z, err
+	}
+	defer stmt.Close()
+
+	rows, err := stmt.Query()
+	if err != nil && err != sql.ErrNoRows {
+		return z, err
+	}
+
+	columns, err := rows.Columns()
+	if err != nil {
+		return z, err
+	}
+
+	values := make([]sql.RawBytes, len(columns))
+	scanArgs := make([]interface{}, len(values))
+	for i := range values {
+		scanArgs[i] = &values[i]
+	}
+
+	m := make(map[string]string)
+	for rows.Next() {
+		err = rows.Scan(scanArgs...)
+		if err != nil {
+			return
+		}
+		var value string
+		for i, col := range values {
+			if col == nil {
+				value = "NULL"
+			} else {
+				value = php2go.Stripslashes(string(col))
+			}
+			m[columns[i]] = value
+		}
+	}
+	if err = rows.Err(); err != nil {
+		return z, err
+	}
+	return m, nil
+}
