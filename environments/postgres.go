@@ -188,7 +188,7 @@ func (p *GetEnvironments) read() (z []map[string]interface{}, err error) {
 	return m, nil
 }
 
-// delete will insert environments in DB
+// delete will delete environments in DB
 func (p *DeleteEnvironment) delete() (err error) {
 	db, err := sql.Open(
 		"postgres",
