@@ -1,0 +1,1 @@
+ALTER TABLE projects RENAME COLUMN cypress_docker_version TO cpyress_docker_version;
