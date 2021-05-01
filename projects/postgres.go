@@ -22,7 +22,7 @@ func (p *projects) create() (z int64, err error) {
 	}
 	defer db.Close()
 
-	stmt, err := db.Prepare("INSERT INTO projects(project_name, team_id, repository, branch, cypress_docker_version) VALUES($1, $2, $3, $4, $5) RETURNING project_id")
+	stmt, err := db.Prepare("INSERT INTO projects(project_name, team_id, repository, branch, specs, cypress_docker_version) VALUES($1, $2, $3, $4, $5, $6) RETURNING project_id")
 	if err != nil && err != sql.ErrNoRows {
 		return z, err
 	}
@@ -32,6 +32,7 @@ func (p *projects) create() (z int64, err error) {
 		p.TeamID,
 		php2go.Addslashes(p.Repository),
 		php2go.Addslashes(p.Branch),
+		php2go.Addslashes(p.Specs),
 		php2go.Addslashes(p.CypressDockerVersion),
 	).Scan(&z)
 	if err != nil && err != sql.ErrNoRows {

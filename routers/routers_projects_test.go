@@ -6,6 +6,7 @@ import (
 
 	"github.com/Lord-Y/cypress-parallel-api/projects"
 	"github.com/Lord-Y/cypress-parallel-api/teams"
+	"github.com/Lord-Y/cypress-parallel-api/tools"
 	"github.com/icrowley/fake"
 	"github.com/rs/zerolog/log"
 	"github.com/stretchr/testify/assert"
@@ -65,7 +66,7 @@ func TestProjectsCreateMulti(t *testing.T) {
 		payload += fmt.Sprintf("&teamId=%s", result["team_id"])
 		payload += "&repository=https://github.com/cypress-io/cypress-example-kitchensink.git"
 		payload += "&branch=master"
-		payload += "&specs=cypress/integration/examples/actions.spec.js"
+		payload += fmt.Sprintf("&specs=%s", tools.RandomValueFromSlice(specs))
 		payload += "&scheduling="
 		payload += "&schedulingEnabled=false"
 		payload += fmt.Sprintf("&maxPods=%d", fake.MonthNum())

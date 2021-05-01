@@ -17,6 +17,7 @@ type projects struct {
 	Name                 string `form:"name" json:"name" binding:"required,max=100"`
 	Repository           string `form:"repository" json:"repository" binding:"required"`
 	Branch               string `form:"branch" json:"branch" binding:"required"`
+	Specs                string `form:"specs" json:"specs" binding:"required"`
 	CypressDockerVersion string `form:"cypress_docker_version,default=7.2.0" json:"cypress_docker_version"`
 }
 
