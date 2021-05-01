@@ -16,7 +16,7 @@ func TestEnvironmentsCreateOrUpdate(t *testing.T) {
 	headers["Content-Type"] = "application/x-www-form-urlencoded"
 
 	TestProjectsCreate(t)
-	resultTeamID, err := projects.GetProjectIDForUnitTesting()
+	result, err := projects.GetProjectIDForUnitTesting()
 	if err != nil {
 		log.Err(err).Msgf("Fail to retrieve team id")
 		t.Fail()
@@ -47,7 +47,7 @@ func TestEnvironmentsCreateOrUpdate(t *testing.T) {
 	}
 
 	for _, tc := range tests {
-		payload := fmt.Sprintf("projectId=%s", resultTeamID["project_id"])
+		payload := fmt.Sprintf("projectId=%s", result["project_id"])
 		if tc.environments != "" {
 			payload += fmt.Sprintf("&environments=%s", tc.environments)
 		}
@@ -71,7 +71,7 @@ func TestEnvironmentsDelete(t *testing.T) {
 	headers := make(map[string]string)
 	headers["Content-Type"] = "application/x-www-form-urlencoded"
 
-	resultEnvironmentID, err := environments.GetEnvironmentIDForUnitTesting()
+	result, err := environments.GetEnvironmentIDForUnitTesting()
 	if err != nil {
 		log.Err(err).Msgf("Fail to retrieve team id")
 		t.Fail()
@@ -79,6 +79,6 @@ func TestEnvironmentsDelete(t *testing.T) {
 	}
 
 	router := SetupRouter()
-	w, _ := performRequest(router, headers, "DELETE", fmt.Sprintf("/api/v1/cypress-parallel-api/environments/%s", resultEnvironmentID["environment_id"]), "")
+	w, _ := performRequest(router, headers, "DELETE", fmt.Sprintf("/api/v1/cypress-parallel-api/environments/%s", result["environment_id"]), "")
 	assert.Equal(200, w.Code)
 }
