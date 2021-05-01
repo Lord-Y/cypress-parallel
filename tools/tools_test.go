@@ -1,9 +1,12 @@
 package tools
 
 import (
+	"fmt"
 	"log"
+	"os"
 	"testing"
 
+	"github.com/icrowley/fake"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -145,5 +148,64 @@ func TestGetPagination(t *testing.T) {
 		sl, el := GetPagination(tc.page, tc.start, tc.end, tc.rangeLimit)
 		assert.Equal(sl, tc.actualStartLimit)
 		assert.Equal(el, tc.actualEndLimit)
+	}
+}
+
+func TestCheckIsFile(t *testing.T) {
+	assert := assert.New(t)
+
+	f, err := os.CreateTemp(os.TempDir(), fake.CharactersN(5))
+	if err != nil {
+		assert.Fail("Fail to create temp file")
+		return
+	}
+	defer os.Remove(f.Name())
+
+	z := CheckIsFile(f.Name())
+	assert.Nil(z)
+	fmt.Printf("filename %s\n", f.Name())
+
+	z = CheckIsFile(fmt.Sprintf("%s/%s", os.TempDir(), fake.CharactersN(10)))
+	assert.Error(z)
+
+	directory, err := os.MkdirTemp(os.TempDir(), fake.CharactersN(10))
+	if err != nil {
+		assert.Fail("Fail to create temp directory")
+		return
+	}
+	defer os.RemoveAll(directory)
+
+	z = CheckIsFile(directory)
+	assert.Error(z)
+}
+
+func TestRandomValueFromSlice(t *testing.T) {
+	assert := assert.New(t)
+
+	tests := []struct {
+		slice []string
+	}{
+		{
+			slice: []string{"a", "1", "", "v"},
+		},
+		{
+			slice: []string{"a", "1", "v"},
+		},
+	}
+
+	for i, tc := range tests {
+		z := RandomValueFromSlice(tc.slice)
+		if i == 0 {
+			switch len(z) {
+			case 0:
+				assert.Equal(0, len(z))
+			case 1:
+				assert.Equal(1, len(z))
+			default:
+				t.Fail()
+			}
+		} else {
+			assert.Equal(1, len(z))
+		}
 	}
 }

@@ -3,13 +3,14 @@ package tools
 
 import (
 	"bytes"
+	"fmt"
 	"log"
 	"math/rand"
 	"os"
 	"time"
 )
 
-// RandString function is explicit
+// RandString return random string with max int size
 func RandString(n int) string {
 	if n < 1 {
 		n = 1
@@ -37,7 +38,7 @@ func RandString(n int) string {
 	return string(b)
 }
 
-// RandStringInt function is explicit
+// RandStringInt return random string and int with max int size
 func RandStringInt(n int) string {
 	if n < 1 {
 		n = 1
@@ -97,4 +98,26 @@ func GetPagination(page int, start int, end int, rangeLimit int) (startLimit int
 	default:
 		return rangeLimit * (page - 1), rangeLimit
 	}
+}
+
+// CheckIsFile check if provided file exist
+func CheckIsFile(f string) (err error) {
+	var info os.FileInfo
+	if info, err = os.Stat(f); os.IsNotExist(err) {
+		return err
+	}
+	if !info.Mode().IsRegular() {
+		return fmt.Errorf("File %s is not a file", f)
+	}
+	return
+}
+
+// RandomValueFromSlice return a string slice
+func RandomValueFromSlice(s []string) string {
+	r := rand.New(rand.NewSource(time.Now().UnixNano()))
+	n := make([]string, len(s))
+	for i, v := range r.Perm(len(s)) {
+		n[i] = s[v]
+	}
+	return n[0]
 }
