@@ -86,6 +86,7 @@ func (p *annotations) create(id int) (err error) {
 	if err != nil && err != sql.ErrNoRows {
 		return err
 	}
+	defer stmt.Close()
 	err = stmt.QueryRow(
 		php2go.Addslashes(p.annotation[id].Key),
 		php2go.Addslashes(p.annotation[id].Value),
@@ -94,7 +95,6 @@ func (p *annotations) create(id int) (err error) {
 	if err != nil && err != sql.ErrNoRows {
 		return err
 	}
-	defer stmt.Close()
 	return nil
 }
 
@@ -114,6 +114,7 @@ func (p *annotations) update(id int) (err error) {
 	if err != nil && err != sql.ErrNoRows {
 		return err
 	}
+	defer stmt.Close()
 	err = stmt.QueryRow(
 		php2go.Addslashes(p.annotation[id].Key),
 		php2go.Addslashes(p.annotation[id].Value),
@@ -123,7 +124,6 @@ func (p *annotations) update(id int) (err error) {
 	if err != nil && err != sql.ErrNoRows {
 		return err
 	}
-	defer stmt.Close()
 	return nil
 }
 
@@ -204,13 +204,13 @@ func (p *deleteAnnotation) delete() (err error) {
 	if err != nil && err != sql.ErrNoRows {
 		return err
 	}
+	defer stmt.Close()
 	err = stmt.QueryRow(
 		p.AnnotationID,
 	).Scan()
 	if err != nil && err != sql.ErrNoRows {
 		return err
 	}
-	defer stmt.Close()
 	return nil
 }
 
