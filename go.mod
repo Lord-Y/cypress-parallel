@@ -12,6 +12,7 @@ require (
 	github.com/docker/go-units v0.4.0 // indirect
 	github.com/gin-contrib/logger v0.0.3
 	github.com/gin-gonic/gin v1.7.1
+	github.com/go-git/go-git/v5 v5.3.0
 	github.com/go-redis/redis/v8 v8.8.2
 	github.com/golang-migrate/migrate v3.5.4+incompatible
 	github.com/icrowley/fake v0.0.0-20180203215853-4178557ae428
