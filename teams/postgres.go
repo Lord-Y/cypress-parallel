@@ -26,13 +26,13 @@ func (p *teams) create() (z int64, err error) {
 	if err != nil && err != sql.ErrNoRows {
 		return z, err
 	}
+	defer stmt.Close()
 	err = stmt.QueryRow(
 		php2go.Addslashes(p.Name),
 	).Scan(&z)
 	if err != nil && err != sql.ErrNoRows {
 		return z, err
 	}
-	defer stmt.Close()
 	return z, nil
 }
 
@@ -169,6 +169,7 @@ func (p *updateTeam) update() (err error) {
 	if err != nil && err != sql.ErrNoRows {
 		return err
 	}
+	defer stmt.Close()
 	err = stmt.QueryRow(
 		php2go.Addslashes(p.Name),
 		p.TeamID,
@@ -176,7 +177,6 @@ func (p *updateTeam) update() (err error) {
 	if err != nil && err != sql.ErrNoRows {
 		return err
 	}
-	defer stmt.Close()
 	return nil
 }
 
@@ -196,12 +196,12 @@ func (p *deleteTeam) delete() (err error) {
 	if err != nil && err != sql.ErrNoRows {
 		return err
 	}
+	defer stmt.Close()
 	err = stmt.QueryRow(
 		p.TeamID,
 	).Scan()
 	if err != nil && err != sql.ErrNoRows {
 		return err
 	}
-	defer stmt.Close()
 	return nil
 }
