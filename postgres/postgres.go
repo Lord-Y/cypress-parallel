@@ -26,6 +26,7 @@ func InitDB() {
 		"postgres",
 		commons.BuildDSN(),
 	)
+	defer db.Close()
 	if err != nil {
 		log.Fatal().Err(err).Msgf("Failed to connect to DB")
 		return
@@ -51,7 +52,6 @@ func InitDB() {
 		log.Fatal().Err(err).Msgf("An error occurred while syncing the database with error msg: %v", err)
 		return
 	}
-	defer db.Close()
 	log.Info().Msg("Database migrated successfully")
 }
 
@@ -61,11 +61,11 @@ func Ping() (b bool) {
 		"postgres",
 		commons.BuildDSN(),
 	)
+	defer db.Close()
 	if err != nil {
 		log.Error().Err(err).Msg("Error occured while connecting to DB")
 		return
 	}
-	defer db.Close()
 	err = db.Ping()
 	if err != nil {
 		log.Error().Err(err).Msg("Error occured while pinging DB")
