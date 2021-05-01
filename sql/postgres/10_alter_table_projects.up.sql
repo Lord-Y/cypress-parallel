@@ -1,0 +1,1 @@
+ALTER TABLE projects ADD cpyress_docker_version VARCHAR(10) DEFAULT '7.2.0';

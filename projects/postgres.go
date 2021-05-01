@@ -22,20 +22,21 @@ func (p *projects) create() (z int64, err error) {
 	}
 	defer db.Close()
 
-	stmt, err := db.Prepare("INSERT INTO projects(project_name, team_id, repository, branch) VALUES($1, $2, $3, $4) RETURNING project_id")
+	stmt, err := db.Prepare("INSERT INTO projects(project_name, team_id, repository, branch, cypress_docker_version) VALUES($1, $2, $3, $4, $5) RETURNING project_id")
 	if err != nil && err != sql.ErrNoRows {
 		return z, err
 	}
+	defer stmt.Close()
 	err = stmt.QueryRow(
 		php2go.Addslashes(p.Name),
 		p.TeamID,
 		php2go.Addslashes(p.Repository),
 		php2go.Addslashes(p.Branch),
+		php2go.Addslashes(p.CypressDockerVersion),
 	).Scan(&z)
 	if err != nil && err != sql.ErrNoRows {
 		return z, err
 	}
-	defer stmt.Close()
 	return z, nil
 }
 
@@ -167,10 +168,11 @@ func (p *updateProjects) update() (err error) {
 	}
 	defer db.Close()
 
-	stmt, err := db.Prepare("UPDATE projects SET project_name = $1, team_id = $2, repository = $3, branch = $4, specs = $5, scheduling = $6, scheduling_enabled = $7, max_pods = $8 WHERE project_id = $9")
+	stmt, err := db.Prepare("UPDATE projects SET project_name = $1, team_id = $2, repository = $3, branch = $4, specs = $5, scheduling = $6, scheduling_enabled = $7, max_pods = $8, cypress_docker_version = $9 WHERE project_id = $10")
 	if err != nil && err != sql.ErrNoRows {
 		return err
 	}
+	defer stmt.Close()
 	err = stmt.QueryRow(
 		php2go.Addslashes(p.Name),
 		p.TeamID,
@@ -180,12 +182,12 @@ func (p *updateProjects) update() (err error) {
 		php2go.Addslashes(p.Scheduling),
 		p.SchedulingEnabled,
 		p.MaxPods,
+		php2go.Addslashes(p.CypressDockerVersion),
 		p.ProjectID,
 	).Scan()
 	if err != nil && err != sql.ErrNoRows {
 		return err
 	}
-	defer stmt.Close()
 	return nil
 }
 
@@ -205,12 +207,12 @@ func (p *deleteProject) delete() (err error) {
 	if err != nil && err != sql.ErrNoRows {
 		return err
 	}
+	defer stmt.Close()
 	err = stmt.QueryRow(
 		p.ProjectID,
 	).Scan()
 	if err != nil && err != sql.ErrNoRows {
 		return err
 	}
-	defer stmt.Close()
 	return nil
 }
