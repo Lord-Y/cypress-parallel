@@ -112,7 +112,7 @@ func GetProjectIDForUnitTesting() (z map[string]string, err error) {
 	}
 	defer db.Close()
 
-	stmt, err := db.Prepare("SELECT project_id,team_id FROM projects LIMIT 1")
+	stmt, err := db.Prepare("SELECT project_id,team_id,project_name FROM projects LIMIT 1")
 	if err != nil && err != sql.ErrNoRows {
 		return z, err
 	}
