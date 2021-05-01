@@ -26,11 +26,11 @@ func InitDB() {
 		"postgres",
 		commons.BuildDSN(),
 	)
-	defer db.Close()
 	if err != nil {
 		log.Fatal().Err(err).Msgf("Failed to connect to DB")
 		return
 	}
+	defer db.Close()
 	if err := db.Ping(); err != nil {
 		log.Fatal().Err(err).Msgf("could not ping DB: %v", err)
 	}
