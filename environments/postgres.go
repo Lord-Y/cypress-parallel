@@ -86,6 +86,7 @@ func (p *environments) create(id int) (err error) {
 	if err != nil && err != sql.ErrNoRows {
 		return err
 	}
+	defer stmt.Close()
 	err = stmt.QueryRow(
 		php2go.Addslashes(p.environment[id].Key),
 		php2go.Addslashes(p.environment[id].Value),
@@ -94,7 +95,6 @@ func (p *environments) create(id int) (err error) {
 	if err != nil && err != sql.ErrNoRows {
 		return err
 	}
-	defer stmt.Close()
 	return nil
 }
 
@@ -114,6 +114,7 @@ func (p *environments) update(id int) (err error) {
 	if err != nil && err != sql.ErrNoRows {
 		return err
 	}
+	defer stmt.Close()
 	err = stmt.QueryRow(
 		php2go.Addslashes(p.environment[id].Key),
 		php2go.Addslashes(p.environment[id].Value),
@@ -123,7 +124,6 @@ func (p *environments) update(id int) (err error) {
 	if err != nil && err != sql.ErrNoRows {
 		return err
 	}
-	defer stmt.Close()
 	return nil
 }
 
@@ -204,13 +204,13 @@ func (p *deleteEnvironment) delete() (err error) {
 	if err != nil && err != sql.ErrNoRows {
 		return err
 	}
+	defer stmt.Close()
 	err = stmt.QueryRow(
 		p.EnvironmentID,
 	).Scan()
 	if err != nil && err != sql.ErrNoRows {
 		return err
 	}
-	defer stmt.Close()
 	return nil
 }
 
