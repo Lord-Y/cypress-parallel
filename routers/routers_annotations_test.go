@@ -16,7 +16,7 @@ func TestAnnotationsCreateOrUpdate(t *testing.T) {
 	headers["Content-Type"] = "application/x-www-form-urlencoded"
 
 	TestProjectsCreate(t)
-	resultTeamID, err := projects.GetProjectIDForUnitTesting()
+	result, err := projects.GetProjectIDForUnitTesting()
 	if err != nil {
 		log.Err(err).Msgf("Fail to retrieve team id")
 		t.Fail()
@@ -47,7 +47,7 @@ func TestAnnotationsCreateOrUpdate(t *testing.T) {
 	}
 
 	for _, tc := range tests {
-		payload := fmt.Sprintf("projectId=%s", resultTeamID["project_id"])
+		payload := fmt.Sprintf("projectId=%s", result["project_id"])
 		if tc.annotations != "" {
 			payload += fmt.Sprintf("&annotations=%s", tc.annotations)
 		}
@@ -71,7 +71,7 @@ func TestAnnotationsDelete(t *testing.T) {
 	headers := make(map[string]string)
 	headers["Content-Type"] = "application/x-www-form-urlencoded"
 
-	resultAnnotationID, err := annotations.GetAnnotationIDForUnitTesting()
+	result, err := annotations.GetAnnotationIDForUnitTesting()
 	if err != nil {
 		log.Err(err).Msgf("Fail to retrieve team id")
 		t.Fail()
@@ -79,6 +79,6 @@ func TestAnnotationsDelete(t *testing.T) {
 	}
 
 	router := SetupRouter()
-	w, _ := performRequest(router, headers, "DELETE", fmt.Sprintf("/api/v1/cypress-parallel-api/annotations/%s", resultAnnotationID["annotation_id"]), "")
+	w, _ := performRequest(router, headers, "DELETE", fmt.Sprintf("/api/v1/cypress-parallel-api/annotations/%s", result["annotation_id"]), "")
 	assert.Equal(200, w.Code)
 }
