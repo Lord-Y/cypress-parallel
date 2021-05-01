@@ -17,14 +17,14 @@ func TestProjectsCreate(t *testing.T) {
 	headers["Content-Type"] = "application/x-www-form-urlencoded"
 
 	TestTeamsCreate(t)
-	resultTeamID, err := teams.GetTeamIDForUnitTesting()
+	result, err := teams.GetTeamIDForUnitTesting()
 	if err != nil {
 		log.Err(err).Msgf("Fail to retrieve team id")
 		t.Fail()
 		return
 	}
 	payload := fmt.Sprintf("name=%s", fake.CharactersN(10))
-	payload += fmt.Sprintf("&teamId=%s", resultTeamID["team_id"])
+	payload += fmt.Sprintf("&teamId=%s", result["team_id"])
 	payload += "&repository=https://github.com/cypress-io/cypress-example-kitchensink.git"
 	payload += "&branch=master"
 	payload += "&specs=cypress/integration/examples/actions.spec.js"
@@ -53,7 +53,7 @@ func TestProjectsCreateMulti(t *testing.T) {
 	headers := make(map[string]string)
 	headers["Content-Type"] = "application/x-www-form-urlencoded"
 
-	resultTeamID, err := teams.GetTeamIDForUnitTesting()
+	result, err := teams.GetTeamIDForUnitTesting()
 	if err != nil {
 		log.Err(err).Msgf("Fail to retrieve team id")
 		t.Fail()
@@ -62,7 +62,7 @@ func TestProjectsCreateMulti(t *testing.T) {
 	router := SetupRouter()
 	for i := 1; i < 5; i++ {
 		payload := fmt.Sprintf("name=%s", fake.CharactersN(10))
-		payload += fmt.Sprintf("&teamId=%s", resultTeamID["team_id"])
+		payload += fmt.Sprintf("&teamId=%s", result["team_id"])
 		payload += "&repository=https://github.com/cypress-io/cypress-example-kitchensink.git"
 		payload += "&branch=master"
 		payload += "&specs=cypress/integration/examples/actions.spec.js"
