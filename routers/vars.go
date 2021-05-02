@@ -14,6 +14,7 @@ var (
 	}
 
 	// https://github.com/cypress-io/cypress-docker-images/tree/master/included
+	// cypress docker images https://hub.docker.com/r/cypress/included
 	cypressVersions = []string{
 		"7.2.0",
 		"7.1.0",

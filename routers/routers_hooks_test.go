@@ -28,41 +28,40 @@ func TestHooksPlainCreate(t *testing.T) {
 		branch     string
 		statusCode int
 	}{
-		// {
-		// 	branch:     "",
-		// 	statusCode: 201,
-		// },
-		// {
-		// 	branch:     "master",
-		// 	statusCode: 201,
-		// },
+		{
+			branch:     "",
+			statusCode: 201,
+		},
+		{
+			branch:     "master",
+			statusCode: 201,
+		},
 		{
 			branch:     "test",
 			statusCode: 400,
 		},
 	}
 
-	payload := fmt.Sprintf("project_name=%s", result["project_name"])
 	for _, tc := range tests {
+		payload := fmt.Sprintf("project_name=%s", result["project_name"])
 		if tc.branch != "" {
 			payload += fmt.Sprintf("&branch=%s", tc.branch)
-			payload += fmt.Sprintf("&spec=%s", tools.RandomValueFromSlice(specs))
+			payload += fmt.Sprintf("&specs=%s", tools.RandomValueFromSlice(specs))
 		}
-		log.Info().Msgf("payload %s", payload)
 		w, _ := performRequest(router, headers, "POST", "/api/v1/cypress-parallel-api/hooks/launch/plain", payload)
 		assert.Equal(tc.statusCode, w.Code)
 	}
 
-	// payload = fmt.Sprintf("project_name=%s", result["project_name"])
-	// payload += fmt.Sprintf("&branch=master")
-	// payload += fmt.Sprintf("&spec=cypress/integration/exampless")
-	// w, _ := performRequest(router, headers, "POST", "/api/v1/cypress-parallel-api/hooks/launch/plain", payload)
-	// assert.Equal(400, w.Code)
+	payload := fmt.Sprintf("project_name=%s", result["project_name"])
+	payload += fmt.Sprintf("&branch=master")
+	payload += fmt.Sprintf("&specs=cypress/integration/exampless")
+	w, _ := performRequest(router, headers, "POST", "/api/v1/cypress-parallel-api/hooks/launch/plain", payload)
+	assert.Equal(400, w.Code)
 
-	// payload = fmt.Sprintf("project_name=%s", result["project_name"])
-	// payload += fmt.Sprintf("&branch=master")
-	// payload += fmt.Sprintf("&spec=cypress/integration/examples")
-	// payload += fmt.Sprintf("&cypress_docker_version=%s", tools.RandomValueFromSlice(cypressVersions))
-	// w, _ = performRequest(router, headers, "POST", "/api/v1/cypress-parallel-api/hooks/launch/plain", payload)
-	// assert.Equal(201, w.Code)
+	payload = fmt.Sprintf("project_name=%s", result["project_name"])
+	payload += fmt.Sprintf("&branch=master")
+	payload += fmt.Sprintf("&specs=cypress/integration/examples")
+	payload += fmt.Sprintf("&cypress_docker_version=%s", tools.RandomValueFromSlice(cypressVersions))
+	w, _ = performRequest(router, headers, "POST", "/api/v1/cypress-parallel-api/hooks/launch/plain", payload)
+	assert.Equal(201, w.Code)
 }

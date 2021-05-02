@@ -22,7 +22,7 @@ type plain struct {
 	Group                string `form:"group" json:"group"`
 	Browser              string `form:"browser" json:"browser"`
 	MaxPods              string `form:"max_pods" json:"max_pods"`
-	CypressDockerVersion string `form:"cypress_docker_version,default=7.2.0" json:"cypress_docker_version"`
+	CypressDockerVersion string `form:"cypress_docker_version,default=7.2.0,max=20" json:"cypress_docker_version,max=20"`
 	plain                bool
 }
 

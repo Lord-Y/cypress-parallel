@@ -83,7 +83,7 @@ func (p *projects) plainClone(branch string, specs string) (z []string, statusCo
 		}
 		z = append(z, targetSpecs)
 	} else {
-		err := filepath.Walk(directory, func(file string, info os.FileInfo, err error) error {
+		err := filepath.Walk(fmt.Sprintf("%s/%s", directory, targetSpecs), func(file string, info os.FileInfo, err error) error {
 			if err != nil {
 				return err
 			}
