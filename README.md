@@ -4,9 +4,9 @@
 
 ## Database
 
-Our api is developped with PostgresSQL database so the environment variable CYPRESS_PARALLEL_DB_URI must be set:
+Our api is developped with PostgresSQL database so the environment variable CYPRESS_PARALLEL_API_DB_URI must be set:
 ```bash
-export CYPRESS_PARALLEL_DB_URI="postgres://USERNAME:PASSWORD@HOST:PORT/DB_NAME?sslmode=disable"
+export CYPRESS_PARALLEL_API_DB_URI="postgres://USERNAME:PASSWORD@HOST:PORT/DB_NAME?sslmode=disable"
 ```
 
 ## Content types

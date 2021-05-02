@@ -13,8 +13,8 @@ var (
 
 // Test example found here: https://github.com/golang/go/issues/21000
 func TestMain(t *testing.T) {
-	os.Setenv("CYPRESS_PARALLEL_DB_URI", pg_uri)
-	defer os.Unsetenv("CYPRESS_PARALLEL_DB_URI")
+	os.Setenv("CYPRESS_PARALLEL_API_DB_URI", pg_uri)
+	defer os.Unsetenv("CYPRESS_PARALLEL_API_DB_URI")
 
 	proc, err := os.FindProcess(os.Getpid())
 	if err != nil {
@@ -35,8 +35,8 @@ func TestMain(t *testing.T) {
 }
 
 func TestMain_set_port(t *testing.T) {
-	os.Setenv("CYPRESS_PARALLEL_DB_URI", pg_uri)
-	defer os.Unsetenv("CYPRESS_PARALLEL_DB_URI")
+	os.Setenv("CYPRESS_PARALLEL_API_DB_URI", pg_uri)
+	defer os.Unsetenv("CYPRESS_PARALLEL_API_DB_URI")
 	os.Setenv("CYPRESS_PARALLEL_API_PORT", "10000")
 	defer os.Unsetenv("CYPRESS_PARALLEL_API_PORT")
 	proc, err := os.FindProcess(os.Getpid())
