@@ -98,3 +98,121 @@ func (p *execution) create() (err error) {
 	}
 	return nil
 }
+
+// getProjectAnnotations collect requirements to start the unit testing
+func (p *projects) getProjectAnnotations() (z []map[string]interface{}, err error) {
+	db, err := sql.Open(
+		"postgres",
+		commons.BuildDSN(),
+	)
+	if err != nil {
+		return
+	}
+	defer db.Close()
+
+	stmt, err := db.Prepare("SELECT * FROM annotations WHERE project_id = $1 LIMIT 1")
+	if err != nil && err != sql.ErrNoRows {
+		return
+	}
+	defer stmt.Close()
+
+	rows, err := stmt.Query(
+		p.Project_id,
+	)
+	if err != nil && err != sql.ErrNoRows {
+		return
+	}
+
+	columns, err := rows.Columns()
+	if err != nil {
+		return
+	}
+
+	values := make([]sql.RawBytes, len(columns))
+	scanArgs := make([]interface{}, len(values))
+	for i := range values {
+		scanArgs[i] = &values[i]
+	}
+
+	m := make([]map[string]interface{}, 0)
+	for rows.Next() {
+		err = rows.Scan(scanArgs...)
+		if err != nil {
+			return
+		}
+		var value string
+		sub := make(map[string]interface{})
+		for i, col := range values {
+			if col == nil {
+				value = "NULL"
+			} else {
+				value = php2go.Stripslashes(string(col))
+			}
+			sub[columns[i]] = value
+		}
+		m = append(m, sub)
+	}
+	if err = rows.Err(); err != nil {
+		return
+	}
+	return m, nil
+}
+
+// getProjectEnvironments collect requirements to start the unit testing
+func (p *projects) getProjectEnvironments() (z []map[string]interface{}, err error) {
+	db, err := sql.Open(
+		"postgres",
+		commons.BuildDSN(),
+	)
+	if err != nil {
+		return
+	}
+	defer db.Close()
+
+	stmt, err := db.Prepare("SELECT * FROM environments WHERE project_id = $1 LIMIT 1")
+	if err != nil && err != sql.ErrNoRows {
+		return
+	}
+	defer stmt.Close()
+
+	rows, err := stmt.Query(
+		p.Project_id,
+	)
+	if err != nil && err != sql.ErrNoRows {
+		return
+	}
+
+	columns, err := rows.Columns()
+	if err != nil {
+		return
+	}
+
+	values := make([]sql.RawBytes, len(columns))
+	scanArgs := make([]interface{}, len(values))
+	for i := range values {
+		scanArgs[i] = &values[i]
+	}
+
+	m := make([]map[string]interface{}, 0)
+	for rows.Next() {
+		err = rows.Scan(scanArgs...)
+		if err != nil {
+			return
+		}
+		var value string
+		sub := make(map[string]interface{})
+		for i, col := range values {
+			if col == nil {
+				value = "NULL"
+			} else {
+				value = php2go.Stripslashes(string(col))
+			}
+			sub[columns[i]] = value
+		}
+		m = append(m, sub)
+	}
+	if err = rows.Err(); err != nil {
+		return
+	}
+	return m, nil
+}

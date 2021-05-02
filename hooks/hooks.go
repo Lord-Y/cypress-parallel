@@ -8,6 +8,9 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/Lord-Y/cypress-parallel-api/commons"
+	"github.com/Lord-Y/cypress-parallel-api/kubernetes"
+	"github.com/Lord-Y/cypress-parallel-api/models"
 	"github.com/gin-gonic/gin"
 	"github.com/mitchellh/mapstructure"
 	"github.com/rs/zerolog/log"
@@ -56,6 +59,12 @@ type execution struct {
 	result          string
 }
 
+// environmentVar k/v to set inside of the container
+type environmentVar struct {
+	Key   string // Variable key
+	Value string // Variable value
+}
+
 // Plain handle requirements to start unit testing
 func Plain(c *gin.Context) {
 	var (
@@ -63,6 +72,7 @@ func Plain(c *gin.Context) {
 		pj  projects
 		exs executions
 		ex  execution
+		pod models.Pods
 	)
 	if err := c.ShouldBind(&p); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -88,6 +98,23 @@ func Plain(c *gin.Context) {
 		return
 	}
 
+	clientset, err := kubernetes.Client()
+	if err != nil {
+		log.Error().Err(err).Msg("Error occured while initializing kubernetes client")
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
+		return
+	}
+	err = kubernetes.GetNamespace(clientset, commons.GetKubernetesJobsNamespace())
+	if err != nil {
+		log.Warn().Err(err).Msg("Error occured while getting kubernetes namespace")
+		err = kubernetes.CreateNamespace(clientset)
+		if err != nil {
+			log.Error().Err(err).Msg("Error occured while creating kubernetes namespace")
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
+			return
+		}
+	}
+
 	for _, spec := range specs {
 		uniqID := md5.Sum([]byte(fmt.Sprintf("%s%s%s", pj.Repository, spec, time.Now())))
 		runidID := fmt.Sprintf("%x", uniqID)
@@ -111,6 +138,58 @@ func Plain(c *gin.Context) {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
 			return
 		}
+
+		annotations, err := pj.getProjectAnnotations()
+		if err != nil {
+			log.Error().Err(err).Msg("Error occured while performing db query")
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
+			return
+		}
+		if len(annotations) > 0 {
+			annotation := make(map[string]string)
+			for _, k := range annotations {
+				annotation[fmt.Sprintf("%s", k["key"])] = fmt.Sprintf("%s", k["value"])
+			}
+			pod.Annotations = annotation
+		}
+
+		envVars, err := pj.getProjectEnvironments()
+		if err != nil {
+			log.Error().Err(err).Msg("Error occured while performing db query")
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
+			return
+		}
+		if len(envVars) > 0 {
+			var (
+				envs   []models.EnvironmentVar
+				envVar models.EnvironmentVar
+			)
+			for _, k := range envVars {
+				envVar.Key = fmt.Sprintf("%s", k["key"])
+				envVar.Value = fmt.Sprintf("%s", k["value"])
+				envs = append(envs, envVar)
+			}
+			pod.Container.EnvironmentVars = envs
+		}
+		pod.Namespace = commons.GetKubernetesJobsNamespace()
+		pod.GenerateName = "cypress-parallel-jobs-"
+		pod.Labels = map[string]string{
+			"worker": "kubernetes",
+			"app":    "cypress-parallel-jobs",
+		}
+		pod.Container.Command = []string{
+			"ls",
+		}
+		pod.Container.Name = "cypress-parallel-jobs"
+		pod.Container.Image = "alpine:latest"
+
+		podName, err := kubernetes.CreatePod(clientset, pod)
+		if err != nil {
+			log.Error().Err(err).Msg("Error occured while creating pod")
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
+			return
+		}
+		log.Debug().Msgf("Pod name %s created", podName)
 	}
 	c.JSON(http.StatusCreated, "OK")
 }

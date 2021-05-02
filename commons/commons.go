@@ -20,3 +20,23 @@ func GetRedisURI() string {
 func GetRangeLimit() int {
 	return 25
 }
+
+// GetKubernetesMode permit to retrieve OS env variable
+func GetKubernetesMode() string {
+	return strings.TrimSpace(os.Getenv("CYPRESS_PARALLEL_API_K8S_CLIENT_OUTSIDE"))
+}
+
+// GetKubernetesKubeConfig permit to retrieve OS env variable
+func GetKubernetesKubeConfig() string {
+	return strings.TrimSpace(os.Getenv("CYPRESS_PARALLEL_API_K8S_KUBE_CONFIG"))
+}
+
+// GetKubernetesJobsNamespace permit to retrieve OS env variable
+func GetKubernetesJobsNamespace() string {
+	jobsNamespace := strings.TrimSpace(os.Getenv("CYPRESS_PARALLEL_API_JOBS_NAMESPACE"))
+	if jobsNamespace == "" {
+		return "cypress-parallel-jobs"
+	} else {
+		return jobsNamespace
+	}
+}
