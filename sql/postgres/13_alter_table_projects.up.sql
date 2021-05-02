@@ -1,0 +1,1 @@
+ALTER TABLE projects ALTER COLUMN cypress_docker_version TYPE VARCHAR(20);
