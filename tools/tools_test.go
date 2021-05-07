@@ -1,3 +1,4 @@
+// Package tools assemble useful functions used by other packages
 package tools
 
 import (
