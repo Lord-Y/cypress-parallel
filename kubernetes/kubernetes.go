@@ -31,10 +31,12 @@ func Client() (c *kubernetes.Clientset, err error) {
 	}
 
 	var kconfig string
-	if home := homedir.HomeDir(); home != "" {
-		kconfig = filepath.Join(home, ".kube", "config")
-	} else {
+	if commons.GetKubernetesKubeConfig() != "" {
 		kconfig = commons.GetKubernetesKubeConfig()
+	} else {
+		if home := homedir.HomeDir(); home != "" {
+			kconfig = filepath.Join(home, ".kube", "config")
+		}
 	}
 
 	kubeconfig := &kconfig
@@ -52,19 +54,81 @@ func Client() (c *kubernetes.Clientset, err error) {
 
 // GetNamespace check if namespace defined for jobs exist or not
 func GetNamespace(clientset *kubernetes.Clientset, namespace string) (err error) {
-	_, err = clientset.CoreV1().Namespaces().Get(context.TODO(), commons.GetKubernetesJobsNamespace(), metav1.GetOptions{})
-	return err
+	_, err = clientset.
+		CoreV1().
+		Namespaces().
+		Get(
+			context.TODO(),
+			namespace,
+			metav1.GetOptions{},
+		)
+	return
 }
 
 // CreateNamespace permit to create namespace
-func CreateNamespace(clientset *kubernetes.Clientset) (err error) {
+func CreateNamespace(clientset *kubernetes.Clientset, namespace string) (err error) {
 	ns := &v1.Namespace{
 		ObjectMeta: metav1.ObjectMeta{
-			Name: commons.GetKubernetesJobsNamespace(),
+			Name: namespace,
 		},
 	}
-	_, err = clientset.CoreV1().Namespaces().Create(context.TODO(), ns, metav1.CreateOptions{})
+	_, err = clientset.
+		CoreV1().
+		Namespaces().
+		Create(
+			context.TODO(),
+			ns,
+			metav1.CreateOptions{},
+		)
 	return
+}
+
+// DeleteNamespace permit to delete created namespace
+func DeleteNamespace(clientset *kubernetes.Clientset, namespace string) (err error) {
+	err = clientset.
+		CoreV1().
+		Namespaces().
+		Delete(
+			context.TODO(),
+			namespace,
+			metav1.DeleteOptions{},
+		)
+	return
+}
+
+// GetServiceAccountName permit to get service account in specified namespace
+func GetServiceAccountName(clientset *kubernetes.Clientset, namespace string, serviceAccount string) (err error) {
+	_, err = clientset.
+		CoreV1().
+		ServiceAccounts(namespace).
+		Get(
+			context.TODO(),
+			serviceAccount,
+			metav1.GetOptions{},
+		)
+	return
+}
+
+// CreateServiceAccountName permit to create service account that will be used while creating the pod
+func CreateServiceAccountName(clientset *kubernetes.Clientset, namespace string, serviceAccount string) (serviceAccountName string, err error) {
+	sa := &v1.ServiceAccount{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      serviceAccount,
+			Namespace: namespace,
+		},
+	}
+	result, err := clientset.
+		CoreV1().
+		ServiceAccounts(namespace).
+		Create(
+			context.TODO(),
+			sa,
+			metav1.CreateOptions{},
+		)
+	if err != nil {
+		return "", err
+	}
+	return result.Name, nil
 }
 
 // CreatePod permit to create pod inside of specified namespace
@@ -101,9 +165,17 @@ func CreatePod(clientset *kubernetes.Clientset, m models.Pods) (podName string, 
 			},
 			RestartPolicy:                 v1.RestartPolicyNever,
 			TerminationGracePeriodSeconds: &terminationGracePeriodSeconds,
+			ServiceAccountName:            m.Namespace,
 		},
 	}
-	result, err := clientset.CoreV1().Pods(m.Namespace).Create(context.TODO(), pod, metav1.CreateOptions{})
+	result, err := clientset.
+		CoreV1().
+		Pods(m.Namespace).
+		Create(
+			context.TODO(),
+			pod,
+			metav1.CreateOptions{},
+		)
 	if err != nil {
 		return "", err
 	}
