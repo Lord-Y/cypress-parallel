@@ -111,6 +111,7 @@ func Plain(c *gin.Context) {
 	gitc.Repository = pj.Repository
 
 	gitdir, statusCode, err := gitc.Clone()
+	defer os.RemoveAll(gitdir)
 	if err != nil {
 		msg := fmt.Sprintf("Error occured while cloning git repository, error: %s", err.Error())
 		if statusCode == 400 {
