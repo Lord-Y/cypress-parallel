@@ -107,9 +107,19 @@ func Plain(c *gin.Context) {
 	err = kubernetes.GetNamespace(clientset, commons.GetKubernetesJobsNamespace())
 	if err != nil {
 		log.Warn().Err(err).Msg("Error occured while getting kubernetes namespace")
-		err = kubernetes.CreateNamespace(clientset)
+		err = kubernetes.CreateNamespace(clientset, commons.GetKubernetesJobsNamespace())
 		if err != nil {
 			log.Error().Err(err).Msg("Error occured while creating kubernetes namespace")
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
+			return
+		}
+	}
+	err = kubernetes.GetServiceAccountName(clientset, commons.GetKubernetesJobsNamespace(), commons.GetKubernetesJobsNamespace())
+	if err != nil {
+		log.Warn().Err(err).Msgf("Error occured while getting kubernetes service account %s", commons.GetKubernetesJobsNamespace())
+		_, err = kubernetes.CreateServiceAccountName(clientset, commons.GetKubernetesJobsNamespace(), commons.GetKubernetesJobsNamespace())
+		if err != nil {
+			log.Error().Err(err).Msgf("Error occured while creating kubernetes service account %s", commons.GetKubernetesJobsNamespace())
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
 			return
 		}
