@@ -164,7 +164,6 @@ func TestCheckIsFile(t *testing.T) {
 
 	z := CheckIsFile(f.Name())
 	assert.Nil(z)
-	fmt.Printf("filename %s\n", f.Name())
 
 	z = CheckIsFile(fmt.Sprintf("%s/%s", os.TempDir(), fake.CharactersN(10)))
 	assert.Error(z)
