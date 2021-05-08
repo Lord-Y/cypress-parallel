@@ -5,12 +5,17 @@ import (
 	"crypto/md5"
 	"fmt"
 	"net/http"
+	"os"
+	"path/filepath"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/Lord-Y/cypress-parallel-api/commons"
+	"github.com/Lord-Y/cypress-parallel-api/git"
 	"github.com/Lord-Y/cypress-parallel-api/kubernetes"
 	"github.com/Lord-Y/cypress-parallel-api/models"
+	"github.com/Lord-Y/cypress-parallel-api/tools"
 	"github.com/gin-gonic/gin"
 	"github.com/mitchellh/mapstructure"
 	"github.com/rs/zerolog/log"
@@ -68,11 +73,14 @@ type environmentVar struct {
 // Plain handle requirements to start unit testing
 func Plain(c *gin.Context) {
 	var (
-		p   plain
-		pj  projects
-		exs executions
-		ex  execution
-		pod models.Pods
+		p           plain
+		pj          projects
+		exs         executions
+		ex          execution
+		pod         models.Pods
+		gitc        git.Repository
+		targetSpecs string
+		specs       []string
 	)
 	if err := c.ShouldBind(&p); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -87,15 +95,60 @@ func Plain(c *gin.Context) {
 	}
 	mapstructure.Decode(result, &pj)
 
-	specs, statusCode, err := pj.plainClone(p.Branch, p.Specs)
+	if p.Branch != "" {
+		if p.Branch == "master" {
+			gitc.Branch = ""
+		} else {
+			gitc.Branch = p.Branch
+		}
+	} else {
+		if pj.Branch == "master" {
+			gitc.Branch = ""
+		} else {
+			gitc.Branch = pj.Branch
+		}
+	}
+	gitc.Repository = pj.Repository
+
+	gitdir, statusCode, err := gitc.Clone()
 	if err != nil {
-		msg := fmt.Sprintf("Error occured while retrieving specs, error: %s", err.Error())
+		msg := fmt.Sprintf("Error occured while cloning git repository, error: %s", err.Error())
 		if statusCode == 400 {
 			c.JSON(http.StatusBadRequest, gin.H{"error": msg})
 		} else {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		}
-		return
+	}
+
+	if p.Specs != "" {
+		targetSpecs = p.Specs
+	} else {
+		targetSpecs = pj.Specs
+	}
+
+	if strings.HasSuffix(targetSpecs, ".spec.js") || strings.HasSuffix(targetSpecs, ".ts") {
+		err := tools.CheckIsFile(fmt.Sprintf("%s/%s", gitdir, targetSpecs))
+		if err != nil {
+			msg := fmt.Sprintf("Error occured while retrieving specs, error: %s", err.Error())
+			c.JSON(http.StatusBadRequest, gin.H{"error": msg})
+			return
+		}
+		specs = append(specs, targetSpecs)
+	} else {
+		err := filepath.Walk(fmt.Sprintf("%s/%s", gitdir, targetSpecs), func(file string, info os.FileInfo, err error) error {
+			if err != nil {
+				return err
+			}
+			if info.Mode().IsRegular() && (strings.HasSuffix(file, ".spec.js") || strings.HasSuffix(file, ".ts")) {
+				specs = append(specs, strings.ReplaceAll(file, fmt.Sprintf("%s/", gitdir), ""))
+			}
+			return nil
+		})
+		if err != nil {
+			msg := fmt.Sprintf("Error occured while retrieving specs, error: %s", err.Error())
+			c.JSON(http.StatusBadRequest, gin.H{"error": msg})
+			return
+		}
 	}
 
 	clientset, err := kubernetes.Client()
