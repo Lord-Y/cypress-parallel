@@ -181,3 +181,16 @@ func CreatePod(clientset *kubernetes.Clientset, m models.Pods) (podName string, 
 	}
 	return result.Name, nil
 }
+
+// DeletePod permit to delete pod inside of specified namespace
+func DeletePod(clientset *kubernetes.Clientset, namespace string, podName string) (err error) {
+	err = clientset.
+		CoreV1().
+		Pods(namespace).
+		Delete(
+			context.TODO(),
+			podName,
+			metav1.DeleteOptions{},
+		)
+	return
+}

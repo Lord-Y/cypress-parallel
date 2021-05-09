@@ -70,10 +70,14 @@ func TestCreatePod(t *testing.T) {
 	envs = append(envs, envVar)
 	pod.Container.EnvironmentVars = envs
 
-	_, err = CreatePod(client, pod)
+	podName, err := CreatePod(client, pod)
 	assert.NoError(err)
 
 	time.Sleep(time.Duration(30) * time.Second)
+	err = DeletePod(client, name, podName)
+	assert.NoError(err)
+
+	time.Sleep(time.Duration(10) * time.Second)
 	err = DeleteNamespace(client, name)
 	assert.NoError(err)
 }
