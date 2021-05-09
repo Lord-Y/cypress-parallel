@@ -69,20 +69,20 @@ func (p *plain) getProjectInfos() (z map[string]string, err error) {
 }
 
 // create will insert executions in DB
-func (p *execution) create() (err error) {
+func (p *execution) create() (z int64, err error) {
 	db, err := sql.Open(
 		"postgres",
 		commons.BuildDSN(),
 	)
 	if err != nil {
 		log.Error().Err(err).Msg("Failed to connect to DB")
-		return err
+		return z, err
 	}
 	defer db.Close()
 
-	stmt, err := db.Prepare("INSERT INTO executions(project_id, branch, execution_status, uniq_id, spec, result) VALUES($1, $2, $3, $4, $5, $6)")
+	stmt, err := db.Prepare("INSERT INTO executions(project_id, branch, execution_status, uniq_id, spec, result) VALUES($1, $2, $3, $4, $5, $6) RETURNING execution_id")
 	if err != nil && err != sql.ErrNoRows {
-		return err
+		return z, err
 	}
 	defer stmt.Close()
 	err = stmt.QueryRow(
@@ -92,11 +92,11 @@ func (p *execution) create() (err error) {
 		php2go.Addslashes(p.uniqID),
 		php2go.Addslashes(p.spec),
 		php2go.Addslashes(p.result),
-	).Scan()
+	).Scan(&z)
 	if err != nil && err != sql.ErrNoRows {
-		return err
+		return z, err
 	}
-	return nil
+	return z, nil
 }
 
 // getProjectAnnotations collect requirements to start the unit testing

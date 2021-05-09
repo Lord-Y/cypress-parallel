@@ -204,7 +204,7 @@ func Plain(c *gin.Context) {
 		ex.result = `{}`
 		exs.executions = append(exs.executions, ex)
 
-		err = ex.create()
+		_, err = ex.create()
 		if err != nil {
 			log.Error().Err(err).Msg("Error occured while performing db query")
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
