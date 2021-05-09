@@ -129,14 +129,14 @@ func Delete(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "projectId is missing in uri"})
 		return
 	}
-	convID, err := strconv.Atoi(id)
+	vID, err := strconv.Atoi(id)
 	if err != nil {
 		log.Error().Err(err).Msg("Error occured while converting string to int")
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
 		return
 	}
 
-	p.ProjectID = convID
+	p.ProjectID = vID
 
 	err = p.delete()
 	if err != nil {
