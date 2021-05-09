@@ -216,3 +216,31 @@ func (p *projects) getProjectEnvironments() (z []map[string]interface{}, err err
 	}
 	return m, nil
 }
+
+// update will update pod_name field in DB
+func (p *updatePodName) update() (err error) {
+	db, err := sql.Open(
+		"postgres",
+		commons.BuildDSN(),
+	)
+	if err != nil {
+		log.Error().Err(err).Msg("Failed to connect to DB")
+		return err
+	}
+	defer db.Close()
+
+	stmt, err := db.Prepare("UPDATE executions SET pod_name = $1 WHERE uniq_id = $2 AND spec = $3")
+	if err != nil && err != sql.ErrNoRows {
+		return err
+	}
+	defer stmt.Close()
+	err = stmt.QueryRow(
+		php2go.Addslashes(p.podName),
+		php2go.Addslashes(p.uniqID),
+		php2go.Addslashes(p.spec),
+	).Scan()
+	if err != nil && err != sql.ErrNoRows {
+		return err
+	}
+	return nil
+}

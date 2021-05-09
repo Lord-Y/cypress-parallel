@@ -70,6 +70,13 @@ type environmentVar struct {
 	Value string // Variable value
 }
 
+// updatePodName will be used to update pod name in DB
+type updatePodName struct {
+	podName string
+	uniqID  string
+	spec    string
+}
+
 // Plain handle requirements to start unit testing
 func Plain(c *gin.Context) {
 	var (
@@ -180,6 +187,7 @@ func Plain(c *gin.Context) {
 	}
 
 	for _, spec := range specs {
+		var pdn updatePodName
 		uniqID := md5.Sum([]byte(fmt.Sprintf("%s%s%s", pj.Repository, spec, time.Now())))
 		runidID := fmt.Sprintf("%x", uniqID)
 		projecID, err := strconv.Atoi(pj.Project_id)
@@ -254,6 +262,17 @@ func Plain(c *gin.Context) {
 			return
 		}
 		log.Debug().Msgf("Pod name %s created", podName)
+
+		pdn.podName = podName
+		pdn.uniqID = runidID[0:10]
+		pdn.spec = spec
+
+		err = pdn.update()
+		if err != nil {
+			log.Error().Err(err).Msg("Error occured while performing update db query")
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
+			return
+		}
 	}
 	c.JSON(http.StatusCreated, "OK")
 }
