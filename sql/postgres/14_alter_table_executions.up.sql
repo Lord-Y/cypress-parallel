@@ -1,0 +1,1 @@
+ALTER TABLE executions ADD execution_error_output TEXT, ADD pod_name VARCHAR(64), ADD pod_cleaned BOOL DEFAULT false;
