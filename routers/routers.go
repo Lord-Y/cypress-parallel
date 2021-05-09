@@ -6,6 +6,7 @@ import (
 
 	"github.com/Lord-Y/cypress-parallel-api/annotations"
 	"github.com/Lord-Y/cypress-parallel-api/environments"
+	"github.com/Lord-Y/cypress-parallel-api/executions"
 	"github.com/Lord-Y/cypress-parallel-api/health"
 	"github.com/Lord-Y/cypress-parallel-api/hooks"
 	customLogger "github.com/Lord-Y/cypress-parallel-api/logger"
@@ -75,6 +76,10 @@ func SetupRouter() *gin.Engine {
 		v1.DELETE("/annotations/:annotationId", annotations.Delete)
 
 		v1.POST("/hooks/launch/plain", hooks.Plain)
+
+		v1.GET("/executions/list", executions.List)
+		v1.PUT("/executions/:executionId", executions.UpdateResultExecution)
+		v1.GET("/executions", executions.Read)
 	}
 	return router
 }
