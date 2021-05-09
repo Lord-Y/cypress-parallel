@@ -83,7 +83,7 @@ func (p *getTeams) read() (z []map[string]interface{}, err error) {
 		sub := make(map[string]interface{})
 		for i, col := range values {
 			if col == nil {
-				value = "NULL"
+				value = ""
 			} else {
 				value = php2go.Stripslashes(string(col))
 			}
@@ -140,7 +140,7 @@ func GetTeamIDForUnitTesting() (z map[string]string, err error) {
 		var value string
 		for i, col := range values {
 			if col == nil {
-				value = "NULL"
+				value = ""
 			} else {
 				value = php2go.Stripslashes(string(col))
 			}
