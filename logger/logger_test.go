@@ -1,7 +1,6 @@
 package logger
 
 import (
-	"fmt"
 	"os"
 	"testing"
 
@@ -14,57 +13,57 @@ func TestSetLoggerLogLevel(t *testing.T) {
 
 	tests := []struct {
 		logLevel string
-		actual   string
+		expected string
 		errorMsg string
 	}{
 		{
 			logLevel: "info",
-			actual:   "info",
+			expected: "info",
 			errorMsg: "Fail to get expected logLevel",
 		},
 		{
 			logLevel: "warn",
-			actual:   "warn",
+			expected: "warn",
 			errorMsg: "Fail to get expected logLevel",
 		},
 		{
 			logLevel: "debug",
-			actual:   "debug",
+			expected: "debug",
 			errorMsg: "Fail to get expected logLevel",
 		},
 		{
 			logLevel: "error",
-			actual:   "error",
+			expected: "error",
 			errorMsg: "Fail to get expected logLevel",
 		},
 		{
 			logLevel: "fatal",
-			actual:   "fatal",
+			expected: "fatal",
 			errorMsg: "Fail to get expected logLevel",
 		},
 		{
 			logLevel: "trace",
-			actual:   "trace",
+			expected: "trace",
 			errorMsg: "Fail to get expected logLevel",
 		},
 		{
 			logLevel: "panic",
-			actual:   "panic",
+			expected: "panic",
 			errorMsg: "Fail to get expected logLevel",
 		},
 		{
 			logLevel: "plop",
-			actual:   "info",
+			expected: "info",
 			errorMsg: "Fail to get expected logLevel",
 		},
 	}
 
-	for i, tc := range tests {
+	for _, tc := range tests {
 		os.Setenv("CYPRESS_PARALLEL_API_LOG_LEVEL", tc.logLevel)
 		SetLoggerLogLevel()
 		z := zerolog.GlobalLevel().String()
 
-		assert.Equal(z, tc.actual, fmt.Sprintf("%s on test number %d", tc.errorMsg, i))
+		assert.Equal(tc.expected, z)
 		os.Unsetenv("CYPRESS_PARALLEL_API_LOG_LEVEL")
 	}
 }
