@@ -48,16 +48,43 @@ func TestExecutionsUpdateResult(t *testing.T) {
 	}
 	payload := `result={"key": "key", "value": "value", "environment_id": 35}`
 	payload += "&executionStatus=DONE"
+	payload += fmt.Sprintf("&branch=%s", resultEx["branch"])
+	payload += fmt.Sprintf("&spec=%s", resultEx["spec"])
+	payload += fmt.Sprintf("&uniqId=%s", resultEx["spec"])
 
-	w, _ := performRequest(router, headers, "PUT", fmt.Sprintf("/api/v1/cypress-parallel-api/executions/%s", resultEx["execution_id"]), payload)
+	w, _ := performRequest(router, headers, "POST", "/api/v1/cypress-parallel-api/executions/update", payload)
 	assert.Equal(200, w.Code)
 
 	// rollback
 	payload = `result={}`
 	payload += "&executionStatus=NOT_STARTED"
+	payload += fmt.Sprintf("&branch=%s", resultEx["branch"])
+	payload += fmt.Sprintf("&spec=%s", resultEx["spec"])
+	payload += fmt.Sprintf("&uniqId=%s", resultEx["spec"])
 
-	w, _ = performRequest(router, headers, "PUT", fmt.Sprintf("/api/v1/cypress-parallel-api/executions/%s", resultEx["execution_id"]), payload)
+	w, _ = performRequest(router, headers, "POST", "/api/v1/cypress-parallel-api/executions/update", payload)
 	assert.Equal(200, w.Code)
+}
+
+func TestExecutionsUpdateResult_fail(t *testing.T) {
+	assert := assert.New(t)
+	headers := make(map[string]string)
+	headers["Content-Type"] = "application/x-www-form-urlencoded"
+
+	router := SetupRouter()
+	resultEx, err := executions.GetExecutionIDForUnitTesting()
+	if err != nil {
+		log.Err(err).Msgf("Fail to retrieve project and team id")
+		t.Fail()
+		return
+	}
+	payload := `result={"key": "key", "value": "value", "environment_id": 35}`
+	payload += "&executionStatus=DONE"
+	payload += fmt.Sprintf("&branch=%s", resultEx["branch"])
+	payload += fmt.Sprintf("&spec=%s", resultEx["spec"])
+
+	w, _ := performRequest(router, headers, "POST", "/api/v1/cypress-parallel-api/executions/update", payload)
+	assert.Equal(400, w.Code)
 }
 
 func TestExecutionsRead(t *testing.T) {
@@ -68,8 +95,7 @@ func TestExecutionsRead(t *testing.T) {
 	router := SetupRouter()
 	resultEx, err := executions.GetExecutionIDForUnitTesting()
 	if err != nil {
-		log.Err(err).Msgf("Fail to retrieve project and team id")
-		t.Fail()
+		assert.Fail("Fail to retrieve project and team id")
 		return
 	}
 

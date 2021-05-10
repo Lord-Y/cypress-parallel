@@ -78,7 +78,7 @@ func SetupRouter() *gin.Engine {
 		v1.POST("/hooks/launch/plain", hooks.Plain)
 
 		v1.GET("/executions/list", executions.List)
-		v1.PUT("/executions/:executionId", executions.UpdateResultExecution)
+		v1.POST("/executions/update", executions.UpdateResultExecution)
 		v1.GET("/executions", executions.Read)
 	}
 	return router

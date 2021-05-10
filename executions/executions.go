@@ -3,7 +3,6 @@ package executions
 
 import (
 	"net/http"
-	"strconv"
 
 	"github.com/Lord-Y/cypress-parallel-api/commons"
 	"github.com/Lord-Y/cypress-parallel-api/tools"
@@ -26,7 +25,9 @@ type readExecutions struct {
 
 // updateResultExecution permit to update execution result
 type updateResultExecution struct {
-	ExecutionID          int    `form:"executionId" json:"executionId" binding:"required"`
+	UniqID               string `form:"uniqId" json:"uniqId" binding:"required"`
+	Spec                 string `form:"spec" json:"spec" binding:"required"`
+	Branch               string `form:"branch" json:"branch"`
 	Result               string `form:"result" json:"result" binding:"required"`
 	ExecutionStatus      string `form:"executionStatus" json:"executionStatus" binding:"required"`
 	ExecutionErrorOutput string `form:"executionErrorOutput" json:"executionErrorOutput"`
@@ -85,25 +86,12 @@ func UpdateResultExecution(c *gin.Context) {
 	var (
 		p updateResultExecution
 	)
-	id := c.Params.ByName("executionId")
-	if id == "" {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "executionId is missing in uri"})
-		return
-	}
-	vID, err := strconv.Atoi(id)
-	if err != nil {
-		log.Error().Err(err).Msg("Error occured while converting string to int")
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
-		return
-	}
-
-	p.ExecutionID = vID
 	if err := c.ShouldBind(&p); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	err = p.updateResult()
+	err := p.updateResult()
 	if err != nil {
 		log.Error().Err(err).Msg("Error occured while performing db query")
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})

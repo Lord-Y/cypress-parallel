@@ -140,7 +140,7 @@ func (p *updateResultExecution) updateResult() (err error) {
 	}
 	defer db.Close()
 
-	stmt, err := db.Prepare("UPDATE executions SET result = $1, execution_status = $2, execution_error_output = $3 WHERE execution_id = $4")
+	stmt, err := db.Prepare("UPDATE executions SET result = $1, execution_status = $2, execution_error_output = $3 WHERE uniq_id = $4 AND spec = $5 AND branch = $6")
 	if err != nil && err != sql.ErrNoRows {
 		return err
 	}
@@ -149,7 +149,9 @@ func (p *updateResultExecution) updateResult() (err error) {
 		p.Result,
 		php2go.Addslashes(p.ExecutionStatus),
 		p.ExecutionErrorOutput,
-		p.ExecutionID,
+		p.UniqID,
+		php2go.Addslashes(p.Spec),
+		php2go.Addslashes(p.Branch),
 	).Scan()
 	if err != nil && err != sql.ErrNoRows {
 		return err
@@ -169,7 +171,7 @@ func GetExecutionIDForUnitTesting() (z map[string]string, err error) {
 	}
 	defer db.Close()
 
-	stmt, err := db.Prepare("SELECT execution_id, pod_name FROM executions WHERE  RANDOM() < 0.01 LIMIT 1")
+	stmt, err := db.Prepare("SELECT * FROM executions WHERE RANDOM() < 0.01 LIMIT 1")
 	if err != nil && err != sql.ErrNoRows {
 		return z, err
 	}
