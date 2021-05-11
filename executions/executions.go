@@ -2,6 +2,7 @@
 package executions
 
 import (
+	"encoding/hex"
 	"net/http"
 
 	"github.com/Lord-Y/cypress-parallel-api/commons"
@@ -31,6 +32,7 @@ type updateResultExecution struct {
 	Result               string `form:"result" json:"result" binding:"required"`
 	ExecutionStatus      string `form:"executionStatus" json:"executionStatus" binding:"required"`
 	ExecutionErrorOutput string `form:"executionErrorOutput" json:"executionErrorOutput"`
+	Encoded              bool   `form:"encoded" json:"encoded"`
 }
 
 // List permit to retrieve executions with pagination
@@ -89,6 +91,16 @@ func UpdateResultExecution(c *gin.Context) {
 	if err := c.ShouldBind(&p); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
+	}
+
+	if p.Encoded {
+		decoded, err := hex.DecodeString(p.Result)
+		if err != nil {
+			log.Error().Err(err).Msg("Error occured while decoding result")
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
+			return
+		}
+		p.Result = string(decoded)
 	}
 
 	err := p.updateResult()
