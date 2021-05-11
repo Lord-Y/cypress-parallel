@@ -50,7 +50,7 @@ func TestExecutionsUpdateResult(t *testing.T) {
 	payload += "&executionStatus=DONE"
 	payload += fmt.Sprintf("&branch=%s", resultEx["branch"])
 	payload += fmt.Sprintf("&spec=%s", resultEx["spec"])
-	payload += fmt.Sprintf("&uniqId=%s", resultEx["spec"])
+	payload += fmt.Sprintf("&uniqId=%s", resultEx["uniq_id"])
 
 	w, _ := performRequest(router, headers, "POST", "/api/v1/cypress-parallel-api/executions/update", payload)
 	assert.Equal(200, w.Code)
@@ -60,7 +60,7 @@ func TestExecutionsUpdateResult(t *testing.T) {
 	payload += "&executionStatus=NOT_STARTED"
 	payload += fmt.Sprintf("&branch=%s", resultEx["branch"])
 	payload += fmt.Sprintf("&spec=%s", resultEx["spec"])
-	payload += fmt.Sprintf("&uniqId=%s", resultEx["spec"])
+	payload += fmt.Sprintf("&uniqId=%s", resultEx["uniq_id"])
 
 	w, _ = performRequest(router, headers, "POST", "/api/v1/cypress-parallel-api/executions/update", payload)
 	assert.Equal(200, w.Code)
