@@ -2,6 +2,10 @@
 
 `cypress-parallel-api` is the api used by `cypress-parallel` frontend UI.
 
+## API url
+
+By default, the api url is `http://127.0.0.1` but it can be override with os environment variable `CYPRESS_PARALLEL_API_URL`.
+
 ## Database
 
 Our api is developped with PostgresSQL database so the environment variable CYPRESS_PARALLEL_API_DB_URI must be set:
