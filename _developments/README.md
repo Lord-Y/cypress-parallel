@@ -1,5 +1,6 @@
 # developments
 
+## Creation
 For our development we will use kind like this:
 
 ```bash
@@ -9,3 +10,9 @@ sudo cp -r /root/.kube/ ~/ && sudo chown -R $USER:$USER ~/.kube
 ```
 
 Kind documentation can be found [here](https://kind.sigs.k8s.io/docs/user/quick-start/)
+
+## Cleaning
+
+```bash
+sudo kind delete cluster --name cypress-parallel
+```
