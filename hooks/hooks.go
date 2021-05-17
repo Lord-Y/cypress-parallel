@@ -30,7 +30,7 @@ type plain struct {
 	Group                string `form:"group" json:"group"`
 	Browser              string `form:"browser" json:"browser"`
 	MaxPods              string `form:"max_pods" json:"max_pods"`
-	CypressDockerVersion string `form:"cypress_docker_version,default=7.2.0,max=20" json:"cypress_docker_version,max=20"`
+	CypressDockerVersion string `form:"cypress_docker_version,default=7.2.0-0.0.1,max=20" json:"cypress_docker_version,max=20"`
 	plain                bool
 }
 
@@ -76,6 +76,10 @@ type updatePodName struct {
 	uniqID  string
 	spec    string
 }
+
+const (
+	ghr = "docker.pkg.github.com/lord-y/cypress-parallel-docker-images/cypress-parallel-docker-images"
+)
 
 // Plain handle requirements to start unit testing
 func Plain(c *gin.Context) {
@@ -187,9 +191,14 @@ func Plain(c *gin.Context) {
 	}
 
 	for _, spec := range specs {
-		var pdn updatePodName
+		var (
+			pdn     updatePodName
+			tag     string
+			command []string
+		)
 		uniqID := md5.Sum([]byte(fmt.Sprintf("%s%s%s", pj.Repository, spec, time.Now())))
 		runidID := fmt.Sprintf("%x", uniqID)
+		uniqID_ := runidID[0:10]
 		projecID, err := strconv.Atoi(pj.Project_id)
 		if err != nil {
 			log.Error().Err(err).Msg("Error occured while converting string to int")
@@ -198,7 +207,7 @@ func Plain(c *gin.Context) {
 		}
 
 		ex.projectID = projecID
-		ex.uniqID = runidID[0:10]
+		ex.uniqID = uniqID_
 		ex.executionStatus = "NOT_STARTED"
 		ex.spec = spec
 		ex.result = `{}`
@@ -249,11 +258,41 @@ func Plain(c *gin.Context) {
 			"worker": "kubernetes",
 			"app":    "cypress-parallel-jobs",
 		}
-		pod.Container.Command = []string{
-			"ls",
+
+		command = append(command, "cypress-parallel-cli")
+		command = append(command, "cypress")
+		if p.Browser != "" {
+			command = append(command, "--browser")
+			command = append(command, p.Browser)
 		}
+		if p.ConfigFile != "" {
+			command = append(command, "--cf")
+			command = append(command, p.ConfigFile)
+		}
+		command = append(command, "--specs")
+		command = append(command, spec)
+		command = append(command, "--uid")
+		command = append(command, uniqID_)
+		command = append(command, "--branch")
+		command = append(command, gitc.Branch)
+		command = append(command, "--repository")
+		command = append(command, gitc.Repository)
+		command = append(command, "--api-url")
+		if strings.TrimSpace(os.Getenv("CYPRESS_PARALLEL_API_URL")) == "" {
+			command = append(command, "http://127.0.0.1:8080")
+		} else {
+			command = append(command, strings.TrimSpace(os.Getenv("CYPRESS_PARALLEL_API_URL")))
+		}
+		command = append(command, "--report-back")
+		if p.CypressDockerVersion != "" {
+			tag = p.CypressDockerVersion
+		} else {
+			tag = pj.CypressDockerVersion
+		}
+
+		pod.Container.Command = command
 		pod.Container.Name = "cypress-parallel-jobs"
-		pod.Container.Image = "alpine:latest"
+		pod.Container.Image = fmt.Sprintf("%s:%s", ghr, tag)
 
 		podName, err := kubernetes.CreatePod(clientset, pod)
 		if err != nil {
@@ -264,7 +303,7 @@ func Plain(c *gin.Context) {
 		log.Debug().Msgf("Pod name %s created", podName)
 
 		pdn.podName = podName
-		pdn.uniqID = runidID[0:10]
+		pdn.uniqID = uniqID_
 		pdn.spec = spec
 
 		err = pdn.update()
