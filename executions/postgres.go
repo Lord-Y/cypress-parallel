@@ -129,20 +129,20 @@ func (p *readExecutions) read() (z map[string]string, err error) {
 }
 
 // updateResult will update execution result in DB
-func (p *updateResultExecution) updateResult() (err error) {
+func (p *updateResultExecution) updateResult() (z string, err error) {
 	db, err := sql.Open(
 		"postgres",
 		commons.BuildDSN(),
 	)
 	if err != nil {
 		log.Error().Err(err).Msg("Failed to connect to DB")
-		return err
+		return z, err
 	}
 	defer db.Close()
 
-	stmt, err := db.Prepare("UPDATE executions SET result = $1, execution_status = $2, execution_error_output = $3, pod_cleaned = 'true' WHERE uniq_id = $4 AND spec = $5 AND branch = $6")
+	stmt, err := db.Prepare("UPDATE executions SET result = $1, execution_status = $2, execution_error_output = $3, pod_cleaned = 'true' WHERE uniq_id = $4 AND spec = $5 AND branch = $6 RETURNING pod_name")
 	if err != nil && err != sql.ErrNoRows {
-		return err
+		return z, err
 	}
 	defer stmt.Close()
 	err = stmt.QueryRow(
@@ -152,11 +152,11 @@ func (p *updateResultExecution) updateResult() (err error) {
 		p.UniqID,
 		php2go.Addslashes(p.Spec),
 		php2go.Addslashes(p.Branch),
-	).Scan()
+	).Scan(&z)
 	if err != nil && err != sql.ErrNoRows {
-		return err
+		return z, err
 	}
-	return nil
+	return z, nil
 }
 
 // GetExecutionIDForUnitTesting in only for unit testing purpose and will return annotation_id field

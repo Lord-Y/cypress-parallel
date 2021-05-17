@@ -6,6 +6,7 @@ import (
 	"net/http"
 
 	"github.com/Lord-Y/cypress-parallel-api/commons"
+	"github.com/Lord-Y/cypress-parallel-api/kubernetes"
 	"github.com/Lord-Y/cypress-parallel-api/tools"
 	"github.com/gin-gonic/gin"
 	"github.com/rs/zerolog/log"
@@ -103,11 +104,18 @@ func UpdateResultExecution(c *gin.Context) {
 		p.Result = string(decoded)
 	}
 
-	err := p.updateResult()
+	result, err := p.updateResult()
 	if err != nil {
 		log.Error().Err(err).Msg("Error occured while performing db query")
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
 	} else {
 		c.JSON(http.StatusOK, "OK")
 	}
+	clientset, err := kubernetes.Client()
+	if err != nil {
+		log.Error().Err(err).Msg("Error occured while initializing kubernetes client")
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
+		return
+	}
+	_ = kubernetes.DeletePod(clientset, commons.GetKubernetesJobsNamespace(), result)
 }
