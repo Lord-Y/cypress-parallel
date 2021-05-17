@@ -140,7 +140,7 @@ func (p *updateResultExecution) updateResult() (err error) {
 	}
 	defer db.Close()
 
-	stmt, err := db.Prepare("UPDATE executions SET result = $1, execution_status = $2, execution_error_output = $3 WHERE uniq_id = $4 AND spec = $5 AND branch = $6")
+	stmt, err := db.Prepare("UPDATE executions SET result = $1, execution_status = $2, execution_error_output = $3, pod_cleaned = 'true' WHERE uniq_id = $4 AND spec = $5 AND branch = $6")
 	if err != nil && err != sql.ErrNoRows {
 		return err
 	}
