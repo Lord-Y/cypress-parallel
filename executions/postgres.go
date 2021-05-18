@@ -148,8 +148,8 @@ func (p *updateResultExecution) updateResult() (z string, err error) {
 	err = stmt.QueryRow(
 		p.Result,
 		php2go.Addslashes(p.ExecutionStatus),
-		p.ExecutionErrorOutput,
-		p.UniqID,
+		php2go.Addslashes(p.ExecutionErrorOutput),
+		php2go.Addslashes(p.UniqID),
 		php2go.Addslashes(p.Spec),
 		php2go.Addslashes(p.Branch),
 	).Scan(&z)
