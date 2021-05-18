@@ -1,0 +1,1 @@
+ALTER TABLE projects ADD timeout INT NOT NULL DEFAULT 10;
