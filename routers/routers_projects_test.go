@@ -32,7 +32,7 @@ func TestProjectsCreate(t *testing.T) {
 	payload += "&scheduling=* */10 * * *"
 	payload += "&schedulingEnabled=false"
 	payload += "&maxPods=10"
-	payload += "&cypress_docker_version=7.1.0"
+	payload += fmt.Sprintf("&cypress_docker_version=%s", tools.RandomValueFromSlice(cypressVersions))
 
 	router := SetupRouter()
 	w, _ := performRequest(router, headers, "POST", "/api/v1/cypress-parallel-api/projects", payload)
