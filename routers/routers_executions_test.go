@@ -53,6 +53,10 @@ func TestExecutionsUpdateResult(t *testing.T) {
 	payload += fmt.Sprintf("&uniqId=%s", resultEx["uniq_id"])
 
 	w, _ := performRequest(router, headers, "POST", "/api/v1/cypress-parallel-api/executions/update", payload)
+	if len(resultEx) == 0 {
+		assert.Equal(400, w.Code)
+		return
+	}
 	assert.Equal(200, w.Code)
 
 	// rollback
