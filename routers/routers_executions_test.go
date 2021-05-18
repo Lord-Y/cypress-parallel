@@ -104,5 +104,9 @@ func TestExecutionsRead(t *testing.T) {
 	}
 
 	w, _ := performRequest(router, headers, "GET", fmt.Sprintf("/api/v1/cypress-parallel-api/executions?executionId=%s", resultEx["execution_id"]), "")
+	if len(resultEx) == 0 {
+		assert.Equal(400, w.Code)
+		return
+	}
 	assert.Equal(200, w.Code)
 }
