@@ -18,7 +18,8 @@ type projects struct {
 	Repository           string `form:"repository" json:"repository" binding:"required"`
 	Branch               string `form:"branch" json:"branch" binding:"required"`
 	Specs                string `form:"specs" json:"specs" binding:"required"`
-	CypressDockerVersion string `form:"cypress_docker_version,default=7.2.0" json:"cypress_docker_version"`
+	CypressDockerVersion string `form:"cypress_docker_version,default=7.2.0-0.0.2" json:"cypress_docker_version"`
+	Timeout              int    `form:"timeout,default=10" json:"timeout"`
 }
 
 // getProjects struct handle requirements to get projects
@@ -40,7 +41,8 @@ type updateProjects struct {
 	Scheduling           string `form:"scheduling" json:"scheduling" binding:"max=15"`
 	SchedulingEnabled    bool   `form:"schedulingEnabled" json:"schedulingEnabled"`
 	MaxPods              int    `form:"maxPods,default=10" json:"maxPods"`
-	CypressDockerVersion string `form:"cypress_docker_version,default=7.2.0" json:"cypress_docker_version"`
+	CypressDockerVersion string `form:"cypress_docker_version,default=7.2.0-0.0.2" json:"cypress_docker_version"`
+	Timeout              int    `form:"timeout,default=10" json:"timeout"`
 }
 
 // deleteProject struct handle requirements to delete project
@@ -59,7 +61,10 @@ func Create(c *gin.Context) {
 	}
 	// default value not supported yet with json
 	if p.CypressDockerVersion == "" {
-		p.CypressDockerVersion = "7.2.0"
+		p.CypressDockerVersion = "7.2.0-0.0.2"
+	}
+	if p.Timeout == 0 {
+		p.Timeout = 10
 	}
 
 	result, err := p.create()
@@ -107,7 +112,10 @@ func Update(c *gin.Context) {
 	}
 	// default value not supported yet with json
 	if p.CypressDockerVersion == "" {
-		p.CypressDockerVersion = "7.2.0"
+		p.CypressDockerVersion = "7.2.0-0.0.2"
+	}
+	if p.Timeout == 0 {
+		p.Timeout = 10
 	}
 
 	err := p.update()
