@@ -30,7 +30,7 @@ type plain struct {
 	Group                string `form:"group" json:"group"`
 	Browser              string `form:"browser" json:"browser"`
 	MaxPods              string `form:"max_pods" json:"max_pods"`
-	CypressDockerVersion string `form:"cypress_docker_version,default=7.2.0-0.0.1,max=20" json:"cypress_docker_version,max=20"`
+	CypressDockerVersion string `form:"cypress_docker_version,default=7.2.0-0.0.2,max=20" json:"cypress_docker_version,max=20"`
 	plain                bool
 }
 
@@ -47,6 +47,7 @@ type projects struct {
 	SchedulingEnabled    bool
 	Max_pods             string
 	CypressDockerVersion string
+	Timeout              string
 }
 
 // executions is a slice of execution struct
@@ -91,6 +92,7 @@ func Plain(c *gin.Context) {
 		pod         models.Pods
 		gitc        git.Repository
 		targetSpecs string
+		branch      string
 		specs       []string
 	)
 	if err := c.ShouldBind(&p); err != nil {
@@ -106,17 +108,22 @@ func Plain(c *gin.Context) {
 	}
 	mapstructure.Decode(result, &pj)
 
+	// original branch must remain for POST "executions" with update db otherwise, pod will stay up forever
 	if p.Branch != "" {
 		if p.Branch == "master" {
 			gitc.Branch = ""
+			branch = "master"
 		} else {
 			gitc.Branch = p.Branch
+			branch = p.Branch
 		}
 	} else {
 		if pj.Branch == "master" {
 			gitc.Branch = ""
+			branch = "master"
 		} else {
 			gitc.Branch = pj.Branch
+			branch = pj.Branch
 		}
 	}
 	gitc.Repository = pj.Repository
@@ -211,6 +218,7 @@ func Plain(c *gin.Context) {
 		ex.executionStatus = "NOT_STARTED"
 		ex.spec = spec
 		ex.result = `{}`
+		ex.branch = branch
 		exs.executions = append(exs.executions, ex)
 
 		_, err = ex.create()
@@ -250,6 +258,11 @@ func Plain(c *gin.Context) {
 				envVar.Value = fmt.Sprintf("%s", k["value"])
 				envs = append(envs, envVar)
 			}
+			if strings.TrimSpace(os.Getenv("CYPRESS_PARALLEL_CLI_LOG_LEVEL")) != "" {
+				envVar.Key = "CYPRESS_PARALLEL_CLI_LOG_LEVEL"
+				envVar.Value = strings.TrimSpace(os.Getenv("CYPRESS_PARALLEL_CLI_LOG_LEVEL"))
+				envs = append(envs, envVar)
+			}
 			pod.Container.EnvironmentVars = envs
 		}
 		pod.Namespace = commons.GetKubernetesJobsNamespace()
@@ -274,7 +287,7 @@ func Plain(c *gin.Context) {
 		command = append(command, "--uid")
 		command = append(command, uniqID_)
 		command = append(command, "--branch")
-		command = append(command, gitc.Branch)
+		command = append(command, branch)
 		command = append(command, "--repository")
 		command = append(command, gitc.Repository)
 		command = append(command, "--api-url")
@@ -284,6 +297,8 @@ func Plain(c *gin.Context) {
 			command = append(command, strings.TrimSpace(os.Getenv("CYPRESS_PARALLEL_API_URL")))
 		}
 		command = append(command, "--report-back")
+		command = append(command, "--timeout")
+		command = append(command, pj.Timeout)
 		if p.CypressDockerVersion != "" {
 			tag = p.CypressDockerVersion
 		} else {
