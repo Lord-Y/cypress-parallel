@@ -114,8 +114,12 @@ func UpdateResultExecution(c *gin.Context) {
 	clientset, err := kubernetes.Client()
 	if err != nil {
 		log.Error().Err(err).Msg("Error occured while initializing kubernetes client")
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
 		return
 	}
-	_ = kubernetes.DeletePod(clientset, commons.GetKubernetesJobsNamespace(), result)
+	log.Debug().Msgf("POST body %+v", p)
+	err = kubernetes.DeletePod(clientset, commons.GetKubernetesJobsNamespace(), result)
+	if err != nil {
+		log.Error().Err(err).Msgf("Error occured while trying to delete pod name: %s", result)
+		return
+	}
 }
