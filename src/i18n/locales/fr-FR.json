@@ -1,0 +1,44 @@
+{
+    "brand": {
+        "name": "cypress-parallel"
+    },
+    "home": {
+        "home": "Accueil"
+    },
+    "teams": {
+        "teams": "Equipes",
+        "create": "Créer une équipe",
+        "list": "Liste des équipes",
+        "search": "Rechercher les équipes par nom"
+        
+    },
+    "projects": {
+        "projects": "Projets",
+        "create": "Créer un projet",
+        "list": "Liste des projects",
+        "search": "Rechercher les projects par nom"
+    },
+    "executions": {
+        "executions": "Exécution | Exécutions",
+        "list": "Liste des executions"
+    },
+    "alert": {
+        "http": {
+            "errorOccured": "Une erreur est survenue lors de l'exécution de cette action. Veuillez essayer ultérieurement",
+            "noDataFound": "Aucune donnée trouvée",
+            "internalServerError": "Internal server error",
+            "pageNotFound": "Page non trouvée",
+            "createOK": "La création a bien été effectuée",
+            "updateOK": "La modification a bien été effectuée"
+          }
+    },
+    "delete": {
+        "delete": "Supprimer"
+    },
+    "edit": {
+        "edit": "Editer"
+    },
+    "confirm": {
+        "sure": "Etes-vous sur de vouloir effectuer cette opération?"
+    }
+}
