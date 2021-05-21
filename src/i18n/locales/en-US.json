@@ -1,0 +1,44 @@
+{
+    "brand": {
+        "name": "cypress-parallel"
+    },
+    "home": {
+        "home": "Home"
+    },
+    "teams": {
+        "teams": "Teams",
+        "create": "Create team",
+        "list": "List teams",
+        "search": "Search teams by name"
+        
+    },
+    "projects": {
+        "projects": "Projects",
+        "create": "Create projects",
+        "list": "Liste projects",
+        "search": "Search projects by name"
+    },
+    "executions": {
+        "executions": "Execution | Executions",
+        "list": "List executions"
+    },
+    "alert": {
+        "http": {
+            "errorOccured": "An error occured, please try later",
+            "noDataFound": "No data found",
+            "internalServerError": "Internal server error",
+            "pageNotFound": "Page not found",
+            "createOK": "Creation OK",
+            "updateOK": "Modification OK"
+          }
+    },
+    "delete": {
+        "delete": "Delete"
+    },
+    "edit": {
+        "edit": "Edit"
+    },
+    "confirm": {
+        "sure": "Are you sure you want to perform this action?"
+    }
+}
