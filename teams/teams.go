@@ -35,6 +35,11 @@ type deleteTeam struct {
 	TeamID int `form:"teamId" json:"teamId" binding:"required"`
 }
 
+// searchTeams struct handle requirements to get teams
+type searchTeams struct {
+	Q string `form:"q" json:"q" binding:"required"`
+}
+
 // Create handle requirements to create teams with teams struct
 func Create(c *gin.Context) {
 	var (
@@ -124,4 +129,28 @@ func Delete(c *gin.Context) {
 		return
 	}
 	c.JSON(http.StatusOK, "OK")
+}
+
+// Search handle requirements to search teams with searchTeams struct
+func Search(c *gin.Context) {
+	var (
+		p searchTeams
+	)
+	if err := c.ShouldBind(&p); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	result, err := p.search()
+	if err != nil {
+		log.Error().Err(err).Msg("Error occured while performing db query")
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
+		return
+	}
+
+	if len(result) == 0 {
+		c.AbortWithStatus(204)
+	} else {
+		c.JSON(http.StatusOK, result)
+	}
 }

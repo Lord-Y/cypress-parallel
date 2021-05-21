@@ -81,3 +81,25 @@ func TestTeamsDelete(t *testing.T) {
 	w, _ := performRequest(router, headers, "DELETE", fmt.Sprintf("/api/v1/cypress-parallel-api/teams/%s", result["team_id"]), "")
 	assert.Equal(200, w.Code)
 }
+
+func TestTeamsSearch(t *testing.T) {
+	assert := assert.New(t)
+	headers := make(map[string]string)
+	headers["Content-Type"] = "application/x-www-form-urlencoded"
+
+	result, err := teams.GetTeamIDForUnitTesting()
+	if err != nil {
+		log.Err(err).Msgf("Fail to retrieve teams")
+		t.Fail()
+		return
+	}
+
+	router := SetupRouter()
+	w, _ := performRequest(router, headers, "GET", fmt.Sprintf("/api/v1/cypress-parallel-api/teams/search?q=%s", result["team_name"]), "")
+	if len(result) > 0 {
+		assert.Contains(w.Body.String(), "team_name")
+		return
+	}
+	w, _ = performRequest(router, headers, "GET", "/api/v1/cypress-parallel-api/teams/search?q=", "")
+	assert.Equal(400, w.Code)
+}
