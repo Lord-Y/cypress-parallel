@@ -218,15 +218,18 @@ func (p *searchTeams) search() (z []map[string]interface{}, err error) {
 	}
 	defer db.Close()
 
-	stmt, err := db.Prepare("SELECT *, (SELECT count(team_id) FROM teams) total FROM teams WHERE team_name LIKE $1 ORDER BY date DESC LIMIT 25")
+	stmt, err := db.Prepare("SELECT *, (SELECT count(team_id) FROM teams WHERE team_name LIKE '%' || $1 || '%') total FROM teams WHERE team_name LIKE '%' || $1 || '%' ORDER BY date DESC OFFSET $2 LIMIT $3")
 	if err != nil && err != sql.ErrNoRows {
 		return z, err
 	}
 	defer stmt.Close()
 
 	rows, err := stmt.Query(
-		php2go.Addslashes(p.Q),
+		p.Q,
+		p.StartLimit,
+		p.EndLimit,
 	)
+
 	if err != nil && err != sql.ErrNoRows {
 		return z, err
 	}

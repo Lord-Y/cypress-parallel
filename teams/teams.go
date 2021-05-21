@@ -37,7 +37,11 @@ type deleteTeam struct {
 
 // searchTeams struct handle requirements to get teams
 type searchTeams struct {
-	Q string `form:"q" json:"q" binding:"required"`
+	Q          string `form:"q" json:"q" binding:"required"`
+	Page       int    `form:"page,default=1" json:"page"`
+	RangeLimit int
+	StartLimit int
+	EndLimit   int
 }
 
 // Create handle requirements to create teams with teams struct
@@ -140,6 +144,7 @@ func Search(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
+	p.StartLimit, p.EndLimit = tools.GetPagination(p.Page, 0, commons.GetRangeLimit(), commons.GetRangeLimit())
 
 	result, err := p.search()
 	if err != nil {
