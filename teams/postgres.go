@@ -48,7 +48,7 @@ func (p *getTeams) read() (z []map[string]interface{}, err error) {
 	}
 	defer db.Close()
 
-	stmt, err := db.Prepare("SELECT * FROM teams WHERE team_id = $1")
+	stmt, err := db.Prepare("SELECT * FROM teams WHERE team_id = $1 LIMIT 1")
 	if err != nil && err != sql.ErrNoRows {
 		return z, err
 	}
