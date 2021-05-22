@@ -55,6 +55,15 @@ type deleteProject struct {
 	ProjectID int `form:"projectId" json:"projectId" binding:"required"`
 }
 
+// searchProjects struct handle requirements to get projects
+type searchProjects struct {
+	Q          string `form:"q" json:"q" binding:"required"`
+	Page       int    `form:"page,default=1" json:"page"`
+	RangeLimit int
+	StartLimit int
+	EndLimit   int
+}
+
 // Create handle requirements to create projects with projects struct
 func Create(c *gin.Context) {
 	var (
@@ -191,4 +200,29 @@ func Delete(c *gin.Context) {
 		return
 	}
 	c.JSON(http.StatusOK, "OK")
+}
+
+// Search handle requirements to search projects with searchProjects struct
+func Search(c *gin.Context) {
+	var (
+		p searchProjects
+	)
+	if err := c.ShouldBind(&p); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	p.StartLimit, p.EndLimit = tools.GetPagination(p.Page, 0, commons.GetRangeLimit(), commons.GetRangeLimit())
+
+	result, err := p.search()
+	if err != nil {
+		log.Error().Err(err).Msg("Error occured while performing db query")
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
+		return
+	}
+
+	if len(result) == 0 {
+		c.AbortWithStatus(204)
+	} else {
+		c.JSON(http.StatusOK, result)
+	}
 }

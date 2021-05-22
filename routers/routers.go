@@ -65,11 +65,11 @@ func SetupRouter() *gin.Engine {
 		v1.GET("/teams/search", teams.Search)
 
 		v1.POST("/projects", projects.Create)
-		v1.GET("/projects", projects.Read)
 		v1.GET("/projects/:projectId", projects.Read)
 		v1.GET("/projects/list", projects.List)
 		v1.PUT("/projects", projects.Update)
 		v1.DELETE("/projects/:projectId", projects.Delete)
+		v1.GET("/projects/search", projects.Search)
 
 		v1.POST("/environments", environments.CreateOrUpdate)
 		v1.GET("/environments", environments.Read)

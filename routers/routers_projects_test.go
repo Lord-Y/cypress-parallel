@@ -134,3 +134,25 @@ func TestProjectsDelete(t *testing.T) {
 	w, _ := performRequest(router, headers, "DELETE", fmt.Sprintf("/api/v1/cypress-parallel-api/projects/%s", result["project_id"]), "")
 	assert.Equal(200, w.Code)
 }
+
+func TestProjectsSearch(t *testing.T) {
+	assert := assert.New(t)
+	headers := make(map[string]string)
+	headers["Content-Type"] = "application/x-www-form-urlencoded"
+
+	result, err := projects.GetProjectIDForUnitTesting()
+	if err != nil {
+		log.Err(err).Msgf("Fail to retrieve teams")
+		t.Fail()
+		return
+	}
+
+	router := SetupRouter()
+	w, _ := performRequest(router, headers, "GET", fmt.Sprintf("/api/v1/cypress-parallel-api/projects/search?q=%s", result["project_name"]), "")
+	if len(result) > 0 {
+		assert.Contains(w.Body.String(), "project_name")
+		return
+	}
+	w, _ = performRequest(router, headers, "GET", "/api/v1/cypress-parallel-api/projects/search?q=", "")
+	assert.Equal(400, w.Code)
+}
