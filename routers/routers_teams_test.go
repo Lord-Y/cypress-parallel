@@ -27,8 +27,24 @@ func TestTeamsRead(t *testing.T) {
 	headers := make(map[string]string)
 	headers["Content-Type"] = "application/x-www-form-urlencoded"
 
+	result, err := teams.GetTeamIDForUnitTesting()
+	if err != nil {
+		log.Err(err).Msgf("Fail to retrieve team id")
+		t.Fail()
+		return
+	}
 	router := SetupRouter()
-	w, _ := performRequest(router, headers, "GET", "/api/v1/cypress-parallel-api/teams", "")
+	w, _ := performRequest(router, headers, "GET", fmt.Sprintf("/api/v1/cypress-parallel-api/teams/%s", result["team_id"]), "")
+	assert.Contains(w.Body.String(), "name")
+}
+
+func TestTeamsList(t *testing.T) {
+	assert := assert.New(t)
+	headers := make(map[string]string)
+	headers["Content-Type"] = "application/x-www-form-urlencoded"
+
+	router := SetupRouter()
+	w, _ := performRequest(router, headers, "GET", "/api/v1/cypress-parallel-api/teams/list", "")
 	assert.Contains(w.Body.String(), "name")
 }
 

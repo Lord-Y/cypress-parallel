@@ -18,6 +18,11 @@ type teams struct {
 
 // getTeams struct handle requirements to get teams
 type getTeams struct {
+	TeamID int `form:"teamId" json:"teamId" binding:"required"`
+}
+
+// listTeams struct handle requirements to get teams
+type listTeams struct {
 	Page       int `form:"page,default=1" json:"page"`
 	RangeLimit int
 	StartLimit int
@@ -68,13 +73,46 @@ func Read(c *gin.Context) {
 	var (
 		p getTeams
 	)
+	id := c.Params.ByName("teamId")
+	if id == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "teamId is missing in uri"})
+		return
+	}
+	vID, err := strconv.Atoi(id)
+	if err != nil {
+		log.Error().Err(err).Msg("Error occured while converting string to int")
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
+		return
+	}
+
+	p.TeamID = vID
+
+	result, err := p.read()
+	if err != nil {
+		log.Error().Err(err).Msg("Error occured while performing db query")
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
+		return
+	}
+
+	if len(result) == 0 {
+		c.AbortWithStatus(204)
+	} else {
+		c.JSON(http.StatusOK, result)
+	}
+}
+
+// List handle requirements to read teams with listTeams struct
+func List(c *gin.Context) {
+	var (
+		p listTeams
+	)
 	if err := c.ShouldBind(&p); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 	p.StartLimit, p.EndLimit = tools.GetPagination(p.Page, 0, commons.GetRangeLimit(), commons.GetRangeLimit())
 
-	result, err := p.read()
+	result, err := p.list()
 	if err != nil {
 		log.Error().Err(err).Msg("Error occured while performing db query")
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
