@@ -44,8 +44,24 @@ func TestProjectsRead(t *testing.T) {
 	headers := make(map[string]string)
 	headers["Content-Type"] = "application/x-www-form-urlencoded"
 
+	result, err := projects.GetProjectIDForUnitTesting()
+	if err != nil {
+		log.Err(err).Msgf("Fail to retrieve project and team id")
+		t.Fail()
+		return
+	}
 	router := SetupRouter()
-	w, _ := performRequest(router, headers, "GET", "/api/v1/cypress-parallel-api/projects", "")
+	w, _ := performRequest(router, headers, "GET", fmt.Sprintf("/api/v1/cypress-parallel-api/projects/%s", result["project_id"]), "")
+	assert.Contains(w.Body.String(), "name")
+}
+
+func TestProjectsList(t *testing.T) {
+	assert := assert.New(t)
+	headers := make(map[string]string)
+	headers["Content-Type"] = "application/x-www-form-urlencoded"
+
+	router := SetupRouter()
+	w, _ := performRequest(router, headers, "GET", "/api/v1/cypress-parallel-api/projects/list", "")
 	assert.Contains(w.Body.String(), "name")
 }
 

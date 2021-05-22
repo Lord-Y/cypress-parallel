@@ -66,6 +66,8 @@ func SetupRouter() *gin.Engine {
 
 		v1.POST("/projects", projects.Create)
 		v1.GET("/projects", projects.Read)
+		v1.GET("/projects/:projectId", projects.Read)
+		v1.GET("/projects/list", projects.List)
 		v1.PUT("/projects", projects.Update)
 		v1.DELETE("/projects/:projectId", projects.Delete)
 
