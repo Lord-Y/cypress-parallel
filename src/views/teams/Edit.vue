@@ -16,7 +16,7 @@
               v-model:nameUpdate="form.name"
               :translation="$t('teams.name')"
             />
-            <SubmitButton :text="$t('button.create')" />
+            <SubmitButton :text="$t('button.submit')" />
           </Form>
         </div>
       </div>
