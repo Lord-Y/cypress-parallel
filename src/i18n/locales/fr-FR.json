@@ -51,7 +51,7 @@
         "sure": "Etes-vous sur de vouloir effectuer cette opération?"
     },
     "button": {
-        "create": "Create"
+        "submit": "Soumettre"
     },
     "pagination": {
       "begin": "Début",
