@@ -9,14 +9,17 @@
         "teams": "Equipes",
         "create": "Créer une équipe",
         "list": "Liste des équipes",
-        "search": "Rechercher les équipes par nom"
-        
+        "search": "Rechercher les équipes par nom",
+        "name": "Team name",
+        "edit": "Editer le nom de l'équipe"
     },
     "projects": {
         "projects": "Projets",
         "create": "Créer un projet",
         "list": "Liste des projects",
-        "search": "Rechercher les projects par nom"
+        "search": "Rechercher les projects par nom",
+        "name": "Project name",
+        "edit": "Editer le nom du projet"
     },
     "executions": {
         "executions": "Exécution | Exécutions",
@@ -28,8 +31,14 @@
             "noDataFound": "Aucune donnée trouvée",
             "internalServerError": "Internal server error",
             "pageNotFound": "Page non trouvée",
-            "createOK": "La création a bien été effectuée",
-            "updateOK": "La modification a bien été effectuée"
+            "team": {
+                "created": "L'équipe \"{field}\" a été créé",
+                "updated": "Le nom de l'équipe est désormais: {field}"
+            },
+            "project": {
+                "created": "Le project \"{field}\" a été créé",
+                "updated": "Le nom du project est désormais: {field}"
+            }
           }
     },
     "delete": {
@@ -40,5 +49,14 @@
     },
     "confirm": {
         "sure": "Etes-vous sur de vouloir effectuer cette opération?"
+    },
+    "button": {
+        "create": "Create"
+    },
+    "pagination": {
+      "begin": "Début",
+      "previous": "Précédent",
+      "next": "Suivant",
+      "end": "Fin"
     }
 }
