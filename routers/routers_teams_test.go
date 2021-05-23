@@ -119,3 +119,13 @@ func TestTeamsSearch(t *testing.T) {
 	w, _ = performRequest(router, headers, "GET", "/api/v1/cypress-parallel-api/teams/search?q=", "")
 	assert.Equal(400, w.Code)
 }
+
+func TestTeamsAll(t *testing.T) {
+	assert := assert.New(t)
+	headers := make(map[string]string)
+	headers["Content-Type"] = "application/x-www-form-urlencoded"
+
+	router := SetupRouter()
+	w, _ := performRequest(router, headers, "GET", "/api/v1/cypress-parallel-api/teams/all", "")
+	assert.Contains(w.Body.String(), "name")
+}

@@ -126,6 +126,22 @@ func List(c *gin.Context) {
 	}
 }
 
+// All handle requirements to read teams with listTeams struct
+func All(c *gin.Context) {
+	result, err := all()
+	if err != nil {
+		log.Error().Err(err).Msg("Error occured while performing db query")
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
+		return
+	}
+
+	if len(result) == 0 {
+		c.AbortWithStatus(204)
+	} else {
+		c.JSON(http.StatusOK, result)
+	}
+}
+
 // Update handle requirements to update teams with updateTeam struct
 func Update(c *gin.Context) {
 	var (
