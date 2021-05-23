@@ -51,7 +51,7 @@
         "sure": "Are you sure you want to perform this action?"
     },
     "button": {
-        "create": "Create"
+        "submit": "Submit"
     },
     "pagination": {
         "begin": "Beginning",
