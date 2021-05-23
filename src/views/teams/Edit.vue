@@ -13,7 +13,7 @@
           <Form @submit="submit">
             <CreateUpdateName
               :name="team.team_name"
-              @update:name="form.name = $event"
+              v-model:nameUpdate="form.name"
               :translation="$t('teams.name')"
             />
             <SubmitButton :text="$t('button.create')" />

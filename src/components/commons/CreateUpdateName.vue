@@ -53,14 +53,14 @@ export default defineComponent({
   components: {
     Field,
   },
-  emits: ['update:name'],
+  emits: ['update:nameUpdate'],
   setup(props, { emit }) {
     const local = computed({
       get: () => {
-        emit('update:name', props.name)
+        emit('update:nameUpdate', props.name)
         return props.name
       },
-      set: (value: string) => emit('update:name', value),
+      set: (value: string) => emit('update:nameUpdate', value),
     })
     function getValidationClass(meta: any): string {
       if (meta.valid && meta.validated && meta.dirty) {

@@ -8,11 +8,11 @@
         <AlertMessage :message="alert.message" :classes="alert.class" />
         <SearchTeamsByFilter
           v-if="search.bar.enabled"
-          @update:loading="loading.loading.active = $event"
-          @update:alertClass="alert.class = $event"
-          @update:alertMessage="alert.message = $event"
-          @update:searchTable="search.table.enabled = $event"
-          @update:byFilter="teams.byFilter = $event"
+          v-model:loading="loading.loading.active"
+          v-model:alertClass="alert.class"
+          v-model:alertMessage="alert.message"
+          v-model:searchTable="search.table.enabled"
+          v-model:byFilter="teams.byFilter"
         />
         <div
           class="mx-auto px-3 mt-20 w-full overflow-auto"
@@ -210,8 +210,8 @@ export default defineComponent({
         byFilter: [] as Teams[],
       },
       alert: {
-        message: '',
         class: '',
+        message: '',
       },
       isOpen: false,
       loading: {
