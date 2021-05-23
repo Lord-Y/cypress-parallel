@@ -55,7 +55,6 @@
 <script lang="ts">
 import { defineComponent, reactive, toRefs } from 'vue'
 import TeamsService, { Teams } from '@api/teamsService'
-import { useRoute } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 
 export default defineComponent({
@@ -78,27 +77,19 @@ export default defineComponent({
         byFilter: '',
       },
     })
-    const route = useRoute()
     const { t } = useI18n({
       useScope: 'global',
     })
-    let teams: Teams[], page: number
-
-    if (!route.params.page) {
-      page = 1
-    } else {
-      page = Number(route.params.page)
-    }
+    let teams: Teams[]
 
     function fetchDataByFilter() {
       if (state.search.byFilter.length >= 2) {
         emit('update:loading', true)
-        TeamsService.search(state.search.byFilter.trim(), page)
+        TeamsService.search(state.search.byFilter.trim(), 1)
           .then((response) => {
             switch (response.status) {
               case 200:
                 teams = response.data
-                console.log('teams', teams)
                 emit('update:byFilter', teams)
                 emit('update:searchTable', true)
                 break
