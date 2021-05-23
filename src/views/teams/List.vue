@@ -176,7 +176,6 @@
               </tr>
             </tbody>
           </table>
-          <Pagination v-if="pagination.enabled" :pagination="pagination.data" />
         </div>
       </div>
     </div>
@@ -257,7 +256,7 @@ export default defineComponent({
     }
     state.loading.loading.active = true
 
-    TeamsService.get(page)
+    TeamsService.list(page)
       .then((response: any) => {
         switch (response.status) {
           case 200:
