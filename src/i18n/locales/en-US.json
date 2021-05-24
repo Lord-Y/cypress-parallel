@@ -6,7 +6,7 @@
         "home": "Home"
     },
     "teams": {
-        "teams": "Teams",
+        "teams": "Teams | Team",
         "create": "Create team",
         "list": "Teams list",
         "search": "Search teams by name",
@@ -19,7 +19,17 @@
         "list": "Projects list",
         "search": "Search projects by name",
         "name": "Project name",
-        "edit": "Edit project name"
+        "edit": "Edit project",
+        "branch": "Branch",
+        "docker": "Docker image",
+        "maxPods": "Max number of pods",
+        "repository": "Repository",
+        "scheduling": "Scheduling",
+        "schedulingEnabled": "Scheduling enabled",
+        "specs": "Specs location",
+        "timeout": "Timeout in minutes",
+        "username": "Username",
+        "password": "Password"
     },
     "executions": {
         "executions": "Execution | Executions",
@@ -37,7 +47,7 @@
             },
             "project": {
                 "created": "Project \"{field}\" has been created",
-                "updated": "Project name has been updated to: {field}"
+                "updated": "Project \"{field}\" name has been updated"
             }
           }
     },
@@ -58,5 +68,8 @@
         "previous": "Previous",
         "next": "Next",
         "end": "End"
-      }
+    },
+    "select": {
+        "selectYourChoice": "Select your choice"
+    }
 }

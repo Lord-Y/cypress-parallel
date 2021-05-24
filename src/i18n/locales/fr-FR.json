@@ -6,7 +6,7 @@
         "home": "Accueil"
     },
     "teams": {
-        "teams": "Equipes",
+        "teams": "Equipes | Equipe",
         "create": "Créer une équipe",
         "list": "Liste des équipes",
         "search": "Rechercher les équipes par nom",
@@ -19,7 +19,17 @@
         "list": "Liste des projects",
         "search": "Rechercher les projects par nom",
         "name": "Project name",
-        "edit": "Editer le nom du projet"
+        "edit": "Editer le projet",
+        "branch": "Branche",
+        "docker": "Image docker",
+        "maxPods": "Nb max de pods",
+        "repository": "Dépôt",
+        "scheduling": "Planification",
+        "schedulingEnabled": "Planification activée",
+        "specs": "Emplacement des specs",
+        "timeout": "Timeout in minutes",
+        "username": "Login",
+        "password": "Mot de passe"
     },
     "executions": {
         "executions": "Exécution | Exécutions",
@@ -37,7 +47,7 @@
             },
             "project": {
                 "created": "Le project \"{field}\" a été créé",
-                "updated": "Le nom du project est désormais: {field}"
+                "updated": "Le project \"{field}\" a été mis à jour"
             }
           }
     },
@@ -58,5 +68,8 @@
       "previous": "Précédent",
       "next": "Suivant",
       "end": "Fin"
+    },
+    "select": {
+        "selectYourChoice": "Sélectionner votre choix"
     }
 }
