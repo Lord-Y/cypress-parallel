@@ -1,0 +1,67 @@
+import axios, { AxiosInstance } from 'axios'
+
+export interface Projects {
+  project_id: number
+  project_name: string
+  total: number
+  date: Date
+}
+
+export interface Project {
+  project_id: number
+  project_name: string
+  date: Date
+  repository: string
+  username: string
+  password: string
+  branch: string
+  cypress_docker_version: string
+  max_pods: number
+  scheduling: string
+  scheduling_enabled: boolean
+  specs: string
+  team_id: number
+  timeout: number
+}
+
+const axiosClient: AxiosInstance = axios.create({
+  headers: {
+    'Content-type': 'application/json',
+  },
+})
+
+class ProjectsService {
+  async create(data: any): Promise<any> {
+    return await axiosClient.post('/api/v1/cypress-parallel-api/projects', data)
+  }
+
+  async get(id: number): Promise<any> {
+    return await axiosClient.get<any>(
+      `/api/v1/cypress-parallel-api/projects/${id}`,
+    )
+  }
+
+  async list(page = 1): Promise<any> {
+    return await axiosClient.get<any>(
+      `/api/v1/cypress-parallel-api/projects/list?page=${page}`,
+    )
+  }
+
+  async update(data: any): Promise<any> {
+    return await axiosClient.put('/api/v1/cypress-parallel-api/projects', data)
+  }
+
+  async delete(id: number): Promise<any> {
+    return await axiosClient.delete<Projects[]>(
+      `/api/v1/cypress-parallel-api/projects/${id}`,
+    )
+  }
+
+  async search(q: string, page = 1): Promise<any> {
+    return await axiosClient.get<any>(
+      `/api/v1/cypress-parallel-api/projects/search?q=${q}&page=${page}`,
+    )
+  }
+}
+
+export default new ProjectsService()
