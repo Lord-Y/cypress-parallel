@@ -13,7 +13,7 @@
           <Form @submit="submit">
             <CreateUpdateName
               :name="team.team_name"
-              v-model:nameUpdate="form.name"
+              v-model:updateName="form.name"
               :translation="$t('teams.name')"
             />
             <SubmitButton :text="$t('button.submit')" />
