@@ -1,5 +1,11 @@
 import axios, { AxiosInstance } from 'axios'
 
+const axiosClient: AxiosInstance = axios.create({
+  headers: {
+    'Content-type': 'application/json',
+  },
+})
+
 export interface Teams {
   team_id: number
   team_name: string
@@ -12,12 +18,6 @@ export interface Team {
   team_name: string
   date: Date
 }
-
-const axiosClient: AxiosInstance = axios.create({
-  headers: {
-    'Content-type': 'application/json',
-  },
-})
 
 class TeamsService {
   async create(data: any): Promise<any> {
