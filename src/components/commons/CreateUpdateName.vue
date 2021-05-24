@@ -9,13 +9,13 @@
       rules="required"
       v-slot="{ field, meta, errorMessage }"
       type="text"
-      :id="id"
-      :placeholder="translation.toLowerCase()"
-      autocomplete="off"
     >
       <input
         v-bind="field"
         type="text"
+        :id="id"
+        :placeholder="translation.toLowerCase()"
+        autocomplete="off"
         class="
           block
           w-full
