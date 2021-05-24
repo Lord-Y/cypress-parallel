@@ -28,7 +28,7 @@ func TestProjectsCreate(t *testing.T) {
 	payload += fmt.Sprintf("&teamId=%s", result["team_id"])
 	payload += "&repository=https://github.com/cypress-io/cypress-example-kitchensink.git"
 	payload += "&branch=master"
-	payload += "&specs=cypress/integration/examples/actions.spec.js"
+	payload += fmt.Sprintf("&specs=%s", tools.RandomValueFromSlice(specs))
 	payload += "&scheduling=* */10 * * *"
 	payload += "&schedulingEnabled=false"
 	payload += "&maxPods=10"
@@ -108,7 +108,7 @@ func TestProjectsUpdate(t *testing.T) {
 	payload += fmt.Sprintf("&teamId=%s", result["team_id"])
 	payload += "&repository=https://github.com/cypress-io/cypress-example-kitchensink.git"
 	payload += "&branch=master"
-	payload += "&specs=cypress/integration/examples/actions.spec.js"
+	payload += fmt.Sprintf("&specs=%s", tools.RandomValueFromSlice(specs))
 	payload += "&scheduling="
 	payload += "&schedulingEnabled=false"
 	payload += fmt.Sprintf("&maxPods=%d", fake.MonthNum())
