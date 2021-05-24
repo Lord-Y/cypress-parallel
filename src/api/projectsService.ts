@@ -1,5 +1,11 @@
 import axios, { AxiosInstance } from 'axios'
 
+const axiosClient: AxiosInstance = axios.create({
+  headers: {
+    'Content-type': 'application/json',
+  },
+})
+
 export interface Projects {
   project_id: number
   project_name: string
@@ -23,12 +29,6 @@ export interface Project {
   team_id: number
   timeout: number
 }
-
-const axiosClient: AxiosInstance = axios.create({
-  headers: {
-    'Content-type': 'application/json',
-  },
-})
 
 class ProjectsService {
   async create(data: any): Promise<any> {
