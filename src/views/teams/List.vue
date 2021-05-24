@@ -233,7 +233,7 @@ export default defineComponent({
       search: {
         byFilter: '',
         bar: {
-          enabled: true,
+          enabled: false,
         },
         table: {
           enabled: false,
