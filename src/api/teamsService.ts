@@ -36,6 +36,10 @@ class TeamsService {
     )
   }
 
+  async all(): Promise<any> {
+    return await axiosClient.get<any>(`/api/v1/cypress-parallel-api/teams/all`)
+  }
+
   async update(data: any): Promise<any> {
     return await axiosClient.put('/api/v1/cypress-parallel-api/teams', data)
   }
