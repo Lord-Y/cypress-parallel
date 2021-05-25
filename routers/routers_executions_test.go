@@ -42,7 +42,7 @@ func TestExecutionsUpdateResult(t *testing.T) {
 	router := SetupRouter()
 	resultEx, err := executions.GetExecutionIDForUnitTesting()
 	if err != nil {
-		log.Err(err).Msgf("Fail to retrieve project and team id")
+		log.Err(err).Msgf("Fail to retrieve executions")
 		t.Fail()
 		return
 	}
@@ -78,7 +78,7 @@ func TestExecutionsUpdateResult_fail(t *testing.T) {
 	router := SetupRouter()
 	resultEx, err := executions.GetExecutionIDForUnitTesting()
 	if err != nil {
-		log.Err(err).Msgf("Fail to retrieve project and team id")
+		log.Err(err).Msgf("Fail to retrieve executions")
 		t.Fail()
 		return
 	}
@@ -99,14 +99,58 @@ func TestExecutionsRead(t *testing.T) {
 	router := SetupRouter()
 	resultEx, err := executions.GetExecutionIDForUnitTesting()
 	if err != nil {
-		assert.Fail("Fail to retrieve project and team id")
+		assert.Fail("Fail to retrieve executions")
 		return
 	}
 
-	w, _ := performRequest(router, headers, "GET", fmt.Sprintf("/api/v1/cypress-parallel-api/executions?executionId=%s", resultEx["execution_id"]), "")
+	w, _ := performRequest(router, headers, "GET", fmt.Sprintf("/api/v1/cypress-parallel-api/executions/%s", resultEx["execution_id"]), "")
 	if len(resultEx) == 0 {
-		assert.Equal(400, w.Code)
+		assert.Equal(404, w.Code)
 		return
 	}
 	assert.Equal(200, w.Code)
+}
+
+func TestExecutionsSearch(t *testing.T) {
+	assert := assert.New(t)
+	headers := make(map[string]string)
+	headers["Content-Type"] = "application/x-www-form-urlencoded"
+
+	result, err := executions.GetExecutionIDForUnitTesting()
+	if err != nil {
+		assert.Fail("Fail to retrieve executions")
+		return
+	}
+
+	router := SetupRouter()
+	w, _ := performRequest(router, headers, "GET", fmt.Sprintf("/api/v1/cypress-parallel-api/executions/search?q=%s", result["branch"]), "")
+	if len(result) > 0 {
+		assert.Contains(w.Body.String(), "branch")
+		return
+	}
+	w, _ = performRequest(router, headers, "GET", "/api/v1/cypress-parallel-api/executions/search?q=", "")
+	assert.Equal(400, w.Code)
+}
+
+func TestExecutionsUniqID(t *testing.T) {
+	assert := assert.New(t)
+	headers := make(map[string]string)
+	headers["Content-Type"] = "application/x-www-form-urlencoded"
+
+	TestHooksPlainCreate(t)
+
+	result, err := executions.GetExecutionIDForUnitTesting()
+	if err != nil {
+		assert.Fail("Fail to retrieve executions")
+		return
+	}
+
+	router := SetupRouter()
+	w, _ := performRequest(router, headers, "GET", fmt.Sprintf("/api/v1/cypress-parallel-api/list/by/uniqid/%s", result["uniq_id"]), "")
+	if len(result) > 0 {
+		assert.Contains(w.Body.String(), "branch")
+		return
+	}
+	w, _ = performRequest(router, headers, "GET", fmt.Sprintf("/api/v1/cypress-parallel-api/list/by/uniqid/%s", "404"), "")
+	assert.Equal(404, w.Code)
 }

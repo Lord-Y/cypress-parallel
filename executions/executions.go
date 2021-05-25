@@ -4,6 +4,7 @@ package executions
 import (
 	"encoding/hex"
 	"net/http"
+	"strconv"
 
 	"github.com/Lord-Y/cypress-parallel-api/commons"
 	"github.com/Lord-Y/cypress-parallel-api/kubernetes"
@@ -12,7 +13,7 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
-// listExecutions struct handle requirements to get projects
+// listExecutions struct handle requirements to get executions
 type listExecutions struct {
 	Page       int `form:"page,default=1" json:"page"`
 	RangeLimit int
@@ -20,7 +21,7 @@ type listExecutions struct {
 	EndLimit   int
 }
 
-// readExecutions struct handle requirements to get projects
+// readExecutions struct handle requirements to get executions
 type readExecutions struct {
 	ExecutionID int `form:"executionId" json:"executionId" binding:"required"`
 }
@@ -34,6 +35,20 @@ type updateResultExecution struct {
 	ExecutionStatus      string `form:"executionStatus" json:"executionStatus" binding:"required"`
 	ExecutionErrorOutput string `form:"executionErrorOutput" json:"executionErrorOutput"`
 	Encoded              bool   `form:"encoded" json:"encoded"`
+}
+
+// searchExecutions struct handle requirements to get executions
+type searchExecutions struct {
+	Q          string `form:"q" json:"q" binding:"required"`
+	Page       int    `form:"page,default=1" json:"page"`
+	RangeLimit int
+	StartLimit int
+	EndLimit   int
+}
+
+// uniqIDExecutions struct handle requirements to get uniq id executions
+type uniqIDExecutions struct {
+	UniqID int `form:"uniqId" json:"uniqId" binding:"required"`
 }
 
 // List permit to retrieve executions with pagination
@@ -66,10 +81,19 @@ func Read(c *gin.Context) {
 	var (
 		p readExecutions
 	)
-	if err := c.ShouldBind(&p); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+	id := c.Params.ByName("executionId")
+	if id == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "executionId is missing in uri"})
 		return
 	}
+	vID, err := strconv.Atoi(id)
+	if err != nil {
+		log.Error().Err(err).Msg("Error occured while converting string to int")
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
+		return
+	}
+
+	p.ExecutionID = vID
 	result, err := p.read()
 	if err != nil {
 		log.Error().Err(err).Msg("Error occured while performing db query")
@@ -121,5 +145,62 @@ func UpdateResultExecution(c *gin.Context) {
 	if err != nil {
 		log.Error().Err(err).Msgf("Error occured while trying to delete pod name: %s", result)
 		return
+	}
+}
+
+// Search handle requirements to search projects with searchExecutions struct
+func Search(c *gin.Context) {
+	var (
+		p searchExecutions
+	)
+	if err := c.ShouldBind(&p); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	p.StartLimit, p.EndLimit = tools.GetPagination(p.Page, 0, commons.GetRangeLimit(), commons.GetRangeLimit())
+
+	result, err := p.search()
+	if err != nil {
+		log.Error().Err(err).Msg("Error occured while performing db query")
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
+		return
+	}
+
+	if len(result) == 0 {
+		c.AbortWithStatus(204)
+	} else {
+		c.JSON(http.StatusOK, result)
+	}
+}
+
+// UniqID permit to get content of all uniq id executions
+func UniqID(c *gin.Context) {
+	var (
+		p uniqIDExecutions
+	)
+	id := c.Params.ByName("uniqId")
+	if id == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "uniqId is missing in uri"})
+		return
+	}
+	vID, err := strconv.Atoi(id)
+	if err != nil {
+		log.Error().Err(err).Msg("Error occured while converting string to int")
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
+		return
+	}
+
+	p.UniqID = vID
+	result, err := p.uniqId()
+	if err != nil {
+		log.Error().Err(err).Msg("Error occured while performing db query")
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
+		return
+	}
+
+	if len(result) == 0 {
+		c.AbortWithStatus(404)
+	} else {
+		c.JSON(http.StatusOK, result)
 	}
 }
