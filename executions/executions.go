@@ -48,7 +48,7 @@ type searchExecutions struct {
 
 // uniqIDExecutions struct handle requirements to get uniq id executions
 type uniqIDExecutions struct {
-	UniqID int `form:"uniqId" json:"uniqId" binding:"required"`
+	UniqID string `form:"uniqId" json:"uniqId" binding:"required"`
 }
 
 // List permit to retrieve executions with pagination
@@ -183,14 +183,8 @@ func UniqID(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "uniqId is missing in uri"})
 		return
 	}
-	vID, err := strconv.Atoi(id)
-	if err != nil {
-		log.Error().Err(err).Msg("Error occured while converting string to int")
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
-		return
-	}
 
-	p.UniqID = vID
+	p.UniqID = id
 	result, err := p.uniqId()
 	if err != nil {
 		log.Error().Err(err).Msg("Error occured while performing db query")
