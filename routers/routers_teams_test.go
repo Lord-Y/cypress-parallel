@@ -125,6 +125,7 @@ func TestTeamsAll(t *testing.T) {
 	headers := make(map[string]string)
 	headers["Content-Type"] = "application/x-www-form-urlencoded"
 
+	TestTeamsCreate(t)
 	router := SetupRouter()
 	w, _ := performRequest(router, headers, "GET", "/api/v1/cypress-parallel-api/teams/all", "")
 	assert.Contains(w.Body.String(), "name")
