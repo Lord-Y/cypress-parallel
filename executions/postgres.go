@@ -82,7 +82,7 @@ func (p *readExecutions) read() (z map[string]string, err error) {
 	}
 	defer db.Close()
 
-	stmt, err := db.Prepare("SELECT e.*, p.project_name FROM executions e LEFT JOIN ON e.project_id = p.project_id WHERE e.execution_id = $1 LIMIT 1")
+	stmt, err := db.Prepare("SELECT e.*, p.project_name FROM executions e LEFT JOIN projects p ON e.project_id = p.project_id WHERE e.execution_id = $1 LIMIT 1")
 	if err != nil && err != sql.ErrNoRows {
 		return z, err
 	}
