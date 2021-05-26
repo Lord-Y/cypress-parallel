@@ -1,8 +1,6 @@
 <template>
   <div class="mt-4">
-    <label :for="id" class="block w-full pb-1">{{
-      translation
-    }}</label>
+    <label :for="id" class="block w-full pb-1">{{ translation }}</label>
     <Field
       as=""
       :name="name"
