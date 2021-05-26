@@ -51,6 +51,24 @@
             }
         }
     },
+    "annotations": {
+        "annotations": "Annotations",
+        "create": "Create annotation",
+        "list": "Annotations list",
+        "search": "Search annotations by key or value",
+        "edit": "Edit annotation",
+        "key": "Key",
+        "value": "Value"
+    },
+    "environments": {
+        "environments": "Environments",
+        "create": "Create environment variable",
+        "list": "Environments list",
+        "search": "Search environments by key or value",
+        "edit": "Edit environment",
+        "key": "Key",
+        "value": "Value"
+    },
     "alert": {
         "http": {
             "errorOccured": "An error occured, please try later",
@@ -64,6 +82,14 @@
             "project": {
                 "created": "Project \"{field}\" has been created",
                 "updated": "Project \"{field}\" name has been updated"
+            },
+            "annotation": {
+                "created": "Annotation \"{field}\" has been created",
+                "updated": "Annotation key \"{field}\" has been updated"
+            },
+            "environment": {
+              "created": "Environment \"{field}\" has been created",
+              "updated": "Environment key \"{field}\" has been updated"
             }
           }
     },

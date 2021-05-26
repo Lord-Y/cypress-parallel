@@ -51,6 +51,24 @@
             }
         }
     },
+    "annotations": {
+        "annotations": "Annotations",
+        "create": "Créer une annotation",
+        "list": "Liste d'annotations",
+        "search": "Recherchez les annotations par clé or valeur",
+        "edit": "Editer une annotation",
+        "key": "Clé",
+        "value": "Valeur"
+    },
+    "environments": {
+        "environments": "Environnements",
+        "create": "Créer une variable d'environnement",
+        "list": "Environments list",
+        "search": "Recherchez les variables d'environnements par clé or valeur",
+        "edit": "Editer une variable d'environnement",
+        "key": "Clé",
+        "value": "Valeur"
+    },
     "alert": {
         "http": {
             "errorOccured": "Une erreur est survenue lors de l'exécution de cette action. Veuillez essayer ultérieurement",
@@ -64,6 +82,14 @@
             "project": {
                 "created": "Le project \"{field}\" a été créé",
                 "updated": "Le project \"{field}\" a été mis à jour"
+            },
+            "annotation": {
+                "created": "L'annotation \"{field}\" a été créé",
+                "updated": "L'annotation key \"{field}\" a été mis à jour"
+            },
+            "environment": {
+              "created": "La variable d'environnement \"{field}\" a été créé",
+              "updated": "La variable d'environnement \"{field}\" a été mis à jour"
             }
           }
     },
