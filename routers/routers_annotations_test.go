@@ -56,13 +56,30 @@ func TestAnnotationsCreateOrUpdate(t *testing.T) {
 	}
 }
 
-func TestAnnotationsRead(t *testing.T) {
+func TestAnnotationsList(t *testing.T) {
 	assert := assert.New(t)
 	headers := make(map[string]string)
 	headers["Content-Type"] = "application/x-www-form-urlencoded"
 
 	router := SetupRouter()
-	w, _ := performRequest(router, headers, "GET", "/api/v1/cypress-parallel-api/annotations", "")
+	w, _ := performRequest(router, headers, "GET", "/api/v1/cypress-parallel-api/annotations/list", "")
+	assert.Contains(w.Body.String(), "annotation_id")
+}
+
+func TestAnnotationsRead(t *testing.T) {
+	assert := assert.New(t)
+	headers := make(map[string]string)
+	headers["Content-Type"] = "application/x-www-form-urlencoded"
+
+	result, err := annotations.GetAnnotationIDForUnitTesting()
+	if err != nil {
+		log.Err(err).Msgf("Fail to retrieve team id")
+		t.Fail()
+		return
+	}
+
+	router := SetupRouter()
+	w, _ := performRequest(router, headers, "GET", fmt.Sprintf("/api/v1/cypress-parallel-api/annotations/%s", result["annotation_id"]), "")
 	assert.Contains(w.Body.String(), "key")
 }
 
@@ -81,4 +98,26 @@ func TestAnnotationsDelete(t *testing.T) {
 	router := SetupRouter()
 	w, _ := performRequest(router, headers, "DELETE", fmt.Sprintf("/api/v1/cypress-parallel-api/annotations/%s", result["annotation_id"]), "")
 	assert.Equal(200, w.Code)
+}
+
+func TestAnnotationsSearch(t *testing.T) {
+	assert := assert.New(t)
+	headers := make(map[string]string)
+	headers["Content-Type"] = "application/x-www-form-urlencoded"
+
+	result, err := annotations.GetAnnotationIDForUnitTesting()
+	if err != nil {
+		log.Err(err).Msgf("Fail to retrieve teams")
+		t.Fail()
+		return
+	}
+
+	router := SetupRouter()
+	w, _ := performRequest(router, headers, "GET", fmt.Sprintf("/api/v1/cypress-parallel-api/annotations/search?q=%s", result["key"]), "")
+	if len(result) > 0 {
+		assert.Contains(w.Body.String(), "key")
+		return
+	}
+	w, _ = performRequest(router, headers, "GET", "/api/v1/cypress-parallel-api/annotations/search?q=", "")
+	assert.Equal(400, w.Code)
 }

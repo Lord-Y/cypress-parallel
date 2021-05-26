@@ -127,8 +127,68 @@ func (p *annotations) update(id int) (err error) {
 	return nil
 }
 
-// read will return all annotations with range limit settings
-func (p *getAnnotations) read() (z []map[string]interface{}, err error) {
+// list will return all annotations with range limit settings
+func (p *listAnnotations) list() (z []map[string]interface{}, err error) {
+	db, err := sql.Open(
+		"postgres",
+		commons.BuildDSN(),
+	)
+	if err != nil {
+		return
+	}
+	defer db.Close()
+
+	stmt, err := db.Prepare("SELECT a.*, (SELECT count(annotation_id) FROM annotations) total, p.project_name FROM annotations a LEFT JOIN projects p ON a.project_id = p.project_id ORDER BY a.key DESC OFFSET $1 LIMIT $2")
+	if err != nil && err != sql.ErrNoRows {
+		return
+	}
+	defer stmt.Close()
+
+	rows, err := stmt.Query(
+		p.StartLimit,
+		p.EndLimit,
+	)
+	if err != nil && err != sql.ErrNoRows {
+		return
+	}
+
+	columns, err := rows.Columns()
+	if err != nil {
+		return
+	}
+
+	values := make([]sql.RawBytes, len(columns))
+	scanArgs := make([]interface{}, len(values))
+	for i := range values {
+		scanArgs[i] = &values[i]
+	}
+
+	m := make([]map[string]interface{}, 0)
+	for rows.Next() {
+		err = rows.Scan(scanArgs...)
+		if err != nil {
+			return
+		}
+		var value string
+		sub := make(map[string]interface{})
+		for i, col := range values {
+			if col == nil {
+				value = ""
+			} else {
+				value = php2go.Stripslashes(string(col))
+			}
+			sub[columns[i]] = value
+		}
+		m = append(m, sub)
+	}
+	if err = rows.Err(); err != nil {
+		return
+	}
+	return m, nil
+}
+
+// read will return a single annotation with specified id
+func (p *getAnnotations) read() (z map[string]string, err error) {
 	db, err := sql.Open(
 		"postgres",
 		commons.BuildDSN(),
@@ -139,15 +199,14 @@ func (p *getAnnotations) read() (z []map[string]interface{}, err error) {
 	}
 	defer db.Close()
 
-	stmt, err := db.Prepare("SELECT *, (SELECT count(annotation_id) FROM annotations) total FROM annotations OFFSET $1 LIMIT $2")
+	stmt, err := db.Prepare("SELECT a.*, p.project_name FROM annotations a LEFT JOIN projects p ON a.project_id = p.project_id WHERE a.annotation_id = $1 LIMIT 1")
 	if err != nil && err != sql.ErrNoRows {
 		return z, err
 	}
 	defer stmt.Close()
 
 	rows, err := stmt.Query(
-		p.StartLimit,
-		p.EndLimit,
+		p.AnnotationID,
 	)
 	if err != nil && err != sql.ErrNoRows {
 		return z, err
@@ -164,23 +223,21 @@ func (p *getAnnotations) read() (z []map[string]interface{}, err error) {
 		scanArgs[i] = &values[i]
 	}
 
-	m := make([]map[string]interface{}, 0)
+	m := make(map[string]string)
 	for rows.Next() {
 		err = rows.Scan(scanArgs...)
 		if err != nil {
-			return z, err
+			return
 		}
 		var value string
-		sub := make(map[string]interface{})
 		for i, col := range values {
 			if col == nil {
 				value = ""
 			} else {
 				value = php2go.Stripslashes(string(col))
 			}
-			sub[columns[i]] = value
+			m[columns[i]] = value
 		}
-		m = append(m, sub)
 	}
 	if err = rows.Err(); err != nil {
 		return z, err
@@ -226,7 +283,7 @@ func GetAnnotationIDForUnitTesting() (z map[string]string, err error) {
 	}
 	defer db.Close()
 
-	stmt, err := db.Prepare("SELECT annotation_id FROM annotations LIMIT 1")
+	stmt, err := db.Prepare("SELECT * FROM annotations LIMIT 1")
 	if err != nil && err != sql.ErrNoRows {
 		return z, err
 	}
@@ -263,6 +320,69 @@ func GetAnnotationIDForUnitTesting() (z map[string]string, err error) {
 			}
 			m[columns[i]] = value
 		}
+	}
+	if err = rows.Err(); err != nil {
+		return z, err
+	}
+	return m, nil
+}
+
+// search will return all projects
+func (p *searchAnnotations) search() (z []map[string]interface{}, err error) {
+	db, err := sql.Open(
+		"postgres",
+		commons.BuildDSN(),
+	)
+	if err != nil {
+		log.Error().Err(err).Msg("Failed to connect to DB")
+		return z, err
+	}
+	defer db.Close()
+
+	stmt, err := db.Prepare("SELECT a.*, (SELECT count(annotation_id) FROM annotations WHERE key LIKE '%' || $1 || '%' OR value LIKE '%' || $1 || '%') total, p.project_name FROM annotations a LEFT JOIN projects p ON a.project_id = p.project_id WHERE a.key LIKE '%' || $1 || '%' OR a.value LIKE '%' || $1 || '%' ORDER BY a.key DESC OFFSET $2 LIMIT $3")
+	if err != nil && err != sql.ErrNoRows {
+		return z, err
+	}
+	defer stmt.Close()
+
+	rows, err := stmt.Query(
+		p.Q,
+		p.StartLimit,
+		p.EndLimit,
+	)
+
+	if err != nil && err != sql.ErrNoRows {
+		return z, err
+	}
+
+	columns, err := rows.Columns()
+	if err != nil {
+		return z, err
+	}
+
+	values := make([]sql.RawBytes, len(columns))
+	scanArgs := make([]interface{}, len(values))
+	for i := range values {
+		scanArgs[i] = &values[i]
+	}
+
+	m := make([]map[string]interface{}, 0)
+	for rows.Next() {
+		err = rows.Scan(scanArgs...)
+		if err != nil {
+			return z, err
+		}
+		var value string
+		sub := make(map[string]interface{})
+		for i, col := range values {
+			if col == nil {
+				value = ""
+			} else {
+				value = php2go.Stripslashes(string(col))
+			}
+			sub[columns[i]] = value
+		}
+		m = append(m, sub)
 	}
 	if err = rows.Err(); err != nil {
 		return z, err
