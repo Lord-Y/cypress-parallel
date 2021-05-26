@@ -41,7 +41,7 @@ func (p *projects) create() (z int64, err error) {
 	return z, nil
 }
 
-// read will return all projects with range limit settings
+// read will return a single project with specified id
 func (p *getProjects) read() (z map[string]string, err error) {
 	db, err := sql.Open(
 		"postgres",
