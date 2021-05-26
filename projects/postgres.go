@@ -170,7 +170,7 @@ func all() (z []map[string]interface{}, err error) {
 	}
 	defer db.Close()
 
-	stmt, err := db.Prepare("SELECT *, (SELECT count(project_id) FROM projects) total FROM projects ORDER BY date")
+	stmt, err := db.Prepare("SELECT project_id, project_name, (SELECT count(project_id) FROM projects) total FROM projects ORDER BY date")
 	if err != nil && err != sql.ErrNoRows {
 		return z, err
 	}
