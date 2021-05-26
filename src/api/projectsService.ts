@@ -14,6 +14,7 @@ export interface Projects {
 }
 
 export interface Project {
+  team_name: string
   project_id: number
   project_name: string
   date: Date
