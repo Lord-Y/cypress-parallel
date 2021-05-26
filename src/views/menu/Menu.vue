@@ -130,7 +130,6 @@
               >
             </div>
           </div>
-
           <div>
             <button
               type="button"
@@ -187,6 +186,96 @@
                 p-3
                 border-b-2 border-black
               "
+              :class="getSelectedMenu('annotations')"
+              @click="menu.isOpen.annotations = !menu.isOpen.annotations"
+            >
+              {{ $t('annotations.annotations') }}
+            </button>
+            <div class="bg-black" v-if="menu.isOpen.annotations">
+              <router-link
+                class="
+                  block
+                  text-white
+                  hover:text-green-500
+                  hover:font-extrabold
+                  p-2
+                "
+                :class="getActiveLink('/annotations/create')"
+                to="/annotations/create"
+                :title="$t('annotations.create')"
+                >{{ $t('annotations.create') }}</router-link
+              >
+              <router-link
+                class="
+                  block
+                  text-white
+                  hover:text-green-500
+                  hover:font-extrabold
+                  p-2
+                "
+                :class="getActiveLink('/annotations/list')"
+                to="/annotations/list"
+                :title="$t('annotations.list')"
+                >{{ $t('annotations.list') }}</router-link
+              >
+            </div>
+          </div>
+          <div>
+            <button
+              type="button"
+              class="
+                block
+                text-white
+                w-full
+                text-left
+                p-3
+                border-b-2 border-black
+              "
+              :class="getSelectedMenu('environments')"
+              @click="menu.isOpen.environments = !menu.isOpen.environments"
+            >
+              {{ $t('environments.environments') }}
+            </button>
+            <div class="bg-black" v-if="menu.isOpen.environments">
+              <router-link
+                class="
+                  block
+                  text-white
+                  hover:text-green-500
+                  hover:font-extrabold
+                  p-2
+                "
+                :class="getActiveLink('/environments/create')"
+                to="/environments/create"
+                :title="$t('environments.create')"
+                >{{ $t('environments.create') }}</router-link
+              >
+              <router-link
+                class="
+                  block
+                  text-white
+                  hover:text-green-500
+                  hover:font-extrabold
+                  p-2
+                "
+                :class="getActiveLink('/environments/list')"
+                to="/environments/list"
+                :title="$t('environments.list')"
+                >{{ $t('environments.list') }}</router-link
+              >
+            </div>
+          </div>
+          <div>
+            <button
+              type="button"
+              class="
+                block
+                text-white
+                w-full
+                text-left
+                p-3
+                border-b-2 border-black
+              "
               :class="getSelectedMenu('executions')"
               @click="menu.isOpen.executions = !menu.isOpen.executions"
             >
@@ -226,6 +315,8 @@ export default defineComponent({
           home: true,
           teams: false,
           projects: false,
+          annotations: false,
+          environments: false,
           executions: false,
         },
       },
@@ -240,6 +331,12 @@ export default defineComponent({
             break
           case 'projects':
             this.menu.isOpen.projects = true
+            break
+          case 'annotations':
+            this.menu.isOpen.annotations = true
+            break
+          case 'environments':
+            this.menu.isOpen.environments = true
             break
           case 'executions':
             this.menu.isOpen.executions = true
