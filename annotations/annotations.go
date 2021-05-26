@@ -15,7 +15,7 @@ import (
 type annotation struct {
 	ProjectID int    `form:"projectId" json:"projectId" binding:"required"`
 	Key       string `form:"key" json:"key" binding:"required"`
-	Value     string `form:"value" json:"value"`
+	Value     string `form:"value" json:"value" binding:"required"`
 }
 
 // updateAnnotation struct handle requirements to create annotations
