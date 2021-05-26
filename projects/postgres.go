@@ -52,7 +52,7 @@ func (p *getProjects) read() (z map[string]string, err error) {
 	}
 	defer db.Close()
 
-	stmt, err := db.Prepare("SELECT * FROM projects WHERE project_id = $1 LIMIT 1")
+	stmt, err := db.Prepare("SELECT p.*, t.team_name FROM projects p LEFT JOIN teams t ON p.team_id = t.team_id WHERE project_id = $1 LIMIT 1")
 	if err != nil && err != sql.ErrNoRows {
 		return
 	}
@@ -109,7 +109,7 @@ func (p *listProjects) list() (z []map[string]interface{}, err error) {
 	}
 	defer db.Close()
 
-	stmt, err := db.Prepare("SELECT *, (SELECT count(project_id) FROM projects) total FROM projects ORDER BY date DESC OFFSET $1 LIMIT $2")
+	stmt, err := db.Prepare("SELECT p.*, (SELECT count(project_id) FROM projects) total, t.team_name FROM projects p LEFT JOIN teams t ON p.team_id = t.team_id ORDER BY p.date DESC OFFSET $1 LIMIT $2")
 	if err != nil && err != sql.ErrNoRows {
 		return
 	}
@@ -345,7 +345,7 @@ func (p *searchProjects) search() (z []map[string]interface{}, err error) {
 	}
 	defer db.Close()
 
-	stmt, err := db.Prepare("SELECT *, (SELECT count(project_id) FROM projects WHERE project_name LIKE '%' || $1 || '%') total FROM projects WHERE project_name LIKE '%' || $1 || '%' ORDER BY date DESC OFFSET $2 LIMIT $3")
+	stmt, err := db.Prepare("SELECT p.*, (SELECT count(project_id) FROM projects WHERE project_name LIKE '%' || $1 || '%') total, t.team_name FROM projects p LEFT JOIN teams t ON p.team_id = t.team_id WHERE p.project_name LIKE '%' || $1 || '%' ORDER BY p.date DESC OFFSET $2 LIMIT $3")
 	if err != nil && err != sql.ErrNoRows {
 		return z, err
 	}
