@@ -23,7 +23,7 @@ type updateAnnotation struct {
 	ProjectID    int    `form:"projectId" json:"projectId" binding:"required"`
 	AnnotationID int    `form:"annotationId" json:"annotationId" binding:"required"`
 	Key          string `form:"key" json:"key" binding:"required"`
-	Value        string `form:"value" json:"value"`
+	Value        string `form:"value" json:"value" binding:"required"`
 }
 
 // getAnnotations struct handle requirements to get annotations
