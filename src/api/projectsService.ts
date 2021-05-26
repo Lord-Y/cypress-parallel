@@ -30,6 +30,12 @@ export interface Project {
   timeout: number
 }
 
+export interface ProjectOnly {
+  project_id: number
+  project_name: string
+  total: number
+}
+
 class ProjectsService {
   async create(data: any): Promise<any> {
     return await axiosClient.post('/api/v1/cypress-parallel-api/projects', data)
@@ -44,6 +50,12 @@ class ProjectsService {
   async list(page = 1): Promise<any> {
     return await axiosClient.get<any>(
       `/api/v1/cypress-parallel-api/projects/list?page=${page}`,
+    )
+  }
+
+  async all(): Promise<any> {
+    return await axiosClient.get<any>(
+      `/api/v1/cypress-parallel-api/projects/all`,
     )
   }
 
