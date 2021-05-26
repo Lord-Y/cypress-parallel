@@ -71,7 +71,7 @@ func (p *listExecutions) list() (z []map[string]interface{}, err error) {
 }
 
 // read will return return specific execution content
-func (p *readExecutions) read() (z map[string]string, err error) {
+func (p *readExecutions) read() (z []interface{}, err error) {
 	db, err := sql.Open(
 		"postgres",
 		commons.BuildDSN(),
@@ -95,37 +95,67 @@ func (p *readExecutions) read() (z map[string]string, err error) {
 		return z, err
 	}
 
-	columns, err := rows.Columns()
+	columnTypes, err := rows.ColumnTypes()
 	if err != nil {
 		return z, err
 	}
 
-	values := make([]sql.RawBytes, len(columns))
-	scanArgs := make([]interface{}, len(values))
-	for i := range values {
-		scanArgs[i] = &values[i]
+	count := len(columnTypes)
+	finalRows := []interface{}{}
+
+	for rows.Next() {
+		scanArgs := make([]interface{}, count)
+		for i, v := range columnTypes {
+			switch v.DatabaseTypeName() {
+			case "VARCHAR", "TEXT", "UUID", "TIMESTAMP":
+				scanArgs[i] = new(sql.NullString)
+				break
+			case "BOOL":
+				scanArgs[i] = new(sql.NullBool)
+				break
+			case "INT4":
+				scanArgs[i] = new(sql.NullInt64)
+				break
+			default:
+				scanArgs[i] = new(sql.NullString)
+			}
+		}
+		err := rows.Scan(scanArgs...)
+		if err != nil {
+			return z, err
+		}
+
+		m := map[string]interface{}{}
+		for i, v := range columnTypes {
+			if z, ok := (scanArgs[i]).(*sql.NullBool); ok {
+				m[v.Name()] = z.Bool
+				continue
+			}
+			if z, ok := (scanArgs[i]).(*sql.NullString); ok {
+				m[v.Name()] = z.String
+				continue
+			}
+			if z, ok := (scanArgs[i]).(*sql.NullInt64); ok {
+				m[v.Name()] = z.Int64
+				continue
+			}
+			if z, ok := (scanArgs[i]).(*sql.NullFloat64); ok {
+				m[v.Name()] = z.Float64
+				continue
+			}
+			if z, ok := (scanArgs[i]).(*sql.NullInt32); ok {
+				m[v.Name()] = z.Int32
+				continue
+			}
+			m[v.Name()] = scanArgs[i]
+		}
+		finalRows = append(finalRows, m)
 	}
 
-	m := make(map[string]string)
-	for rows.Next() {
-		err = rows.Scan(scanArgs...)
-		if err != nil {
-			return
-		}
-		var value string
-		for i, col := range values {
-			if col == nil {
-				value = ""
-			} else {
-				value = php2go.Stripslashes(string(col))
-			}
-			m[columns[i]] = value
-		}
-	}
 	if err = rows.Err(); err != nil {
 		return z, err
 	}
-	return m, nil
+	return finalRows, nil
 }
 
 // updateResult will update execution result in DB
@@ -216,7 +246,7 @@ func GetExecutionIDForUnitTesting() (z map[string]string, err error) {
 }
 
 // search will return all projects
-func (p *searchExecutions) search() (z []map[string]interface{}, err error) {
+func (p *searchExecutions) search() (z []interface{}, err error) {
 	db, err := sql.Open(
 		"postgres",
 		commons.BuildDSN(),
@@ -243,43 +273,71 @@ func (p *searchExecutions) search() (z []map[string]interface{}, err error) {
 		return z, err
 	}
 
-	columns, err := rows.Columns()
+	columnTypes, err := rows.ColumnTypes()
 	if err != nil {
 		return z, err
 	}
 
-	values := make([]sql.RawBytes, len(columns))
-	scanArgs := make([]interface{}, len(values))
-	for i := range values {
-		scanArgs[i] = &values[i]
-	}
+	count := len(columnTypes)
+	finalRows := []interface{}{}
 
-	m := make([]map[string]interface{}, 0)
 	for rows.Next() {
-		err = rows.Scan(scanArgs...)
+		scanArgs := make([]interface{}, count)
+		for i, v := range columnTypes {
+			switch v.DatabaseTypeName() {
+			case "VARCHAR", "TEXT", "UUID", "TIMESTAMP":
+				scanArgs[i] = new(sql.NullString)
+				break
+			case "BOOL":
+				scanArgs[i] = new(sql.NullBool)
+				break
+			case "INT4":
+				scanArgs[i] = new(sql.NullInt64)
+				break
+			default:
+				scanArgs[i] = new(sql.NullString)
+			}
+		}
+		err := rows.Scan(scanArgs...)
 		if err != nil {
 			return z, err
 		}
-		var value string
-		sub := make(map[string]interface{})
-		for i, col := range values {
-			if col == nil {
-				value = ""
-			} else {
-				value = php2go.Stripslashes(string(col))
+
+		m := map[string]interface{}{}
+		for i, v := range columnTypes {
+			if z, ok := (scanArgs[i]).(*sql.NullBool); ok {
+				m[v.Name()] = z.Bool
+				continue
 			}
-			sub[columns[i]] = value
+			if z, ok := (scanArgs[i]).(*sql.NullString); ok {
+				m[v.Name()] = z.String
+				continue
+			}
+			if z, ok := (scanArgs[i]).(*sql.NullInt64); ok {
+				m[v.Name()] = z.Int64
+				continue
+			}
+			if z, ok := (scanArgs[i]).(*sql.NullFloat64); ok {
+				m[v.Name()] = z.Float64
+				continue
+			}
+			if z, ok := (scanArgs[i]).(*sql.NullInt32); ok {
+				m[v.Name()] = z.Int32
+				continue
+			}
+			m[v.Name()] = scanArgs[i]
 		}
-		m = append(m, sub)
+		finalRows = append(finalRows, m)
 	}
+
 	if err = rows.Err(); err != nil {
 		return z, err
 	}
-	return m, nil
+	return finalRows, nil
 }
 
 // uniqId will return all executions of the uniq id provided
-func (p *uniqIDExecutions) uniqId() (z []map[string]interface{}, err error) {
+func (p *uniqIDExecutions) uniqId() (z []interface{}, err error) {
 	db, err := sql.Open(
 		"postgres",
 		commons.BuildDSN(),
@@ -302,37 +360,65 @@ func (p *uniqIDExecutions) uniqId() (z []map[string]interface{}, err error) {
 		return
 	}
 
-	columns, err := rows.Columns()
+	columnTypes, err := rows.ColumnTypes()
 	if err != nil {
-		return
+		return z, err
 	}
 
-	values := make([]sql.RawBytes, len(columns))
-	scanArgs := make([]interface{}, len(values))
-	for i := range values {
-		scanArgs[i] = &values[i]
-	}
+	count := len(columnTypes)
+	finalRows := []interface{}{}
 
-	m := make([]map[string]interface{}, 0)
 	for rows.Next() {
-		err = rows.Scan(scanArgs...)
-		if err != nil {
-			return
-		}
-		var value string
-		sub := make(map[string]interface{})
-		for i, col := range values {
-			if col == nil {
-				value = ""
-			} else {
-				value = php2go.Stripslashes(string(col))
+		scanArgs := make([]interface{}, count)
+		for i, v := range columnTypes {
+			switch v.DatabaseTypeName() {
+			case "VARCHAR", "TEXT", "UUID", "TIMESTAMP":
+				scanArgs[i] = new(sql.NullString)
+				break
+			case "BOOL":
+				scanArgs[i] = new(sql.NullBool)
+				break
+			case "INT4":
+				scanArgs[i] = new(sql.NullInt64)
+				break
+			default:
+				scanArgs[i] = new(sql.NullString)
 			}
-			sub[columns[i]] = value
 		}
-		m = append(m, sub)
+		err := rows.Scan(scanArgs...)
+		if err != nil {
+			return z, err
+		}
+
+		m := map[string]interface{}{}
+		for i, v := range columnTypes {
+			if z, ok := (scanArgs[i]).(*sql.NullBool); ok {
+				m[v.Name()] = z.Bool
+				continue
+			}
+			if z, ok := (scanArgs[i]).(*sql.NullString); ok {
+				m[v.Name()] = z.String
+				continue
+			}
+			if z, ok := (scanArgs[i]).(*sql.NullInt64); ok {
+				m[v.Name()] = z.Int64
+				continue
+			}
+			if z, ok := (scanArgs[i]).(*sql.NullFloat64); ok {
+				m[v.Name()] = z.Float64
+				continue
+			}
+			if z, ok := (scanArgs[i]).(*sql.NullInt32); ok {
+				m[v.Name()] = z.Int32
+				continue
+			}
+			m[v.Name()] = scanArgs[i]
+		}
+		finalRows = append(finalRows, m)
 	}
+
 	if err = rows.Err(); err != nil {
-		return
+		return z, err
 	}
-	return m, nil
+	return finalRows, nil
 }

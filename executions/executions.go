@@ -104,7 +104,7 @@ func Read(c *gin.Context) {
 	if len(result) == 0 {
 		c.AbortWithStatus(404)
 	} else {
-		c.JSON(http.StatusOK, result)
+		c.JSON(http.StatusOK, result[0])
 	}
 }
 
