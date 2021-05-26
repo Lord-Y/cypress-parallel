@@ -1,127 +1,127 @@
 {
-    "brand": {
-        "name": "cypress-parallel"
+  "brand": {
+    "name": "cypress-parallel"
+  },
+  "home": {
+    "home": "Accueil"
+  },
+  "teams": {
+    "teams": "Equipes | Equipe",
+    "create": "Créer une équipe",
+    "list": "Liste des équipes",
+    "search": "Rechercher les équipes par nom",
+    "name": "Team name",
+    "edit": "Editer le nom de l'équipe"
+  },
+  "projects": {
+    "projects": "Projets",
+    "create": "Créer un projet",
+    "list": "Liste des projects",
+    "search": "Rechercher les projects par nom",
+    "name": "Project name",
+    "edit": "Editer le projet",
+    "branch": "Branche",
+    "docker": "Image docker",
+    "maxPods": "Nb max de pods",
+    "repository": "Dépôt",
+    "scheduling": "Planification",
+    "schedulingEnabled": "Planification activée",
+    "specs": "Emplacement des specs",
+    "timeout": "Timeout in minutes",
+    "username": "Login",
+    "password": "Mot de passe"
+  },
+  "executions": {
+    "executions": "Exécution | Exécutions",
+    "list": "Liste des executions",
+    "uniqId": "ID unique",
+    "spec": "Emplacement du spec",
+    "by": {
+      "uniqId": "Executions par ID unique",
+      "spec": "Execution par spec"
     },
-    "home": {
-        "home": "Accueil"
-    },
-    "teams": {
-        "teams": "Equipes | Equipe",
-        "create": "Créer une équipe",
-        "list": "Liste des équipes",
-        "search": "Rechercher les équipes par nom",
-        "name": "Team name",
-        "edit": "Editer le nom de l'équipe"
-    },
-    "projects": {
-        "projects": "Projets",
-        "create": "Créer un projet",
-        "list": "Liste des projects",
-        "search": "Rechercher les projects par nom",
-        "name": "Project name",
-        "edit": "Editer le projet",
-        "branch": "Branche",
-        "docker": "Image docker",
-        "maxPods": "Nb max de pods",
-        "repository": "Dépôt",
-        "scheduling": "Planification",
-        "schedulingEnabled": "Planification activée",
-        "specs": "Emplacement des specs",
-        "timeout": "Timeout in minutes",
-        "username": "Login",
-        "password": "Mot de passe"
-    },
-    "executions": {
-        "executions": "Exécution | Exécutions",
-        "list": "Liste des executions",
-        "uniqId": "ID unique",
-        "spec": "Emplacement du spec",
-        "by": {
-            "uniqId": "Executions par ID unique",
-            "spec": "Execution par spec"
-        },
-        "status": {
-            "global": "Statut global",
-            "system": "Statut système",
-            "spec": "Statut de l'exécution",
-            "failed": "Execution failed",
-            "code": "Code",
-            "err": {
-                "message": "Message d'erreur"
-            }
-        }
-    },
-    "annotations": {
-        "annotations": "Annotations",
-        "create": "Créer une annotation",
-        "list": "Liste d'annotations",
-        "search": "Recherchez les annotations par clé or valeur",
-        "edit": "Editer une annotation",
-        "key": "Clé",
-        "value": "Valeur"
-    },
-    "environments": {
-        "environments": "Environnements",
-        "create": "Créer une variable d'environnement",
-        "list": "Environments list",
-        "search": "Recherchez les variables d'environnements par clé or valeur",
-        "edit": "Editer une variable d'environnement",
-        "key": "Clé",
-        "value": "Valeur"
-    },
-    "alert": {
-        "http": {
-            "errorOccured": "Une erreur est survenue lors de l'exécution de cette action. Veuillez essayer ultérieurement",
-            "noDataFound": "Aucune donnée trouvée",
-            "internalServerError": "Internal server error",
-            "pageNotFound": "Page non trouvée",
-            "team": {
-                "created": "L'équipe \"{field}\" a été créé",
-                "updated": "Le nom de l'équipe est désormais: {field}"
-            },
-            "project": {
-                "created": "Le project \"{field}\" a été créé",
-                "updated": "Le project \"{field}\" a été mis à jour"
-            },
-            "annotation": {
-                "created": "L'annotation \"{field}\" a été créé",
-                "updated": "L'annotation key \"{field}\" a été mis à jour"
-            },
-            "environment": {
-              "created": "La variable d'environnement \"{field}\" a été créé",
-              "updated": "La variable d'environnement \"{field}\" a été mis à jour"
-            }
-          }
-    },
-    "delete": {
-        "delete": "Supprimer"
-    },
-    "edit": {
-        "edit": "Editer"
-    },
-    "confirm": {
-        "sure": "Etes-vous sur de vouloir effectuer cette opération?"
-    },
-    "button": {
-        "submit": "Soumettre"
-    },
-    "pagination": {
-      "begin": "Début",
-      "previous": "Précédent",
-      "next": "Suivant",
-      "end": "Fin"
-    },
-    "select": {
-        "selectYourChoice": "Sélectionner votre choix"
-    },
-    "see": {
-        "see": "Voir",
-        "by": {
-            "uniqId": "Voir par ID unique",
-            "spec": "Voir par spec"
-        }
-    },
-    "date": {
-        "date": "Date"
+    "status": {
+      "global": "Statut global",
+      "system": "Statut système",
+      "spec": "Statut de l'exécution",
+      "failed": "Execution failed",
+      "code": "Code",
+      "err": {
+        "message": "Message d'erreur"
+      }
     }
+  },
+  "annotations": {
+    "annotations": "Annotations",
+    "create": "Créer une annotation",
+    "list": "Liste d'annotations",
+    "search": "Recherchez les annotations par clé or valeur",
+    "edit": "Editer une annotation",
+    "key": "Clé",
+    "value": "Valeur"
+  },
+  "environments": {
+    "environments": "Environnements",
+    "create": "Créer une variable d'environnement",
+    "list": "Environments list",
+    "search": "Recherchez les variables d'environnements par clé or valeur",
+    "edit": "Editer une variable d'environnement",
+    "key": "Clé",
+    "value": "Valeur"
+  },
+  "alert": {
+    "http": {
+      "errorOccured": "Une erreur est survenue lors de l'exécution de cette action. Veuillez essayer ultérieurement",
+      "noDataFound": "Aucune donnée trouvée",
+      "internalServerError": "Internal server error",
+      "pageNotFound": "Page non trouvée",
+      "team": {
+        "created": "L'équipe \"{field}\" a été créé",
+        "updated": "Le nom de l'équipe est désormais: {field}"
+      },
+      "project": {
+        "created": "Le project \"{field}\" a été créé",
+        "updated": "Le project \"{field}\" a été mis à jour"
+      },
+      "annotation": {
+        "created": "L'annotation \"{field}\" a été créé",
+        "updated": "L'annotation key \"{field}\" a été mis à jour"
+      },
+      "environment": {
+        "created": "La variable d'environnement \"{field}\" a été créé",
+        "updated": "La variable d'environnement \"{field}\" a été mis à jour"
+      }
+    }
+  },
+  "delete": {
+    "delete": "Supprimer"
+  },
+  "edit": {
+    "edit": "Editer"
+  },
+  "confirm": {
+    "sure": "Etes-vous sur de vouloir effectuer cette opération?"
+  },
+  "button": {
+    "submit": "Soumettre"
+  },
+  "pagination": {
+    "begin": "Début",
+    "previous": "Précédent",
+    "next": "Suivant",
+    "end": "Fin"
+  },
+  "select": {
+    "selectYourChoice": "Sélectionner votre choix"
+  },
+  "see": {
+    "see": "Voir",
+    "by": {
+      "uniqId": "Voir par ID unique",
+      "spec": "Voir par spec"
+    }
+  },
+  "date": {
+    "date": "Date"
+  }
 }
