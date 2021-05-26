@@ -34,6 +34,7 @@
           >
             <thead>
               <tr>
+                <th class="py-3">{{ $t('teams.name') }}</th>
                 <th class="py-3">{{ $t('projects.projects') }}</th>
                 <th class="py-3">{{ $t('edit.edit') }}</th>
                 <th class="py-3">{{ $t('delete.delete') }}</th>
@@ -46,6 +47,7 @@
                 :id="project.project_id.toString()"
                 :key="index"
               >
+                <td class="px-2 py-3">{{ project.team_name }}</td>
                 <td class="px-2 py-3">{{ project.project_name }}</td>
                 <td class="px-2 py-3">
                   <router-link
@@ -116,6 +118,7 @@
           >
             <thead>
               <tr>
+                <th class="py-3">{{ $t('teams.name') }}</th>
                 <th class="py-3">{{ $t('projects.projects') }}</th>
                 <th class="py-3">{{ $t('edit.edit') }}</th>
                 <th class="py-3">{{ $t('delete.delete') }}</th>
@@ -128,6 +131,7 @@
                 :id="project.project_id.toString()"
                 :key="index"
               >
+                <td class="px-2 py-3">{{ project.team_name }}</td>
                 <td class="px-2 py-3">{{ project.project_name }}</td>
                 <td class="px-2 py-3">
                   <router-link
