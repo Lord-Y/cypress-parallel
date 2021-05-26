@@ -19,6 +19,22 @@ const routes: Array<RouteRecordRaw> = [
       },
     ],
   },
+  {
+    path: '/executions/:id',
+    component: () => import('@views/executions/Spec.vue'),
+    meta: {
+      root: 'executions',
+      activeLink: '/executions/list',
+    },
+  },
+  {
+    path: '/executions/uniqid/:id',
+    component: () => import('@views/executions/UniqID.vue'),
+    meta: {
+      root: 'executions',
+      activeLink: '/executions/list',
+    },
+  },
 ]
 
 export default routes
