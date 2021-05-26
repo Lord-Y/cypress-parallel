@@ -10,96 +10,36 @@ import (
 	"github.com/syyongx/php2go"
 )
 
-// selectBeforeAct will check if an insert or update must be done
-func (p *annotations) selectBeforeAct(id int) (z map[string]string, err error) {
-	db, err := sql.Open(
-		"postgres",
-		commons.BuildDSN(),
-	)
-	if err != nil {
-		log.Error().Err(err).Msg("Failed to connect to DB")
-		return z, err
-	}
-	defer db.Close()
-
-	stmt, err := db.Prepare("SELECT count(annotation_id) total FROM annotations WHERE key = $1 AND value = $2 AND project_id = $3 LIMIT 1")
-	if err != nil && err != sql.ErrNoRows {
-		return z, err
-	}
-	defer stmt.Close()
-
-	rows, err := stmt.Query(
-		php2go.Addslashes(p.annotation[id].Key),
-		php2go.Addslashes(p.annotation[id].Value),
-		p.ProjectID,
-	)
-	if err != nil && err != sql.ErrNoRows {
-		return z, err
-	}
-
-	columns, err := rows.Columns()
-	if err != nil {
-		return z, err
-	}
-
-	values := make([]sql.RawBytes, len(columns))
-	scanArgs := make([]interface{}, len(values))
-	for i := range values {
-		scanArgs[i] = &values[i]
-	}
-
-	m := make(map[string]string)
-	for rows.Next() {
-		err = rows.Scan(scanArgs...)
-		if err != nil {
-			return
-		}
-		var value string
-		for i, col := range values {
-			if col == nil {
-				value = ""
-			} else {
-				value = php2go.Stripslashes(string(col))
-			}
-			m[columns[i]] = value
-		}
-	}
-	if err = rows.Err(); err != nil {
-		return z, err
-	}
-	return m, nil
-}
-
 // create will insert annotations in DB
-func (p *annotations) create(id int) (err error) {
+func (p *annotation) create() (z int64, err error) {
 	db, err := sql.Open(
 		"postgres",
 		commons.BuildDSN(),
 	)
 	if err != nil {
 		log.Error().Err(err).Msg("Failed to connect to DB")
-		return err
+		return z, err
 	}
 	defer db.Close()
 
-	stmt, err := db.Prepare("INSERT INTO annotations(key, value, project_id) VALUES($1, $2, $3)")
+	stmt, err := db.Prepare("INSERT INTO annotations(key, value, project_id) VALUES($1, $2, $3) RETURNING annotation_id")
 	if err != nil && err != sql.ErrNoRows {
-		return err
+		return z, err
 	}
 	defer stmt.Close()
 	err = stmt.QueryRow(
-		php2go.Addslashes(p.annotation[id].Key),
-		php2go.Addslashes(p.annotation[id].Value),
+		php2go.Addslashes(p.Key),
+		php2go.Addslashes(p.Value),
 		p.ProjectID,
-	).Scan()
+	).Scan(&z)
 	if err != nil && err != sql.ErrNoRows {
-		return err
+		return z, err
 	}
-	return nil
+	return z, nil
 }
 
 // update will update annotations in DB
-func (p *annotations) update(id int) (err error) {
+func (p *updateAnnotation) update() (err error) {
 	db, err := sql.Open(
 		"postgres",
 		commons.BuildDSN(),
@@ -116,10 +56,10 @@ func (p *annotations) update(id int) (err error) {
 	}
 	defer stmt.Close()
 	err = stmt.QueryRow(
-		php2go.Addslashes(p.annotation[id].Key),
-		php2go.Addslashes(p.annotation[id].Value),
+		php2go.Addslashes(p.Key),
+		php2go.Addslashes(p.Value),
 		p.ProjectID,
-		p.annotation[id].Annotation_ID,
+		p.AnnotationID,
 	).Scan()
 	if err != nil && err != sql.ErrNoRows {
 		return err

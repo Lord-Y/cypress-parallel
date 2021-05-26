@@ -2,29 +2,28 @@
 package annotations
 
 import (
-	"encoding/json"
 	"net/http"
 	"strconv"
 
 	"github.com/Lord-Y/cypress-parallel-api/commons"
 	"github.com/Lord-Y/cypress-parallel-api/tools"
 	"github.com/gin-gonic/gin"
-	"github.com/mitchellh/mapstructure"
 	"github.com/rs/zerolog/log"
 )
 
-// annotations struct handle requirements to create annotations
-type annotations struct {
-	ProjectID   int    `form:"projectId" json:"projectId" binding:"required"`
-	Annotations string `form:"annotations" json:"annotations" binding:"required"`
-	annotation  []annotation
+// annotation struct handle requirements to create annotations
+type annotation struct {
+	ProjectID int    `form:"projectId" json:"projectId" binding:"required"`
+	Key       string `form:"key" json:"key" binding:"required"`
+	Value     string `form:"value" json:"value"`
 }
 
-// annotation struct handle k/v from annotations
-type annotation struct {
-	Annotation_ID int
-	Key           string
-	Value         string
+// updateAnnotation struct handle requirements to create annotations
+type updateAnnotation struct {
+	ProjectID    int    `form:"projectId" json:"projectId" binding:"required"`
+	AnnotationID int    `form:"annotationId" json:"annotationId" binding:"required"`
+	Key          string `form:"key" json:"key" binding:"required"`
+	Value        string `form:"value" json:"value"`
 }
 
 // getAnnotations struct handle requirements to get annotations
@@ -54,52 +53,42 @@ type searchAnnotations struct {
 	EndLimit   int
 }
 
-// CreateOrUpdate handle requirements to create annotations with annotations struct
-func CreateOrUpdate(c *gin.Context) {
+// Create handle requirements to create annotations with annotation struct
+func Create(c *gin.Context) {
 	var (
-		p annotations
+		p annotation
 	)
 	if err := c.ShouldBind(&p); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	var m []map[string]interface{}
-	err := json.Unmarshal([]byte(p.Annotations), &m)
+	result, err := p.create()
 	if err != nil {
-		log.Error().Err(err).Msgf("Error occured while unmarshalling data")
+		log.Error().Err(err).Msg("Error occured while performing db query")
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
+	} else {
+		c.JSON(http.StatusCreated, gin.H{"projectId": result})
+	}
+}
+
+// Update handle requirements to update projects with updateAnnotation struct
+func Update(c *gin.Context) {
+	var (
+		p updateAnnotation
+	)
+	if err := c.ShouldBind(&p); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	mapstructure.Decode(m, &p.annotation)
 
-	// pg UPSERT cannot be used for our purpose
-	for i, k := range p.annotation {
-		if k.Annotation_ID == 0 {
-			resultSelect, err := p.selectBeforeAct(i)
-			if err != nil {
-				log.Error().Err(err).Msg("Error occured while performing select db query")
-				c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
-				return
-			}
-			if resultSelect["total"] == "0" {
-				err = p.create(i)
-				if err != nil {
-					log.Error().Err(err).Msg("Error occured while performing create db query")
-					c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
-					return
-				}
-			}
-		} else {
-			err = p.update(i)
-			if err != nil {
-				log.Error().Err(err).Msg("Error occured while performing update db query")
-				c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
-				return
-			}
-		}
+	err := p.update()
+	if err != nil {
+		log.Error().Err(err).Msg("Error occured while performing db query")
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
+	} else {
+		c.JSON(http.StatusOK, "OK")
 	}
-	c.JSON(http.StatusCreated, "OK")
 }
 
 // List handle requirements to read projects with getProjects struct

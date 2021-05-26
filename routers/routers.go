@@ -76,7 +76,8 @@ func SetupRouter() *gin.Engine {
 		v1.GET("/environments", environments.Read)
 		v1.DELETE("/environments/:environmentId", environments.Delete)
 
-		v1.POST("/annotations", annotations.CreateOrUpdate)
+		v1.POST("/annotations", annotations.Create)
+		v1.PUT("/annotations", annotations.Update)
 		v1.GET("/annotations/list", annotations.List)
 		v1.GET("/annotations/:annotationId", annotations.Read)
 		v1.DELETE("/annotations/:annotationId", annotations.Delete)
