@@ -128,7 +128,7 @@ func (p *listEnvironments) list() (z []map[string]interface{}, err error) {
 }
 
 // read will return all environments with range limit settings
-func (p *getEnvironments) read() (z []map[string]interface{}, err error) {
+func (p *getEnvironments) read() (z map[string]string, err error) {
 	db, err := sql.Open(
 		"postgres",
 		commons.BuildDSN(),
@@ -163,23 +163,21 @@ func (p *getEnvironments) read() (z []map[string]interface{}, err error) {
 		scanArgs[i] = &values[i]
 	}
 
-	m := make([]map[string]interface{}, 0)
+	m := make(map[string]string)
 	for rows.Next() {
 		err = rows.Scan(scanArgs...)
 		if err != nil {
-			return z, err
+			return
 		}
 		var value string
-		sub := make(map[string]interface{})
 		for i, col := range values {
 			if col == nil {
 				value = ""
 			} else {
 				value = php2go.Stripslashes(string(col))
 			}
-			sub[columns[i]] = value
+			m[columns[i]] = value
 		}
-		m = append(m, sub)
 	}
 	if err = rows.Err(); err != nil {
 		return z, err
