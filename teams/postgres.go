@@ -155,7 +155,7 @@ func (p *listTeams) list() (z []map[string]interface{}, err error) {
 	return m, nil
 }
 
-// all will return all teams with range limit settings
+// all will return all teams
 func all() (z []map[string]interface{}, err error) {
 	db, err := sql.Open(
 		"postgres",

@@ -126,7 +126,7 @@ func List(c *gin.Context) {
 	}
 }
 
-// All handle requirements to read teams with listTeams struct
+// All handle requirements to return all projects
 func All(c *gin.Context) {
 	result, err := all()
 	if err != nil {
