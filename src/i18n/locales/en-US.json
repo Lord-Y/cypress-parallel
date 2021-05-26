@@ -33,7 +33,23 @@
     },
     "executions": {
         "executions": "Execution | Executions",
-        "list": "Executions list"
+        "list": "Executions list",
+        "uniqId": "Uniq ID",
+        "spec": "Spec location",
+        "by": {
+            "uniqId": "Executions by uniq ID",
+            "spec": "Execution by spec"
+        },
+        "status": {
+            "global": "Global status",
+            "system": "System status",
+            "spec": "Execution status",
+            "failed": "Execution failed",
+            "code": "Code",
+            "err": {
+                "message": "Error message"
+            }
+        }
     },
     "alert": {
         "http": {
@@ -71,5 +87,15 @@
     },
     "select": {
         "selectYourChoice": "Select your choice"
+    },
+    "see": {
+        "see": "See",
+        "by": {
+            "uniqId": "See by uniq ID",
+            "spec": "See by spec"
+        }
+    },
+    "date": {
+        "date": "Date"
     }
 }
