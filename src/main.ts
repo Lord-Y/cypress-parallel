@@ -4,9 +4,8 @@ import router from './router'
 import { createI18n } from 'vue-i18n'
 import messages from '@intlify/vite-plugin-vue-i18n/messages'
 import './tailwind.css'
-import { defineRule, configure } from 'vee-validate'
+import { configure } from 'vee-validate'
 import { localize } from '@vee-validate/i18n'
-import AllRules from '@vee-validate/rules'
 import en from '@vee-validate/i18n/dist/locale/en.json'
 import fr from '@vee-validate/i18n/dist/locale/fr.json'
 const i18n = createI18n({
@@ -22,10 +21,6 @@ configure({
     en,
     fr,
   }),
-})
-
-Object.keys(AllRules).forEach((rule) => {
-  defineRule(rule, AllRules[rule])
 })
 
 const app = createApp(App)
