@@ -1,14 +1,15 @@
 <template>
   <div class="mt-4">
-    <label :for="id" class="block w-full pb-1">{{
+    <label class="block w-full pb-1">{{
       $t('projects.schedulingEnabled')
     }}</label>
-    <label for="checkbox" class="flex items-center cursor-pointer">
+    <label :for="id" class="flex items-center cursor-pointer">
       <div class="relative">
         <input
           type="checkbox"
           :id="id"
           class="hidden"
+          v-model="local"
           @click="update($event)"
         />
         <div
@@ -24,7 +25,7 @@
             duration-200
             ease-in-out
           "
-          :class="{ 'bg-green-500': local === true }"
+          :class="{ 'bg-green-500': local }"
         >
           <div
             id="inner"
@@ -39,7 +40,7 @@
               ease-in-out
             "
             :class="{
-              'translate-x-4': local === true,
+              'translate-x-4': local,
             }"
           ></div>
         </div>
