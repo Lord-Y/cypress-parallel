@@ -44,8 +44,8 @@
 import { defineComponent, PropType, computed } from 'vue'
 import { Field } from 'vee-validate'
 import { Teams } from '@api/teamsService'
-import { defineRule } from 'vee-validate';
-import { required } from '@vee-validate/rules';
+import { defineRule } from 'vee-validate'
+import { required } from '@vee-validate/rules'
 defineRule('required', required)
 
 export default defineComponent({
