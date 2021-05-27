@@ -229,7 +229,7 @@ func (p *updatePodName) update() (err error) {
 	}
 	defer db.Close()
 
-	stmt, err := db.Prepare("UPDATE executions SET pod_name = $1 WHERE uniq_id = $2 AND spec = $3")
+	stmt, err := db.Prepare("UPDATE executions SET pod_name = $1, execution_status = 'RUNNING' WHERE uniq_id = $2 AND spec = $3")
 	if err != nil && err != sql.ErrNoRows {
 		return err
 	}
