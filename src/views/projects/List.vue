@@ -57,7 +57,7 @@
                     :class="['cursor-pointer', classes.aLinks]"
                     :title="$t('projects.hooks.launch')"
                     to=""
-                    @click="launch(project.project_name)"
+                    @click="launch(project)"
                   >
                     <svg
                       class="w-10 h-10"
