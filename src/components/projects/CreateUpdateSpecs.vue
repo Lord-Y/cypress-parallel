@@ -34,7 +34,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, computed } from 'vue'
+import { defineComponent, ref } from 'vue'
 import { Field } from 'vee-validate'
 import { defineRule } from 'vee-validate'
 import { required } from '@vee-validate/rules'
@@ -60,13 +60,9 @@ export default defineComponent({
   },
   emits: ['update:updateSpecs'],
   setup(props, { emit }) {
-    const local = computed({
-      get: () => {
-        emit('update:updateSpecs', props.specs)
-        return props.specs
-      },
-      set: (value: string) => emit('update:updateSpecs', value),
-    })
+    const local = ref(props.specs)
+    emit('update:updateSpecs', local)
+
     function getValidationClass(meta: any): string {
       if (meta.valid && meta.validated && meta.dirty) {
         return 'outline-none border-green-500'

@@ -41,7 +41,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, PropType, computed } from 'vue'
+import { defineComponent, PropType, ref } from 'vue'
 import { Field } from 'vee-validate'
 import { Teams } from '@api/teamsService'
 import { defineRule } from 'vee-validate'
@@ -72,13 +72,9 @@ export default defineComponent({
   },
   emits: ['update:updateTeam'],
   setup(props, { emit }) {
-    const local = computed({
-      get: () => {
-        emit('update:updateTeam', props.teamId)
-        return props.teamId
-      },
-      set: (value: string) => emit('update:updateTeam', value),
-    })
+    const local = ref(props.teamId)
+    emit('update:updateTeam', local)
+
     function getValidationClass(meta: any): string {
       if (meta.valid && meta.validated && meta.dirty) {
         return 'outline-none border-green-500'
