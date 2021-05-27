@@ -22,7 +22,7 @@ func (p *projects) create() (z int64, err error) {
 	}
 	defer db.Close()
 
-	stmt, err := db.Prepare("INSERT INTO projects(project_name, team_id, repository, branch, specs, cypress_docker_version) VALUES($1, $2, $3, $4, $5, $6) RETURNING project_id")
+	stmt, err := db.Prepare("INSERT INTO projects(project_name, team_id, repository, branch, specs, cypress_docker_version, username, password) VALUES($1, $2, $3, $4, $5, $6, $7, $8) RETURNING project_id")
 	if err != nil && err != sql.ErrNoRows {
 		return z, err
 	}
@@ -34,6 +34,8 @@ func (p *projects) create() (z int64, err error) {
 		php2go.Addslashes(p.Branch),
 		php2go.Addslashes(p.Specs),
 		php2go.Addslashes(p.CypressDockerVersion),
+		php2go.Addslashes(p.Username),
+		php2go.Addslashes(p.Password),
 	).Scan(&z)
 	if err != nil && err != sql.ErrNoRows {
 		return z, err
@@ -284,7 +286,7 @@ func (p *updateProjects) update() (err error) {
 	}
 	defer db.Close()
 
-	stmt, err := db.Prepare("UPDATE projects SET project_name = $1, team_id = $2, repository = $3, branch = $4, specs = $5, scheduling = $6, scheduling_enabled = $7, max_pods = $8, cypress_docker_version = $9 WHERE project_id = $10")
+	stmt, err := db.Prepare("UPDATE projects SET project_name = $1, team_id = $2, repository = $3, branch = $4, specs = $5, scheduling = $6, scheduling_enabled = $7, max_pods = $8, cypress_docker_version = $9, username = $10, password = $11 WHERE project_id = $12")
 	if err != nil && err != sql.ErrNoRows {
 		return err
 	}
@@ -299,6 +301,8 @@ func (p *updateProjects) update() (err error) {
 		p.SchedulingEnabled,
 		p.MaxPods,
 		php2go.Addslashes(p.CypressDockerVersion),
+		php2go.Addslashes(p.Username),
+		php2go.Addslashes(p.Password),
 		p.ProjectID,
 	).Scan()
 	if err != nil && err != sql.ErrNoRows {

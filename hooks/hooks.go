@@ -48,6 +48,8 @@ type projects struct {
 	Max_pods             string
 	CypressDockerVersion string
 	Timeout              string
+	Username             string
+	Password             string
 }
 
 // executions is a slice of execution struct
@@ -303,6 +305,10 @@ func Plain(c *gin.Context) {
 		command = append(command, "--report-back")
 		command = append(command, "--timeout")
 		command = append(command, pj.Timeout)
+		command = append(command, "--username")
+		command = append(command, pj.Username)
+		command = append(command, "--password")
+		command = append(command, pj.Password)
 		if p.CypressDockerVersion != "" {
 			tag = p.CypressDockerVersion
 		} else {

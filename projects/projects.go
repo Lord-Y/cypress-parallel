@@ -19,7 +19,9 @@ type projects struct {
 	Branch               string `form:"branch" json:"branch" binding:"required"`
 	Specs                string `form:"specs" json:"specs" binding:"required"`
 	CypressDockerVersion string `form:"cypress_docker_version,default=7.2.0-0.0.2" json:"cypress_docker_version"`
-	Timeout              int    `form:"timeout,default=10" json:"timeout"`
+	Timeout              int    `form:"timeout,default=10" json:"timeout,default=10"`
+	Username             string `form:"username" json:"username" binding:"required,max=100"`
+	Password             string `form:"password" json:"password" binding:"required,max=100"`
 }
 
 // getProjects struct handle requirements to get projects
@@ -45,9 +47,11 @@ type updateProjects struct {
 	Specs                string `form:"specs" json:"specs" binding:"required"`
 	Scheduling           string `form:"scheduling" json:"scheduling" binding:"max=15"`
 	SchedulingEnabled    bool   `form:"schedulingEnabled" json:"schedulingEnabled"`
-	MaxPods              int    `form:"maxPods,default=10" json:"maxPods"`
+	MaxPods              int    `form:"maxPods,default=10" json:"maxPods,default=10"`
 	CypressDockerVersion string `form:"cypress_docker_version,default=7.2.0-0.0.2" json:"cypress_docker_version"`
 	Timeout              int    `form:"timeout,default=10" json:"timeout"`
+	Username             string `form:"username" json:"username" binding:"max=100"`
+	Password             string `form:"password" json:"password" binding:"max=100"`
 }
 
 // deleteProject struct handle requirements to delete project
