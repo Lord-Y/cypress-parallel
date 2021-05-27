@@ -36,6 +36,8 @@
               <tr>
                 <th class="py-3">{{ $t('teams.name') }}</th>
                 <th class="py-3">{{ $t('projects.projects') }}</th>
+                <th class="py-3">{{ $t('projects.branch') }}</th>
+                <th class="py-3">{{ $t('projects.hooks.launch') }}</th>
                 <th class="py-3">{{ $t('edit.edit') }}</th>
                 <th class="py-3">{{ $t('delete.delete') }}</th>
               </tr>
@@ -49,6 +51,35 @@
               >
                 <td class="px-2 py-3">{{ project.team_name }}</td>
                 <td class="px-2 py-3">{{ project.project_name }}</td>
+                <td class="px-2 py-3">{{ project.branch }}</td>
+                <td class="px-2 py-3">
+                  <router-link
+                    :class="['cursor-pointer', classes.aLinks]"
+                    :title="$t('projects.hooks.launch')"
+                    to=""
+                    @click="launch(project.project_name)"
+                  >
+                    <svg
+                      class="w-10 h-10"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"
+                      ></path>
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                      ></path>
+                    </svg>
+                  </router-link>
+                </td>
                 <td class="px-2 py-3">
                   <router-link
                     :class="['cursor-pointer', classes.aLinks]"
@@ -70,7 +101,6 @@
                     </svg>
                   </router-link>
                 </td>
-
                 <td class="px-2 py-3">
                   <router-link
                     class="cursor-pointer"
@@ -120,6 +150,8 @@
               <tr>
                 <th class="py-3">{{ $t('teams.name') }}</th>
                 <th class="py-3">{{ $t('projects.projects') }}</th>
+                <th class="py-3">{{ $t('projects.branch') }}</th>
+                <th class="py-3">{{ $t('projects.hooks.launch') }}</th>
                 <th class="py-3">{{ $t('edit.edit') }}</th>
                 <th class="py-3">{{ $t('delete.delete') }}</th>
               </tr>
@@ -133,6 +165,35 @@
               >
                 <td class="px-2 py-3">{{ project.team_name }}</td>
                 <td class="px-2 py-3">{{ project.project_name }}</td>
+                <td class="px-2 py-3">{{ project.branch }}</td>
+                <td class="px-2 py-3">
+                  <router-link
+                    :class="['cursor-pointer', classes.aLinks]"
+                    :title="$t('projects.hooks.launch')"
+                    to=""
+                    @click="launch(project)"
+                  >
+                    <svg
+                      class="w-10 h-10"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"
+                      ></path>
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                      ></path>
+                    </svg>
+                  </router-link>
+                </td>
                 <td class="px-2 py-3">
                   <router-link
                     :class="['cursor-pointer', classes.aLinks]"
@@ -154,7 +215,6 @@
                     </svg>
                   </router-link>
                 </td>
-
                 <td class="px-2 py-3">
                   <router-link
                     class="cursor-pointer"
@@ -195,7 +255,7 @@ import SpinnerCommon from '@components/commons/SpinnerCommon.vue'
 import AlertMessage from '@components/commons/AlertMessage.vue'
 import SearchProjectsByFilter from '@components/search/SearchProjectsByFilter.vue'
 import Pagination from '@components/commons/Pagination.vue'
-import ProjectsService, { Projects } from '@api/projectsService'
+import ProjectsService, { Project, Projects } from '@api/projectsService'
 import { useI18n } from 'vue-i18n'
 
 export default defineComponent({
@@ -323,6 +383,30 @@ export default defineComponent({
       }
     }
 
+    function launch(project: Project): void {
+      state.alert.message = ''
+      ProjectsService.hook({
+        project_name: project.project_name,
+        cypress_docker_version: project.cypress_docker_version,
+      })
+        .then((response: any) => {
+          if (response.status === 201) {
+            state.alert.class = 'green'
+            state.alert.message = t('alert.http.hook.created', {
+              field: project.project_name,
+            })
+          } else {
+            state.alert.class = 'red'
+            state.alert.message = t('alert.http.errorOccured')
+          }
+        })
+        .catch((error: any) => {
+          state.alert.class = 'red'
+          state.alert.message = t('alert.http.errorOccured')
+          throw error
+        })
+    }
+
     return {
       projects,
       loading,
@@ -331,6 +415,7 @@ export default defineComponent({
       search,
       classes,
       deleteItem,
+      launch,
     }
   },
 })
