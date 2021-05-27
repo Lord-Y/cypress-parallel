@@ -29,7 +29,10 @@
     "specs": "Specs location",
     "timeout": "Timeout in minutes",
     "username": "Username",
-    "password": "Password"
+    "password": "Password",
+    "hooks": {
+      "launch": "Launch"
+    }
   },
   "executions": {
     "executions": "Execution | Executions",
@@ -90,6 +93,9 @@
       "environment": {
         "created": "Environment \"{field}\" has been created",
         "updated": "Environment key \"{field}\" has been updated"
+      },
+      "hook": {
+        "created": "Hook has been successfully triggered on project \"{field}\""
       }
     }
   },

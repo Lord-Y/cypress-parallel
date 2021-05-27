@@ -29,7 +29,10 @@
     "specs": "Emplacement des specs",
     "timeout": "Timeout in minutes",
     "username": "Login",
-    "password": "Mot de passe"
+    "password": "Mot de passe",
+    "hooks": {
+      "launch": "Démarrer"
+    }
   },
   "executions": {
     "executions": "Exécution | Exécutions",
@@ -90,6 +93,9 @@
       "environment": {
         "created": "La variable d'environnement \"{field}\" a été créé",
         "updated": "La variable d'environnement \"{field}\" a été mis à jour"
+      },
+      "hook": {
+        "created": "Une nouvelle séquence de tests unitaires pour le projet \"{field}\" a bien été démarré"
       }
     }
   },
