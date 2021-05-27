@@ -12,6 +12,7 @@ export interface Annotations {
   annotation_id: number
   key: string
   value: string
+  date: Date
   total: number
 }
 
@@ -21,6 +22,7 @@ export interface Annotation {
   annotation_id: number
   key: string
   value: string
+  date: Date
 }
 
 class AnnotationsService {
