@@ -24,12 +24,12 @@
         "
         :class="getValidationClass(meta)"
       >
-        <option value="" disabled selected="selected">
+        <option value="" disabled>
           {{ $t('select.selectYourChoice') }}
         </option>
         <option
           v-for="(project, index) in projects"
-          :value="project.project_id"
+          :value="String(project.project_id)"
           :key="index"
         >
           {{ project.project_name }}
@@ -41,8 +41,9 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, computed } from 'vue'
+import { defineComponent, PropType, computed } from 'vue'
 import { Field } from 'vee-validate'
+import { ProjectOnly } from '@api/projectsService'
 
 export default defineComponent({
   props: {
@@ -55,7 +56,7 @@ export default defineComponent({
       default: 'project',
     },
     projects: {
-      type: Array,
+      type: Array as PropType<ProjectOnly[]>,
       required: true,
     },
     projectId: {

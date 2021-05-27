@@ -24,7 +24,7 @@
             duration-200
             ease-in-out
           "
-          :class="{ 'bg-green-500': local }"
+          :class="{ 'bg-green-500': local === true }"
         >
           <div
             id="inner"
@@ -39,7 +39,7 @@
               ease-in-out
             "
             :class="{
-              'translate-x-4': local,
+              'translate-x-4': local === true,
             }"
           ></div>
         </div>

@@ -24,7 +24,7 @@
         "
         :class="getValidationClass(meta)"
       >
-        <option value="" disabled selected="selected">
+        <option value="" disabled>
           {{ $t('select.selectYourChoice') }}
         </option>
         <option
@@ -41,8 +41,9 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, computed } from 'vue'
+import { defineComponent, PropType, computed } from 'vue'
 import { Field } from 'vee-validate'
+import { Teams } from '@api/teamsService'
 
 export default defineComponent({
   props: {
@@ -55,7 +56,7 @@ export default defineComponent({
       default: 'team',
     },
     teams: {
-      type: Array,
+      type: Array as PropType<Teams[]>,
       required: true,
     },
     teamId: {

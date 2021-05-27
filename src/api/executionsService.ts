@@ -7,6 +7,7 @@ const axiosClient: AxiosInstance = axios.create({
 })
 
 export interface Execution {
+  project_name: string
   execution_id: number
   project_id: number
   branch: string
