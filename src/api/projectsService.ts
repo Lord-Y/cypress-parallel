@@ -7,6 +7,7 @@ const axiosClient: AxiosInstance = axios.create({
 })
 
 export interface Projects {
+  team_name: string
   project_id: number
   project_name: string
   total: number

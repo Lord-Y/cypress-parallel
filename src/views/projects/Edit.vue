@@ -17,7 +17,7 @@
           <Form @submit="submit">
             <CreateUpdateTeam
               :teams="teams"
-              :team-id="project.team_id"
+              :team-id="String(project.team_id)"
               v-model:updateTeam="form.team_id"
             />
             <CreateUpdateName
@@ -47,7 +47,7 @@
               v-model:updateSpecs="form.specs"
             />
             <CreateUpdateSchedulingEnabled
-              :scheduling-enabled="String(project.scheduling_enabled) === true"
+              :scheduling-enabled="project.scheduling_enabled"
               v-model:updateSchedulingEnabled="form.schedulingEnabled"
             />
             <CreateUpdateScheduling

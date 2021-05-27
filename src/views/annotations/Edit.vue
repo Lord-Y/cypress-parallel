@@ -17,7 +17,7 @@
           <Form @submit="submit">
             <CreateUpdateProject
               :projects="projects"
-              :project-id="annotation.project_id"
+              :project-id="String(annotation.project_id)"
               v-model:updateProject="form.project_id"
             />
             <CreateUpdateKey
