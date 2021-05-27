@@ -279,7 +279,6 @@ export default defineComponent({
           break
         case 'NOT_STARTED':
         case 'SCHEDULED':
-        case 'RUNNING':
         case 'CANCELLED':
           state.classes.status.global = 'text-gray-500 font-semibold'
           break
