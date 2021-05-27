@@ -4,7 +4,7 @@
       $t('projects.password')
     }}</label>
     <input
-      v-model="local"
+      v-model.lazy.trim="local"
       type="text"
       :id="id"
       :name="name"
@@ -23,7 +23,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, computed } from 'vue'
+import { defineComponent, ref } from 'vue'
 
 export default defineComponent({
   props: {
@@ -42,13 +42,8 @@ export default defineComponent({
   },
   emits: ['update:updatePassword'],
   setup(props, { emit }) {
-    const local = computed({
-      get: () => {
-        emit('update:updatePassword', props.password)
-        return props.password
-      },
-      set: (value: string) => emit('update:updatePassword', value),
-    })
+    const local = ref(props.password)
+    emit('update:updatePassword', local)
 
     return {
       local,
