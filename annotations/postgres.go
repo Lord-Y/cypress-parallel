@@ -78,7 +78,7 @@ func (p *listAnnotations) list() (z []map[string]interface{}, err error) {
 	}
 	defer db.Close()
 
-	stmt, err := db.Prepare("SELECT a.*, (SELECT count(annotation_id) FROM annotations) total, p.project_name FROM annotations a LEFT JOIN projects p ON a.project_id = p.project_id ORDER BY a.key DESC OFFSET $1 LIMIT $2")
+	stmt, err := db.Prepare("SELECT a.*, (SELECT count(annotation_id) FROM annotations) total, p.project_name FROM annotations a LEFT JOIN projects p ON a.project_id = p.project_id ORDER BY a.date DESC OFFSET $1 LIMIT $2")
 	if err != nil && err != sql.ErrNoRows {
 		return
 	}
@@ -279,7 +279,7 @@ func (p *searchAnnotations) search() (z []map[string]interface{}, err error) {
 	}
 	defer db.Close()
 
-	stmt, err := db.Prepare("SELECT a.*, (SELECT count(annotation_id) FROM annotations WHERE key LIKE '%' || $1 || '%' OR value LIKE '%' || $1 || '%') total, p.project_name FROM annotations a LEFT JOIN projects p ON a.project_id = p.project_id WHERE a.key LIKE '%' || $1 || '%' OR a.value LIKE '%' || $1 || '%' ORDER BY a.key DESC OFFSET $2 LIMIT $3")
+	stmt, err := db.Prepare("SELECT a.*, (SELECT count(annotation_id) FROM annotations WHERE key LIKE '%' || $1 || '%' OR value LIKE '%' || $1 || '%') total, p.project_name FROM annotations a LEFT JOIN projects p ON a.project_id = p.project_id WHERE a.key LIKE '%' || $1 || '%' OR a.value LIKE '%' || $1 || '%' ORDER BY a.date DESC OFFSET $2 LIMIT $3")
 	if err != nil && err != sql.ErrNoRows {
 		return z, err
 	}
