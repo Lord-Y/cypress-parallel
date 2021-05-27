@@ -37,7 +37,8 @@ class Statuses {
     if (
       Object.keys(execution).length > 0 &&
       (execution.execution_status === 'FAILED' ||
-        execution.execution_status === 'NOT_STARTED')
+        execution.execution_status === 'NOT_STARTED' ||
+        execution.execution_status === 'RUNNING')
     ) {
       return execution.execution_status
     }
