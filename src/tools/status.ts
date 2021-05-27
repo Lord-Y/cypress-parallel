@@ -36,7 +36,8 @@ class Statuses {
   global(execution: Execution): string {
     if (
       Object.keys(execution).length > 0 &&
-      execution.execution_status === 'FAILED'
+      (execution.execution_status === 'FAILED' ||
+        execution.execution_status === 'NOT_STARTED')
     ) {
       return execution.execution_status
     }
