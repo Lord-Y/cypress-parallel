@@ -100,6 +100,10 @@ func Plain(c *gin.Context) {
 		return
 	}
 
+	if p.CypressDockerVersion == "" {
+		p.CypressDockerVersion = "7.2.0-0.0.2"
+	}
+
 	result, err := p.getProjectInfos()
 	if err != nil {
 		log.Error().Err(err).Msg("Error occured while performing db query")
