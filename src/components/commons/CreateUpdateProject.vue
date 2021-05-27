@@ -41,7 +41,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, PropType, computed } from 'vue'
+import { defineComponent, PropType, ref } from 'vue'
 import { Field } from 'vee-validate'
 import { ProjectOnly } from '@api/projectsService'
 import { defineRule } from 'vee-validate'
@@ -72,13 +72,9 @@ export default defineComponent({
   },
   emits: ['update:updateProject'],
   setup(props, { emit }) {
-    const local = computed({
-      get: () => {
-        emit('update:updateProject', props.projectId)
-        return props.projectId
-      },
-      set: (value: string) => emit('update:updateProject', value),
-    })
+    const local = ref(props.projectId)
+    emit('update:updateProject', local)
+
     function getValidationClass(meta: any): string {
       if (meta.valid && meta.validated && meta.dirty) {
         return 'outline-none border-green-500'

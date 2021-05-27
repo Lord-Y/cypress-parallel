@@ -6,15 +6,15 @@
     <Field
       as=""
       :name="name"
-      v-model="local"
+      v-model.number="local"
       :label="$t('projects.timeout').toLowerCase()"
       rules="required"
       v-slot="{ field, meta, errorMessage }"
-      type="text"
+      type="number"
     >
       <input
         v-bind="field"
-        type="text"
+        type="number"
         :id="id"
         :placeholder="$t('projects.timeout').toLowerCase()"
         autocomplete="off"
@@ -34,7 +34,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, computed } from 'vue'
+import { defineComponent, ref } from 'vue'
 import { Field } from 'vee-validate'
 import { defineRule } from 'vee-validate'
 import { required } from '@vee-validate/rules'
@@ -60,13 +60,9 @@ export default defineComponent({
   },
   emits: ['update:updateTimeout'],
   setup(props, { emit }) {
-    const local = computed({
-      get: () => {
-        emit('update:updateTimeout', props.timeout)
-        return props.timeout
-      },
-      set: (value: number) => emit('update:updateTimeout', value),
-    })
+    const local = ref(props.timeout)
+    emit('update:updateTimeout', local)
+
     function getValidationClass(meta: any): string {
       if (meta.valid && meta.validated && meta.dirty) {
         return 'outline-none border-green-500'

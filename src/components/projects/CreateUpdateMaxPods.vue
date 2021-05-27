@@ -6,7 +6,7 @@
     <Field
       as=""
       :name="name"
-      v-model="local"
+      v-model.number="local"
       :label="$t('projects.maxPods').toLowerCase()"
       rules="required"
       v-slot="{ field, meta, errorMessage }"
@@ -34,7 +34,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, computed } from 'vue'
+import { defineComponent, ref } from 'vue'
 import { Field } from 'vee-validate'
 import { defineRule } from 'vee-validate'
 import { required } from '@vee-validate/rules'
@@ -60,13 +60,9 @@ export default defineComponent({
   },
   emits: ['update:updateMaxPods'],
   setup(props, { emit }) {
-    const local = computed({
-      get: () => {
-        emit('update:updateMaxPods', props.maxPods)
-        return props.maxPods
-      },
-      set: (value: number) => emit('update:updateMaxPods', value),
-    })
+    const local = ref(props.maxPods)
+    emit('update:updateMaxPods', local)
+
     function getValidationClass(meta: any): string {
       if (meta.valid && meta.validated && meta.dirty) {
         return 'outline-none border-green-500'

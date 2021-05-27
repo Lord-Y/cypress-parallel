@@ -49,7 +49,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, computed } from 'vue'
+import { defineComponent, ref } from 'vue'
 
 export default defineComponent({
   props: {
@@ -68,13 +68,9 @@ export default defineComponent({
   },
   emits: ['update:updateSchedulingEnabled'],
   setup(props, { emit }) {
-    const local = computed({
-      get: () => {
-        emit('update:updateSchedulingEnabled', props.schedulingEnabled)
-        return props.schedulingEnabled
-      },
-      set: (value: boolean) => emit('update:updateSchedulingEnabled', value),
-    })
+    const local = ref(props.schedulingEnabled)
+    emit('update:updateSchedulingEnabled', local)
+
     function update(event: any): void {
       let englobe: Element | null, inner: Element | null
       englobe = document.querySelector('#englobe')
