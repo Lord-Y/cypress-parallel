@@ -14,6 +14,7 @@
             Object.keys(project).length > 0
           "
         >
+          {{ project }}
           <Form @submit="submit">
             <CreateUpdateTeam
               :teams="teams"
@@ -177,6 +178,11 @@ export default defineComponent({
         switch (response.status) {
           case 200:
             state.project = response.data
+            if (response.data.scheduling_enabled === 'false') {
+              state.project.scheduling_enabled = false
+            } else {
+              state.project.scheduling_enabled = true
+            }
             break
           default:
             state.alert.class = 'red'
