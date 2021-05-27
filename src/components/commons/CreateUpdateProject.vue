@@ -44,6 +44,9 @@
 import { defineComponent, PropType, computed } from 'vue'
 import { Field } from 'vee-validate'
 import { ProjectOnly } from '@api/projectsService'
+import { defineRule } from 'vee-validate';
+import { required } from '@vee-validate/rules';
+defineRule('required', required)
 
 export default defineComponent({
   props: {
