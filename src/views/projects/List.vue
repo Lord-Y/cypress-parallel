@@ -383,7 +383,7 @@ export default defineComponent({
       }
     }
 
-    function launch(project: Project): void {
+    function launch(project: Projects): void {
       state.alert.message = ''
       ProjectsService.hook({
         project_name: project.project_name,
