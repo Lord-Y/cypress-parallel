@@ -63,38 +63,7 @@
                 w-full
                 text-left
                 p-3
-                border-t-2 border-black
-              "
-              @click="menu.isOpen.home = !menu.isOpen.home"
-            >
-              {{ $t('home.home') }}
-            </button>
-            <div class="bg-black" v-if="menu.isOpen.home">
-              <router-link
-                class="
-                  block
-                  text-white
-                  font-medium
-                  hover:text-green-500
-                  hover:font-extrabold
-                  p-2
-                "
-                to="/"
-                :title="$t('home.home')"
-                >{{ $t('home.home') }}</router-link
-              >
-            </div>
-          </div>
-          <div>
-            <button
-              type="button"
-              class="
-                block
-                text-white
-                w-full
-                text-left
-                p-3
-                border-b-2 border-black
+                border-t-2 border-b-2 border-black
               "
               :class="getSelectedMenu('teams')"
               @click="menu.isOpen.teams = !menu.isOpen.teams"
@@ -312,7 +281,6 @@ export default defineComponent({
       isOpen: false,
       menu: {
         isOpen: {
-          home: true,
           teams: false,
           projects: false,
           annotations: false,
