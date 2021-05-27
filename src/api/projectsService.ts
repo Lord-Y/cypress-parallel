@@ -10,6 +10,8 @@ export interface Projects {
   team_name: string
   project_id: number
   project_name: string
+  branch: string
+  cypress_docker_version: string
   total: number
   date: Date
 }
