@@ -12,6 +12,7 @@ export interface Environments {
   environment_id: number
   key: string
   value: string
+  date: Date
   total: number
 }
 
@@ -21,6 +22,7 @@ export interface Environment {
   environment_id: number
   key: string
   value: string
+  date: Date
 }
 
 class EnvironmentsService {
