@@ -78,7 +78,7 @@ func (p *listEnvironments) list() (z []map[string]interface{}, err error) {
 	}
 	defer db.Close()
 
-	stmt, err := db.Prepare("SELECT e.*, (SELECT count(environment_id) FROM environments) total, p.project_name FROM environments e LEFT JOIN projects p ON e.project_id = p.project_id ORDER BY e.key DESC OFFSET $1 LIMIT $2")
+	stmt, err := db.Prepare("SELECT e.*, (SELECT count(environment_id) FROM environments) total, p.project_name FROM environments e LEFT JOIN projects p ON e.project_id = p.project_id ORDER BY e.date DESC OFFSET $1 LIMIT $2")
 	if err != nil && err != sql.ErrNoRows {
 		return
 	}
@@ -279,7 +279,7 @@ func (p *searchEnvironments) search() (z []map[string]interface{}, err error) {
 	}
 	defer db.Close()
 
-	stmt, err := db.Prepare("SELECT e.*, (SELECT count(environment_id) FROM environments WHERE key LIKE '%' || $1 || '%' OR value LIKE '%' || $1 || '%') total, p.project_name FROM environments e LEFT JOIN projects p ON e.project_id = p.project_id WHERE e.key LIKE '%' || $1 || '%' OR e.value LIKE '%' || $1 || '%' ORDER BY e.key DESC OFFSET $2 LIMIT $3")
+	stmt, err := db.Prepare("SELECT e.*, (SELECT count(environment_id) FROM environments WHERE key LIKE '%' || $1 || '%' OR value LIKE '%' || $1 || '%') total, p.project_name FROM environments e LEFT JOIN projects p ON e.project_id = p.project_id WHERE e.key LIKE '%' || $1 || '%' OR e.value LIKE '%' || $1 || '%' ORDER BY e.date DESC OFFSET $2 LIMIT $3")
 	if err != nil && err != sql.ErrNoRows {
 		return z, err
 	}
