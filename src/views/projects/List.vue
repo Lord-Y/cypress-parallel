@@ -255,7 +255,7 @@ import SpinnerCommon from '@components/commons/SpinnerCommon.vue'
 import AlertMessage from '@components/commons/AlertMessage.vue'
 import SearchProjectsByFilter from '@components/search/SearchProjectsByFilter.vue'
 import Pagination from '@components/commons/Pagination.vue'
-import ProjectsService, { Project, Projects } from '@api/projectsService'
+import ProjectsService, { Projects } from '@api/projectsService'
 import { useI18n } from 'vue-i18n'
 
 export default defineComponent({
