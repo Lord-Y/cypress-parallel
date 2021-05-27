@@ -1,0 +1,1 @@
+ALTER TABLE annotations ADD date timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP;
