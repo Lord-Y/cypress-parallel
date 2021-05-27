@@ -76,6 +76,13 @@ class ProjectsService {
       `/api/v1/cypress-parallel-api/projects/search?q=${q}&page=${page}`,
     )
   }
+
+  async hook(data: any): Promise<any> {
+    return await axiosClient.post(
+      '/api/v1/cypress-parallel-api/hooks/launch/plain',
+      data,
+    )
+  }
 }
 
 export default new ProjectsService()
