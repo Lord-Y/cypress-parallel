@@ -143,10 +143,16 @@ export default defineComponent({
     }
 
     function getSystemStatus(s: string): string {
-      if (s === 'DONE') {
-        state.classes.status.system = 'text-green-500 font-semibold'
-      } else {
-        state.classes.status.system = 'text-red-500 font-semibold'
+      switch (s) {
+        case 'DONE':
+          state.classes.status.system = 'text-green-500 font-semibold'
+          break
+        case 'NOT_STARTED':
+          state.classes.status.system = 'text-gray-500 font-semibold'
+          break
+        default:
+          state.classes.status.system = 'text-red-500 font-semibold'
+          break
       }
       return s
     }
