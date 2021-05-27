@@ -14,7 +14,6 @@
             Object.keys(project).length > 0
           "
         >
-          {{ project }}
           <Form @submit="submit">
             <CreateUpdateTeam
               :teams="teams"
