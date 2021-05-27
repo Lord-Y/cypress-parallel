@@ -4,7 +4,7 @@
       $t('projects.username')
     }}</label>
     <input
-      v-model="local"
+      v-model.lazy.trim="local"
       type="text"
       :id="id"
       :name="name"
@@ -23,7 +23,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, computed } from 'vue'
+import { defineComponent, ref } from 'vue'
 
 export default defineComponent({
   props: {
@@ -42,13 +42,8 @@ export default defineComponent({
   },
   emits: ['update:updateUsername'],
   setup(props, { emit }) {
-    const local = computed({
-      get: () => {
-        emit('update:updateUsername', props.username)
-        return props.username
-      },
-      set: (value: string) => emit('update:updateUsername', value),
-    })
+    const local = ref(props.username)
+    emit('update:updateUsername', local)
 
     return {
       local,
