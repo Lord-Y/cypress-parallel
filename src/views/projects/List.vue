@@ -5,6 +5,8 @@
       <div class="block">
         <Title :title="$t('projects.list')" />
         <SpinnerCommon v-if="loading.loading.active" />
+        <SpinnerCommon v-if="loading.delete.active" />
+        <SpinnerCommon v-if="loading.hook.active" />
         <AlertMessage :message="alert.message" :classes="alert.class" />
         <SearchProjectsByFilter
           v-if="search.bar.enabled"
@@ -285,6 +287,9 @@ export default defineComponent({
         delete: {
           active: false,
         },
+        hook: {
+          active: false,
+        },
       },
       pagination: {
         enabled: false,
@@ -385,6 +390,7 @@ export default defineComponent({
 
     function launch(project: Projects): void {
       state.alert.message = ''
+      state.loading.hook.active = true
       ProjectsService.hook({
         project_name: project.project_name,
         cypress_docker_version: project.cypress_docker_version,
@@ -399,10 +405,12 @@ export default defineComponent({
             state.alert.class = 'red'
             state.alert.message = t('alert.http.errorOccured')
           }
+          state.loading.hook.active = false
         })
         .catch((error: any) => {
           state.alert.class = 'red'
           state.alert.message = t('alert.http.errorOccured')
+          state.loading.hook.active = false
           throw error
         })
     }

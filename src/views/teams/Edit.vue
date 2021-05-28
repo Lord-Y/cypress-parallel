@@ -68,6 +68,7 @@ export default defineComponent({
       useScope: 'global',
     })
 
+    state.loading.loading.active = true
     TeamsService.get(Number(route.params.id))
       .then((response: any) => {
         switch (response.status) {
@@ -79,6 +80,7 @@ export default defineComponent({
             state.alert.message = t('alert.http.errorOccured')
             break
         }
+        state.loading.loading.active = false
       })
       .catch((error: any) => {
         if (error.response.status === 404) {
@@ -88,6 +90,7 @@ export default defineComponent({
           state.alert.class = 'red'
           state.alert.message = t('alert.http.errorOccured')
         }
+        state.loading.loading.active = false
         throw error
       })
 

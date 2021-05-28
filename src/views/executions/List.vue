@@ -211,7 +211,6 @@ export default defineComponent({
       page = Number(route.params.page)
     }
     state.loading.loading.active = true
-
     ExecutionsService.list(page)
       .then((response: any) => {
         switch (response.status) {
@@ -235,13 +234,14 @@ export default defineComponent({
             state.alert.message = t('alert.http.errorOccured')
             break
         }
+        state.loading.loading.active = false
       })
       .catch((error: any) => {
         state.alert.class = 'red'
         state.alert.message = t('alert.http.errorOccured')
+        state.loading.loading.active = false
         throw error
       })
-    state.loading.loading.active = false
 
     let { executions, loading, alert, pagination, search, classes } =
       toRefs(state)

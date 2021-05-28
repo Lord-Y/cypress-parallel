@@ -223,7 +223,6 @@ export default defineComponent({
     id = String(route.params.id)
 
     state.loading.loading.active = true
-
     ExecutionsService.get(Number(id))
       .then((response: any) => {
         switch (response.status) {
@@ -235,13 +234,14 @@ export default defineComponent({
             state.alert.message = t('alert.http.errorOccured')
             break
         }
+        state.loading.loading.active = false
       })
       .catch((error: any) => {
         state.alert.class = 'red'
         state.alert.message = t('alert.http.errorOccured')
+        state.loading.loading.active = false
         throw error
       })
-    state.loading.loading.active = false
 
     function convertDuration(s: number) {
       if (s > 60000) {
