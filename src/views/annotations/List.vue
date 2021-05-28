@@ -5,6 +5,7 @@
       <div class="block">
         <Title :title="$t('annotations.list')" />
         <SpinnerCommon v-if="loading.loading.active" />
+        <SpinnerCommon v-if="loading.delete.active" />
         <AlertMessage :message="alert.message" :classes="alert.class" />
         <SearchAnnotationsByFilter
           v-if="search.bar.enabled"
@@ -268,8 +269,8 @@ export default defineComponent({
     } else {
       page = Number(route.params.page)
     }
-    state.loading.loading.active = true
 
+    state.loading.loading.active = true
     AnnotationsService.list(page)
       .then((response: any) => {
         switch (response.status) {
@@ -293,13 +294,14 @@ export default defineComponent({
             state.alert.message = t('alert.http.errorOccured')
             break
         }
+        state.loading.loading.active = false
       })
       .catch((error: any) => {
         state.alert.class = 'red'
         state.alert.message = t('alert.http.errorOccured')
+        state.loading.loading.active = false
         throw error
       })
-    state.loading.loading.active = false
 
     let { annotations, loading, alert, pagination, search, classes } =
       toRefs(state)
@@ -323,13 +325,14 @@ export default defineComponent({
                 state.alert.message = t('alert.http.noDataFound')
               }
             }
+            state.loading.delete.active = false
           })
           .catch((error: any) => {
             state.alert.class = 'red'
             state.alert.message = t('alert.http.errorOccured')
+            state.loading.delete.active = false
             throw error
           })
-        state.loading.delete.active = false
       }
     }
 

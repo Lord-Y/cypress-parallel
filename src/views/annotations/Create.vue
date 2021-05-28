@@ -83,6 +83,7 @@ export default defineComponent({
       useScope: 'global',
     })
 
+    state.loading.loading.active = true
     ProjectsService.all()
       .then((response: any) => {
         switch (response.status) {
@@ -94,10 +95,12 @@ export default defineComponent({
             state.alert.message = t('alert.http.errorOccured')
             break
         }
+        state.loading.loading.active = false
       })
       .catch((error: any) => {
         state.alert.class = 'red'
         state.alert.message = t('alert.http.errorOccured')
+        state.loading.loading.active = false
         throw error
       })
 
