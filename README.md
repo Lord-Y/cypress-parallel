@@ -1,4 +1,4 @@
-# cypress-parallel [![CircleCI](https://circleci.com/gh/Lord-Y/cypress-parallel.svg?style=svg)](https://circleci.com/gh/Lord-Y/cypress-parallel)
+# cypress-parallel [![CircleCI](https://circleci.com/gh/Lord-Y/cypress-parallel/tree/main.svg?style=svg)](https://circleci.com/gh/Lord-Y/cypress-parallel?branch=main)
 
 ̀`cypress-parallel` is a UI that permit to see datas fetched from [cypress-parallel-api](https://github.com/Lord-Y/cypress-parallel).
 
