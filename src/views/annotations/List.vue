@@ -72,7 +72,6 @@
                     </svg>
                   </router-link>
                 </td>
-
                 <td class="px-2 py-3">
                   <router-link
                     class="cursor-pointer"
@@ -160,7 +159,6 @@
                     </svg>
                   </router-link>
                 </td>
-
                 <td class="px-2 py-3">
                   <router-link
                     class="cursor-pointer"
