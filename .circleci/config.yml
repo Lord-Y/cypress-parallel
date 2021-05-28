@@ -1,0 +1,70 @@
+---
+version: 2.1
+
+executors:
+  nodejs:
+    machine:
+      image: ubuntu-2004:202104-01
+    environment:
+      IMAGE_NAME: docker.pkg.github.com/lord-y/cypress-parallel/cypress-parallel
+
+jobs:
+  build:
+    executor: nodejs
+
+    steps:
+    - checkout
+
+    - run:
+        name: Build docker image
+        command: docker build -t ${IMAGE_NAME}:latest .
+
+  build-tags-and-publish-prerelease:
+    executor: nodejs
+
+    steps:
+    - checkout
+
+    - run:
+        name: Build and publish prerelease docker image
+        command: |
+          docker build -t ${IMAGE_NAME}:${CIRCLE_TAG} .
+          echo "$GITHUB_TOKEN" | docker login https://docker.pkg.github.com -u Lord-Y --password-stdin
+          docker push ${IMAGE_NAME}:${CIRCLE_TAG}
+
+  build-tags-and-publish-release:
+    executor: nodejs
+
+    steps:
+    - checkout
+
+    - run:
+        name: Build and publish docker image
+        command: |
+          docker build -t ${IMAGE_NAME}:${CIRCLE_TAG} .
+          echo "$GITHUB_TOKEN" | docker login https://docker.pkg.github.com -u Lord-Y --password-stdin
+          docker push ${IMAGE_NAME}:${CIRCLE_TAG}
+
+# https://circleci.com/docs/2.0/workflows/#git-tag-job-execution
+workflows:
+  version: 2
+  test-and-build:
+    jobs:
+    - build:
+        filters:
+          tags:
+            only: /.*/
+    - build-tags-and-publish-prerelease:
+        context: GITHUB
+        filters:
+          tags:
+            only: /^v\d+\.\d+\.\d+-(.*)$/
+          branches:
+            ignore: /.*/
+    - build-tags-and-publish-release:
+        context: GITHUB
+        filters:
+          tags:
+            only: /^v\d+\.\d+\.\d+$/
+          branches:
+            ignore: /.*/
