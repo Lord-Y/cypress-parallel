@@ -25,5 +25,5 @@ ENV NODE_ENV=production
 RUN npm install --only=production
 
 USER appuser
-EXPOSE 5000
-CMD ./node_modules/.bin/vite preview
+EXPOSE 8080
+CMD ./node_modules/.bin/vite preview --port 8080
