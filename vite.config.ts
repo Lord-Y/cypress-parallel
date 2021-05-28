@@ -22,10 +22,10 @@ export default defineConfig({
     }),
   ],
   server: {
+    strictPort: true,
     proxy: {
       '/api': {
         target: process.env.API_GATEWAY || 'http://localhost:8080',
-        // changeOrigin: true,
       },
     }
   }
