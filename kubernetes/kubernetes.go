@@ -166,6 +166,26 @@ func CreatePod(clientset *kubernetes.Clientset, m models.Pods) (podName string, 
 			RestartPolicy:                 v1.RestartPolicyNever,
 			TerminationGracePeriodSeconds: &terminationGracePeriodSeconds,
 			ServiceAccountName:            m.Namespace,
+			Affinity: &v1.Affinity{
+				PodAntiAffinity: &v1.PodAntiAffinity{
+					PreferredDuringSchedulingIgnoredDuringExecution: []v1.WeightedPodAffinityTerm{
+						{
+							Weight: int32(5),
+							PodAffinityTerm: v1.PodAffinityTerm{
+								LabelSelector: &metav1.LabelSelector{
+									MatchLabels: map[string]string{
+										"worker": "kubernetes",
+									},
+								},
+								Namespaces: []string{
+									m.Namespace,
+								},
+								TopologyKey: "kubernetes.io/hostname",
+							},
+						},
+					},
+				},
+			},
 		},
 	}
 	result, err := clientset.
