@@ -146,11 +146,11 @@ func TestExecutionsUniqID(t *testing.T) {
 	}
 
 	router := SetupRouter()
-	w, _ := performRequest(router, headers, "GET", fmt.Sprintf("/api/v1/cypress-parallel-api/list/by/uniqid/%s", result["uniq_id"]), "")
+	w, _ := performRequest(router, headers, "GET", fmt.Sprintf("/api/v1/cypress-parallel-api/executions/list/by/uniqid/%s", result["uniq_id"]), "")
 	if len(result) > 0 {
 		assert.Contains(w.Body.String(), "branch")
 		return
 	}
-	w, _ = performRequest(router, headers, "GET", fmt.Sprintf("/api/v1/cypress-parallel-api/list/by/uniqid/%s", "404"), "")
+	w, _ = performRequest(router, headers, "GET", fmt.Sprintf("/api/v1/cypress-parallel-api/executions/list/by/uniqid/%s", "404"), "")
 	assert.Equal(404, w.Code)
 }
