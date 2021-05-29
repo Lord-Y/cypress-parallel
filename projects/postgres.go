@@ -22,7 +22,7 @@ func (p *projects) create() (z int64, err error) {
 	}
 	defer db.Close()
 
-	stmt, err := db.Prepare("INSERT INTO projects(project_name, team_id, repository, branch, specs, cypress_docker_version, username, password) VALUES($1, $2, $3, $4, $5, $6, $7, $8) RETURNING project_id")
+	stmt, err := db.Prepare("INSERT INTO projects(project_name, team_id, repository, branch, specs, cypress_docker_version, username, password, browser, config_file) VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) RETURNING project_id")
 	if err != nil && err != sql.ErrNoRows {
 		return z, err
 	}
@@ -36,6 +36,8 @@ func (p *projects) create() (z int64, err error) {
 		php2go.Addslashes(p.CypressDockerVersion),
 		php2go.Addslashes(p.Username),
 		php2go.Addslashes(p.Password),
+		php2go.Addslashes(p.Browser),
+		php2go.Addslashes(p.ConfigFile),
 	).Scan(&z)
 	if err != nil && err != sql.ErrNoRows {
 		return z, err
@@ -172,7 +174,7 @@ func all() (z []map[string]interface{}, err error) {
 	}
 	defer db.Close()
 
-	stmt, err := db.Prepare("SELECT project_id, project_name, branch, cypress_docker_version, (SELECT count(project_id) FROM projects) total FROM projects ORDER BY date")
+	stmt, err := db.Prepare("SELECT project_id, project_name, branch, cypress_docker_version, browser, config_file, (SELECT count(project_id) FROM projects) total FROM projects ORDER BY date")
 	if err != nil && err != sql.ErrNoRows {
 		return z, err
 	}
@@ -230,7 +232,7 @@ func GetProjectIDForUnitTesting() (z map[string]string, err error) {
 	}
 	defer db.Close()
 
-	stmt, err := db.Prepare("SELECT project_id,team_id,project_name FROM projects LIMIT 1")
+	stmt, err := db.Prepare("SELECT * FROM projects LIMIT 1")
 	if err != nil && err != sql.ErrNoRows {
 		return z, err
 	}
@@ -286,7 +288,7 @@ func (p *updateProjects) update() (err error) {
 	}
 	defer db.Close()
 
-	stmt, err := db.Prepare("UPDATE projects SET project_name = $1, team_id = $2, repository = $3, branch = $4, specs = $5, scheduling = $6, scheduling_enabled = $7, max_pods = $8, cypress_docker_version = $9, username = $10, password = $11 WHERE project_id = $12")
+	stmt, err := db.Prepare("UPDATE projects SET project_name = $1, team_id = $2, repository = $3, branch = $4, specs = $5, scheduling = $6, scheduling_enabled = $7, max_pods = $8, cypress_docker_version = $9, username = $10, password = $11, browser = $12, config_file = $13 WHERE project_id = $14")
 	if err != nil && err != sql.ErrNoRows {
 		return err
 	}
@@ -303,6 +305,8 @@ func (p *updateProjects) update() (err error) {
 		php2go.Addslashes(p.CypressDockerVersion),
 		php2go.Addslashes(p.Username),
 		php2go.Addslashes(p.Password),
+		php2go.Addslashes(p.Browser),
+		php2go.Addslashes(p.ConfigFile),
 		p.ProjectID,
 	).Scan()
 	if err != nil && err != sql.ErrNoRows {

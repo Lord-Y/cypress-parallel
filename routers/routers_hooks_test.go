@@ -26,14 +26,17 @@ func TestHooksPlainCreate(t *testing.T) {
 	router := SetupRouter()
 	tests := []struct {
 		branch     string
+		browser    string
 		statusCode int
 	}{
 		{
 			branch:     "",
+			browser:    "chrome",
 			statusCode: 201,
 		},
 		{
 			branch:     "master",
+			browser:    "chrome",
 			statusCode: 201,
 		},
 		{

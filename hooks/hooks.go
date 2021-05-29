@@ -26,9 +26,8 @@ type plain struct {
 	ProjectName          string `form:"project_name" json:"project_name" binding:"required,max=100"`
 	Branch               string `form:"branch" json:"branch"`
 	Specs                string `form:"specs" json:"specs"`
-	ConfigFile           string `form:"config_file" json:"config_file"`
-	Group                string `form:"group" json:"group"`
-	Browser              string `form:"browser" json:"browser"`
+	ConfigFile           string `form:"config_file,default=cypress.json" json:"config_file,default=cypress.json" binding:"max=100"`
+	Browser              string `form:"browser,default=chrome" json:"browser,default=chrome" binding:"max=100,oneof=chrome firefox"`
 	MaxPods              string `form:"max_pods" json:"max_pods"`
 	CypressDockerVersion string `form:"cypress_docker_version,default=7.2.0-0.0.2,max=20" json:"cypress_docker_version,max=20"`
 	plain                bool
@@ -104,6 +103,9 @@ func Plain(c *gin.Context) {
 
 	if p.CypressDockerVersion == "" {
 		p.CypressDockerVersion = "7.2.0-0.0.2"
+	}
+	if p.ConfigFile == "" {
+		p.ConfigFile = "cypress.json"
 	}
 
 	result, err := p.getProjectInfos()
@@ -280,14 +282,10 @@ func Plain(c *gin.Context) {
 
 		command = append(command, "cypress-parallel-cli")
 		command = append(command, "cypress")
-		if p.Browser != "" {
-			command = append(command, "--browser")
-			command = append(command, p.Browser)
-		}
-		if p.ConfigFile != "" {
-			command = append(command, "--cf")
-			command = append(command, p.ConfigFile)
-		}
+		command = append(command, "--browser")
+		command = append(command, p.Browser)
+		command = append(command, "--config-file")
+		command = append(command, p.ConfigFile)
 		command = append(command, "--specs")
 		command = append(command, spec)
 		command = append(command, "--uid")

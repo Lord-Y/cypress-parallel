@@ -20,8 +20,10 @@ type projects struct {
 	Specs                string `form:"specs" json:"specs" binding:"required"`
 	CypressDockerVersion string `form:"cypress_docker_version,default=7.2.0-0.0.2" json:"cypress_docker_version"`
 	Timeout              int    `form:"timeout,default=10" json:"timeout,default=10"`
-	Username             string `form:"username" json:"username" binding:"required,max=100"`
-	Password             string `form:"password" json:"password" binding:"required,max=100"`
+	Username             string `form:"username" json:"username"`
+	Password             string `form:"password" json:"password"`
+	Browser              string `form:"browser,default=chrome" json:"browser,default=chrome" binding:"max=100,oneof=chrome firefox"`
+	ConfigFile           string `form:"config_file,default=cypress.json" json:"config_file,default=cypress.json" binding:"max=100"`
 }
 
 // getProjects struct handle requirements to get projects
@@ -52,6 +54,8 @@ type updateProjects struct {
 	Timeout              int    `form:"timeout,default=10" json:"timeout"`
 	Username             string `form:"username" json:"username" binding:"max=100"`
 	Password             string `form:"password" json:"password" binding:"max=100"`
+	Browser              string `form:"browser,default=chrome" json:"browser,default=chrome" binding:"max=100,oneof=chrome firefox"`
+	ConfigFile           string `form:"config_file,default=cypress.json" json:"config_file,default=cypress.json" binding:"max=100"`
 }
 
 // deleteProject struct handle requirements to delete project
@@ -83,6 +87,9 @@ func Create(c *gin.Context) {
 	}
 	if p.Timeout == 0 {
 		p.Timeout = 10
+	}
+	if p.ConfigFile == "" {
+		p.ConfigFile = "cypress.json"
 	}
 
 	result, err := p.create()
@@ -183,6 +190,9 @@ func Update(c *gin.Context) {
 	}
 	if p.Timeout == 0 {
 		p.Timeout = 10
+	}
+	if p.ConfigFile == "" {
+		p.ConfigFile = "cypress.json"
 	}
 
 	err := p.update()
