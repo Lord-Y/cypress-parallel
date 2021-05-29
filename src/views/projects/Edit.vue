@@ -67,6 +67,14 @@
               :timeout="Number(project.timeout)"
               v-model:updateTimeout="form.timeout"
             />
+            <CreateUpdateBrowser
+              :browser="project.browser"
+              v-model:updateBrowser="form.browser"
+            />
+            <CreateUpdateConfigFile
+              :config-file="project.config_file"
+              v-model:updateConfigFile="form.config_file"
+            />
             <SubmitButton :text="$t('button.submit')" />
           </Form>
         </div>
@@ -96,6 +104,8 @@ import CreateUpdateScheduling from '@components/projects/CreateUpdateScheduling.
 import CreateUpdateMaxPods from '@components/projects/CreateUpdateMaxPods.vue'
 import CreateUpdateCypressDockerVersion from '@components/projects/CreateUpdateCypressDockerVersion.vue'
 import CreateUpdateTimeout from '@components/projects/CreateUpdateTimeout.vue'
+import CreateUpdateBrowser from '@components/projects/CreateUpdateBrowser.vue'
+import CreateUpdateConfigFile from '@components/projects/CreateUpdateConfigFile.vue'
 import SubmitButton from '@components/buttons/SubmitButton.vue'
 import TeamsService, { Teams } from '@api/teamsService'
 import ProjectsService, { Project } from '@api/projectsService'
@@ -119,6 +129,8 @@ export default defineComponent({
     CreateUpdateMaxPods,
     CreateUpdateCypressDockerVersion,
     CreateUpdateTimeout,
+    CreateUpdateBrowser,
+    CreateUpdateConfigFile,
     SubmitButton,
   },
   setup() {
@@ -147,6 +159,8 @@ export default defineComponent({
         maxPods: 10,
         cypress_docker_version: '7.2.0-0.0.2',
         timeout: 10,
+        browser: 'chrome',
+        config_file: 'cypress.json',
       },
     })
     const route = useRoute()
@@ -222,6 +236,8 @@ export default defineComponent({
         maxPods: state.form.maxPods,
         cypress_docker_version: state.form.cypress_docker_version,
         timeout: state.form.timeout,
+        browser: state.form.browser,
+        config_file: state.form.config_file,
       })
         .then((response: any) => {
           if (response.status === 200) {

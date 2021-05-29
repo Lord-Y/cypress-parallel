@@ -12,6 +12,8 @@ export interface Projects {
   project_name: string
   branch: string
   cypress_docker_version: string
+  browser: string
+  config_file: string
   total: number
   date: Date
 }
@@ -32,6 +34,8 @@ export interface Project {
   specs: string
   team_id: number
   timeout: number
+  browser: string
+  config_file: string
 }
 
 export interface ProjectOnly {

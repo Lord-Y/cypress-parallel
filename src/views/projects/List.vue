@@ -394,6 +394,8 @@ export default defineComponent({
       ProjectsService.hook({
         project_name: project.project_name,
         cypress_docker_version: project.cypress_docker_version,
+        browser: project.browser,
+        config_file: project.config_file,
       })
         .then((response: any) => {
           if (response.status === 201) {
