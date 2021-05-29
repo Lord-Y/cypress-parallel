@@ -162,3 +162,20 @@ func TestAnnotationsSearch(t *testing.T) {
 	w, _ = performRequest(router, headers, "GET", "/api/v1/cypress-parallel-api/annotations/search?q=", "")
 	assert.Equal(400, w.Code)
 }
+
+func TestAnnotationsByProjectID(t *testing.T) {
+	assert := assert.New(t)
+	headers := make(map[string]string)
+	headers["Content-Type"] = "application/x-www-form-urlencoded"
+
+	result, err := annotations.GetAnnotationIDForUnitTesting()
+	if err != nil {
+		log.Err(err).Msgf("Fail to retrieve environment id")
+		t.Fail()
+		return
+	}
+
+	router := SetupRouter()
+	w, _ := performRequest(router, headers, "GET", fmt.Sprintf("/api/v1/cypress-parallel-api/annotations/list/by/projectid/%s", result["project_id"]), "")
+	assert.Equal(200, w.Code)
+}
