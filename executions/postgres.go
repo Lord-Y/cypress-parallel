@@ -201,7 +201,7 @@ func GetExecutionIDForUnitTesting() (z map[string]string, err error) {
 	}
 	defer db.Close()
 
-	stmt, err := db.Prepare("SELECT * FROM executions WHERE RANDOM() < 0.01 LIMIT 1")
+	stmt, err := db.Prepare("SELECT * FROM executions LIMIT 1")
 	if err != nil && err != sql.ErrNoRows {
 		return z, err
 	}
@@ -354,7 +354,7 @@ func (p *uniqIDExecutions) uniqId() (z []interface{}, err error) {
 	defer stmt.Close()
 
 	rows, err := stmt.Query(
-		p.UniqID,
+		php2go.Addslashes(p.UniqID),
 	)
 	if err != nil && err != sql.ErrNoRows {
 		return
