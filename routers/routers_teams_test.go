@@ -2,7 +2,9 @@ package routers
 
 import (
 	"fmt"
+	"math/rand"
 	"testing"
+	"time"
 
 	"github.com/Lord-Y/cypress-parallel-api/teams"
 	"github.com/icrowley/fake"
@@ -55,6 +57,7 @@ func TestTeamsCreateMulti(t *testing.T) {
 
 	router := SetupRouter()
 	for i := 1; i < 5; i++ {
+		rand.Seed(time.Now().UnixNano())
 		payload := fmt.Sprintf("name=%s", fake.CharactersN(10))
 
 		w, _ := performRequest(router, headers, "POST", "/api/v1/cypress-parallel-api/teams", payload)
