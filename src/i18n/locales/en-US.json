@@ -32,7 +32,9 @@
     "password": "Password",
     "hooks": {
       "launch": "Launch"
-    }
+    },
+    "browsers": "Browser",
+    "configFile": "Config file"
   },
   "executions": {
     "executions": "Execution | Executions",

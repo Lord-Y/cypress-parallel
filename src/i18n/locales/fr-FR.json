@@ -32,7 +32,9 @@
     "password": "Mot de passe",
     "hooks": {
       "launch": "Démarrer"
-    }
+    },
+    "browsers": "Navigateur",
+    "configFile": "Fichier de configuration"
   },
   "executions": {
     "executions": "Exécution | Exécutions",
