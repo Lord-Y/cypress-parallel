@@ -53,6 +53,11 @@ type searchEnvironments struct {
 	EndLimit   int
 }
 
+// listEnvironmentsByProjectID struct handle requirements to get all environment from project id
+type listEnvironmentsByProjectID struct {
+	ProjectID int `form:"projectId" json:"projectId" binding:"required"`
+}
+
 // Create handle requirements to create environments with environments struct
 func Create(c *gin.Context) {
 	var (
@@ -197,6 +202,38 @@ func Search(c *gin.Context) {
 
 	if len(result) == 0 {
 		c.AbortWithStatus(204)
+	} else {
+		c.JSON(http.StatusOK, result)
+	}
+}
+
+// ListByProjectID handle requirements to list environments by project id
+func ListByProjectID(c *gin.Context) {
+	var (
+		p listEnvironmentsByProjectID
+	)
+	id := c.Params.ByName("projectId")
+	if id == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "projectId is missing in uri"})
+		return
+	}
+	vID, err := strconv.Atoi(id)
+	if err != nil {
+		log.Error().Err(err).Msg("Error occured while converting string to int")
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
+		return
+	}
+
+	p.ProjectID = vID
+	result, err := p.listByProjectID()
+	if err != nil {
+		log.Error().Err(err).Msg("Error occured while performing db query")
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
+		return
+	}
+
+	if len(result) == 0 {
+		c.AbortWithStatus(404)
 	} else {
 		c.JSON(http.StatusOK, result)
 	}
