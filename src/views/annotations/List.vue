@@ -49,7 +49,15 @@
                 :id="annotation.annotation_id.toString()"
                 :key="index"
               >
-                <td class="px-2 py-3">{{ annotation.project_name }}</td>
+                <td class="px-2 py-3">
+                  <router-link
+                    :class="['cursor-pointer', classes.aLinks]"
+                    :title="$t('edit.edit')"
+                    :to="'/projects/edit/' + annotation.project_id"
+                  >
+                    {{ annotation.project_name }}
+                  </router-link>
+                </td>
                 <td class="px-2 py-3">{{ annotation.key }}</td>
                 <td class="px-2 py-3">{{ annotation.value }}</td>
                 <td class="px-2 py-3">
@@ -136,7 +144,15 @@
                 :id="annotation.annotation_id.toString()"
                 :key="index"
               >
-                <td class="px-2 py-3">{{ annotation.project_name }}</td>
+                <td class="px-2 py-3">
+                  <router-link
+                    :class="['cursor-pointer', classes.aLinks]"
+                    :title="$t('edit.edit')"
+                    :to="'/projects/edit/' + annotation.project_id"
+                  >
+                    {{ annotation.project_name }}
+                  </router-link>
+                </td>
                 <td class="px-2 py-3">{{ annotation.key }}</td>
                 <td class="px-2 py-3">{{ annotation.value }}</td>
                 <td class="px-2 py-3">
