@@ -39,7 +39,6 @@ func TestProjectsCreate(t *testing.T) {
 
 	router := SetupRouter()
 	w, _ := performRequest(router, headers, "POST", "/api/v1/cypress-parallel-api/projects", payload)
-	fmt.Printf(w.Body.String())
 	assert.Equal(201, w.Code)
 }
 
