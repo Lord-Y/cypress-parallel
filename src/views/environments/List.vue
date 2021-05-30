@@ -49,7 +49,15 @@
                 :id="environment.environment_id.toString()"
                 :key="index"
               >
-                <td class="px-2 py-3">{{ environment.project_name }}</td>
+                <td class="px-2 py-3">
+                  <router-link
+                    :class="['cursor-pointer', classes.aLinks]"
+                    :title="$t('edit.edit')"
+                    :to="'/projects/edit/' + environment.project_id"
+                  >
+                    {{ environment.project_name }}
+                  </router-link>
+                </td>
                 <td class="px-2 py-3">{{ environment.key }}</td>
                 <td class="px-2 py-3">{{ environment.value }}</td>
                 <td class="px-2 py-3">
@@ -140,7 +148,15 @@
                 :id="environment.environment_id.toString()"
                 :key="index"
               >
-                <td class="px-2 py-3">{{ environment.project_name }}</td>
+                <td class="px-2 py-3">
+                  <router-link
+                    :class="['cursor-pointer', classes.aLinks]"
+                    :title="$t('edit.edit')"
+                    :to="'/projects/edit/' + environment.project_id"
+                  >
+                    {{ environment.project_name }}
+                  </router-link>
+                </td>
                 <td class="px-2 py-3">{{ environment.key }}</td>
                 <td class="px-2 py-3">{{ environment.value }}</td>
                 <td class="px-2 py-3">
