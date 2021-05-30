@@ -53,7 +53,7 @@ class AnnotationsService {
   }
 
   async delete(id: number): Promise<any> {
-    return await axiosClient.delete<Annotations[]>(
+    return await axiosClient.delete<any>(
       `/api/v1/cypress-parallel-api/annotations/${id}`,
     )
   }
@@ -61,6 +61,12 @@ class AnnotationsService {
   async search(q: string, page = 1): Promise<any> {
     return await axiosClient.get<any>(
       `/api/v1/cypress-parallel-api/annotations/search?q=${q}&page=${page}`,
+    )
+  }
+
+  async projectID(id: number): Promise<any> {
+    return await axiosClient.get<any>(
+      `/api/v1/cypress-parallel-api/annotations/list/by/projectid/${id}`,
     )
   }
 }

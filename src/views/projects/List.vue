@@ -7,6 +7,7 @@
         <SpinnerCommon v-if="loading.loading.active" />
         <SpinnerCommon v-if="loading.delete.active" />
         <SpinnerCommon v-if="loading.hook.active" />
+        <SpinnerCommon v-if="loading.duplicate.active" />
         <AlertMessage :message="alert.message" :classes="alert.class" />
         <SearchProjectsByFilter
           v-if="search.bar.enabled"
@@ -40,6 +41,7 @@
                 <th class="py-3">{{ $t('projects.projects') }}</th>
                 <th class="py-3">{{ $t('projects.branch') }}</th>
                 <th class="py-3">{{ $t('projects.hooks.launch') }}</th>
+                <th class="py-3">{{ $t('projects.duplicate') }}</th>
                 <th class="py-3">{{ $t('edit.edit') }}</th>
                 <th class="py-3">{{ $t('delete.delete') }}</th>
               </tr>
@@ -78,6 +80,28 @@
                         stroke-linejoin="round"
                         stroke-width="2"
                         d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                      ></path>
+                    </svg>
+                  </router-link>
+                </td>
+                <td class="px-2 py-3">
+                  <router-link
+                    :class="['cursor-pointer', classes.aLinks]"
+                    :title="$t('projects.duplicate')"
+                    to=""
+                    @click="duplicate(project.project_id)"
+                  >
+                    <svg
+                      class="w-10 h-10"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M8 7v8a2 2 0 002 2h6M8 7V5a2 2 0 012-2h4.586a1 1 0 01.707.293l4.414 4.414a1 1 0 01.293.707V15a2 2 0 01-2 2h-2M8 7H6a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2v-2"
                       ></path>
                     </svg>
                   </router-link>
@@ -154,6 +178,7 @@
                 <th class="py-3">{{ $t('projects.projects') }}</th>
                 <th class="py-3">{{ $t('projects.branch') }}</th>
                 <th class="py-3">{{ $t('projects.hooks.launch') }}</th>
+                <th class="py-3">{{ $t('projects.duplicate') }}</th>
                 <th class="py-3">{{ $t('edit.edit') }}</th>
                 <th class="py-3">{{ $t('delete.delete') }}</th>
               </tr>
@@ -192,6 +217,28 @@
                         stroke-linejoin="round"
                         stroke-width="2"
                         d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                      ></path>
+                    </svg>
+                  </router-link>
+                </td>
+                <td class="px-2 py-3">
+                  <router-link
+                    :class="['cursor-pointer', classes.aLinks]"
+                    :title="$t('projects.duplicate')"
+                    to=""
+                    @click="duplicate(project.project_id)"
+                  >
+                    <svg
+                      class="w-10 h-10"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M8 7v8a2 2 0 002 2h6M8 7V5a2 2 0 012-2h4.586a1 1 0 01.707.293l4.414 4.414a1 1 0 01.293.707V15a2 2 0 01-2 2h-2M8 7H6a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2v-2"
                       ></path>
                     </svg>
                   </router-link>
@@ -257,7 +304,9 @@ import SpinnerCommon from '@components/commons/SpinnerCommon.vue'
 import AlertMessage from '@components/commons/AlertMessage.vue'
 import SearchProjectsByFilter from '@components/search/SearchProjectsByFilter.vue'
 import Pagination from '@components/commons/Pagination.vue'
-import ProjectsService, { Projects } from '@api/projectsService'
+import ProjectsService, { Projects, Project } from '@api/projectsService'
+import AnnotationsService, { Annotation } from '@api/annotationsService'
+import EnvironmentsService, { Environment } from '@api/environmentsService'
 import { useI18n } from 'vue-i18n'
 
 export default defineComponent({
@@ -274,6 +323,11 @@ export default defineComponent({
       projects: {
         projects: [] as Projects[],
         byFilter: [] as Projects[],
+        duplicate: {
+          data: {} as Project,
+          annoations: {} as Annotation[],
+          environments: {} as Environment[],
+        },
       },
       alert: {
         class: '',
@@ -288,6 +342,9 @@ export default defineComponent({
           active: false,
         },
         hook: {
+          active: false,
+        },
+        duplicate: {
           active: false,
         },
       },
@@ -310,6 +367,14 @@ export default defineComponent({
       },
       classes: {
         aLinks: 'hover:text-green-500 hover:font-extrabold',
+      },
+      status: {
+        annoations: {
+          count: 0,
+        },
+        environments: {
+          count: 0,
+        },
       },
     })
     const route = useRoute()
@@ -417,6 +482,245 @@ export default defineComponent({
         })
     }
 
+    function duplicate(project_id: number) {
+      state.loading.duplicate.active = true
+      let new_project_id: number
+      getProjectByID(project_id).then((response) => {
+        if (response) {
+          duplicateProject().then((response) => {
+            new_project_id = response
+            if (response > 0) {
+              getAnnotationsByProjectID(project_id).then((response) => {
+                if (
+                  response &&
+                  state.projects.duplicate.annoations.length > 0
+                ) {
+                  duplicateAnnotations(new_project_id)
+                }
+              })
+              getEnvironmentsByProjectID(project_id).then((response) => {
+                if (
+                  response &&
+                  state.projects.duplicate.environments.length > 0
+                ) {
+                  duplicateEnvionments(new_project_id)
+                }
+              })
+              state.loading.duplicate.active = false
+            }
+          })
+        }
+      })
+    }
+
+    async function getProjectByID(project_id: number): Promise<boolean> {
+      let status: boolean
+      return await ProjectsService.get(project_id)
+        .then((response: any) => {
+          switch (response.status) {
+            case 200:
+              state.projects.duplicate.data = response.data
+              if (response.data.scheduling_enabled === 'false') {
+                state.projects.duplicate.data.scheduling_enabled = false
+              } else {
+                state.projects.duplicate.data.scheduling_enabled = true
+              }
+              status = true
+              break
+            default:
+              state.alert.class = 'red'
+              state.alert.message = t('alert.http.errorOccured')
+              state.loading.duplicate.active = false
+              status = false
+              break
+          }
+          return status
+        })
+        .catch((error: any) => {
+          if (error.response.status === 404) {
+            state.alert.class = 'mute'
+            state.alert.message = t('alert.http.pageNotFound')
+          } else {
+            state.alert.class = 'red'
+            state.alert.message = t('alert.http.errorOccured')
+          }
+          state.loading.duplicate.active = false
+          return false
+        })
+    }
+
+    async function duplicateProject(): Promise<number> {
+      return await ProjectsService.create({
+        teamId: Number(state.projects.duplicate.data.team_id),
+        name: state.projects.duplicate.data.project_name + '_duplicated',
+        repository: state.projects.duplicate.data.repository,
+        branch: state.projects.duplicate.data.branch,
+        username: state.projects.duplicate.data.username,
+        password: state.projects.duplicate.data.password,
+        specs: state.projects.duplicate.data.specs,
+        scheduling: state.projects.duplicate.data.scheduling,
+        schedulingEnabled: state.projects.duplicate.data.scheduling_enabled,
+        maxPods: Number(state.projects.duplicate.data.max_pods),
+        cypress_docker_version:
+          state.projects.duplicate.data.cypress_docker_version,
+        timeout: Number(state.projects.duplicate.data.timeout),
+        browser: state.projects.duplicate.data.browser,
+        config_file: state.projects.duplicate.data.config_file,
+      })
+        .then((response: any) => {
+          if (response.status === 201) {
+            state.alert.class = 'green'
+            state.alert.message = t('alert.http.project.duplicate', {
+              field: state.projects.duplicate.data.project_name + '_duplicated',
+            })
+            return Number(response.data['projectId'])
+          } else {
+            state.alert.class = 'red'
+            state.alert.message = t('alert.http.errorOccured')
+            state.loading.duplicate.active = false
+            return 0
+          }
+        })
+        .catch(() => {
+          state.alert.class = 'red'
+          state.alert.message = t('alert.http.errorOccured')
+          state.loading.duplicate.active = false
+          return 0
+        })
+    }
+
+    async function getAnnotationsByProjectID(
+      project_id: number,
+    ): Promise<boolean> {
+      let status: boolean
+      return await AnnotationsService.projectID(project_id)
+        .then((response: any) => {
+          switch (response.status) {
+            case 200:
+              state.projects.duplicate.annoations = response.data
+              status = true
+              break
+            default:
+              state.alert.class = 'red'
+              state.alert.message = t('alert.http.errorOccured')
+              state.loading.duplicate.active = false
+              status = false
+              break
+          }
+          return status
+        })
+        .catch((error: any) => {
+          if (error.response.status === 404) {
+            state.alert.class = 'mute'
+            state.alert.message = t('alert.http.pageNotFound')
+          } else {
+            state.alert.class = 'red'
+            state.alert.message = t('alert.http.errorOccured')
+          }
+          state.loading.duplicate.active = false
+          return false
+        })
+    }
+
+    function duplicateAnnotations(project_id: number): boolean {
+      for (let i = 0; i < state.projects.duplicate.annoations.length; i++) {
+        AnnotationsService.create({
+          projectId: Number(project_id),
+          key: state.projects.duplicate.annoations[i].key,
+          value: state.projects.duplicate.annoations[i].value,
+        })
+          .then((response: any) => {
+            if (response.status === 201) {
+              state.status.annoations.count++
+            } else {
+              state.alert.class = 'red'
+              state.alert.message = t('alert.http.errorOccured')
+              state.loading.duplicate.active = false
+            }
+          })
+          .catch((error: any) => {
+            state.alert.class = 'red'
+            state.alert.message = t('alert.http.errorOccured')
+            state.loading.duplicate.active = false
+            throw error
+          })
+      }
+      if (
+        state.status.annoations.count ===
+        state.projects.duplicate.annoations.length
+      ) {
+        return true
+      } else {
+        return false
+      }
+    }
+
+    async function getEnvironmentsByProjectID(
+      project_id: number,
+    ): Promise<boolean> {
+      let status: boolean
+      return await EnvironmentsService.projectID(project_id)
+        .then((response: any) => {
+          switch (response.status) {
+            case 200:
+              state.projects.duplicate.environments = response.data
+              status = true
+              break
+            default:
+              state.alert.class = 'red'
+              state.alert.message = t('alert.http.errorOccured')
+              state.loading.duplicate.active = false
+              status = false
+              break
+          }
+          return status
+        })
+        .catch((error: any) => {
+          if (error.response.status === 404) {
+            state.alert.class = 'mute'
+            state.alert.message = t('alert.http.pageNotFound')
+          } else {
+            state.alert.class = 'red'
+            state.alert.message = t('alert.http.errorOccured')
+          }
+          state.loading.duplicate.active = false
+          return false
+        })
+    }
+
+    function duplicateEnvionments(project_id: number): boolean {
+      for (let i = 0; i < state.projects.duplicate.environments.length; i++) {
+        EnvironmentsService.create({
+          projectId: Number(project_id),
+          key: state.projects.duplicate.environments[i].key,
+          value: state.projects.duplicate.environments[i].value,
+        })
+          .then((response: any) => {
+            if (response.status === 201) {
+              state.status.environments.count++
+            } else {
+              state.alert.class = 'red'
+              state.alert.message = t('alert.http.errorOccured')
+              state.loading.duplicate.active = false
+            }
+          })
+          .catch((error: any) => {
+            state.alert.class = 'red'
+            state.alert.message = t('alert.http.errorOccured')
+            state.loading.duplicate.active = false
+            throw error
+          })
+      }
+      if (
+        state.status.environments.count ===
+        state.projects.duplicate.environments.length
+      ) {
+        return true
+      } else {
+        return false
+      }
+    }
+
     return {
       projects,
       loading,
@@ -426,6 +730,7 @@ export default defineComponent({
       classes,
       deleteItem,
       launch,
+      duplicate,
     }
   },
 })

@@ -46,14 +46,14 @@ class EnvironmentsService {
   }
 
   async update(data: any): Promise<any> {
-    return await axiosClient.put(
+    return await axiosClient.put<any>(
       '/api/v1/cypress-parallel-api/environments',
       data,
     )
   }
 
   async delete(id: number): Promise<any> {
-    return await axiosClient.delete<Environments[]>(
+    return await axiosClient.delete<any>(
       `/api/v1/cypress-parallel-api/environments/${id}`,
     )
   }
@@ -61,6 +61,12 @@ class EnvironmentsService {
   async search(q: string, page = 1): Promise<any> {
     return await axiosClient.get<any>(
       `/api/v1/cypress-parallel-api/environments/search?q=${q}&page=${page}`,
+    )
+  }
+
+  async projectID(id: number): Promise<any> {
+    return await axiosClient.get<any>(
+      `/api/v1/cypress-parallel-api/environments/list/by/projectid/${id}`,
     )
   }
 }
