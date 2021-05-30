@@ -34,7 +34,8 @@
       "launch": "Launch"
     },
     "browsers": "Browser",
-    "configFile": "Config file"
+    "configFile": "Config file",
+    "duplicate": "Duplicate"
   },
   "executions": {
     "executions": "Execution | Executions",
@@ -86,7 +87,8 @@
       },
       "project": {
         "created": "Project \"{field}\" has been created",
-        "updated": "Project \"{field}\" name has been updated"
+        "updated": "Project \"{field}\" name has been updated",
+        "duplicate": "New project \"{field}\" has been created"
       },
       "annotation": {
         "created": "Annotation \"{field}\" has been created",

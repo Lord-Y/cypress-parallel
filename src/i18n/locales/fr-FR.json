@@ -34,7 +34,8 @@
       "launch": "Démarrer"
     },
     "browsers": "Navigateur",
-    "configFile": "Fichier de configuration"
+    "configFile": "Fichier de configuration",
+    "duplicate": "Dupliquer"
   },
   "executions": {
     "executions": "Exécution | Exécutions",
@@ -86,7 +87,8 @@
       },
       "project": {
         "created": "Le project \"{field}\" a été créé",
-        "updated": "Le project \"{field}\" a été mis à jour"
+        "updated": "Le project \"{field}\" a été mis à jour",
+        "duplicate": "Le nouveau project \"{field}\" a été créé"
       },
       "annotation": {
         "created": "L'annotation \"{field}\" a été créé",
