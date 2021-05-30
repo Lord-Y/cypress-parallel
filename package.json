@@ -13,7 +13,7 @@
     "@vee-validate/rules": "^4.1.20",
     "axios": "^0.21.1",
     "moment": "^2.29.1",
-    "vee-validate": "^4.4.1",
+    "vee-validate": "^4.4.2",
     "vue": "^3.0.5",
     "vue-i18n": "^9.1.6",
     "vue-router": "^4.0.8"
@@ -30,7 +30,7 @@
     "autoprefixer": "^10.2.6",
     "eslint": "^7.26.0",
     "eslint-plugin-prettier": "^3.4.0",
-    "eslint-plugin-vue": "^7.9.0",
+    "eslint-plugin-vue": "^7.10.0",
     "git-hooks": "^1.1.10",
     "postcss": "^8.2.15",
     "prettier": "^2.3.0",
