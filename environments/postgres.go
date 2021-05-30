@@ -341,7 +341,7 @@ func (p *listEnvironmentsByProjectID) listByProjectID() (z []map[string]interfac
 	}
 	defer db.Close()
 
-	stmt, err := db.Prepare("SELECT * FROM environments WHERE project_id = $1")
+	stmt, err := db.Prepare("SELECT e.*, p.project_name FROM environments e LEFT JOIN projects p ON e.project_id = p.project_id WHERE e.project_id = $1 ORDER BY e.date DESC")
 	if err != nil && err != sql.ErrNoRows {
 		return
 	}
