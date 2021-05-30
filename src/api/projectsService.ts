@@ -36,6 +36,7 @@ export interface Project {
   timeout: number
   browser: string
   config_file: string
+  total: number
 }
 
 export interface ProjectOnly {
@@ -72,7 +73,7 @@ class ProjectsService {
   }
 
   async delete(id: number): Promise<any> {
-    return await axiosClient.delete<Projects[]>(
+    return await axiosClient.delete<any>(
       `/api/v1/cypress-parallel-api/projects/${id}`,
     )
   }

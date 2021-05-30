@@ -337,8 +337,8 @@ export default defineComponent({
   setup() {
     let state = reactive({
       projects: {
-        projects: [] as Projects[],
-        byFilter: [] as Projects[],
+        projects: [] as Project[],
+        byFilter: [] as Project[],
         duplicate: {
           data: {} as Project,
           annoations: {} as Annotation[],
@@ -469,7 +469,7 @@ export default defineComponent({
       }
     }
 
-    function launch(project: Projects): void {
+    function launch(project: Project): void {
       state.alert.message = ''
       state.loading.hook.active = true
       ProjectsService.hook({
