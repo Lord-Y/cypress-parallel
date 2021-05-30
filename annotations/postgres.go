@@ -341,7 +341,7 @@ func (p *listAnnotationsByProjectID) listByProjectID() (z []map[string]interface
 	}
 	defer db.Close()
 
-	stmt, err := db.Prepare("SELECT * FROM annotations WHERE project_id = $1")
+	stmt, err := db.Prepare("SELECT a.*, p.project_name FROM annotations a LEFT JOIN projects p ON a.project_id = p.project_id WHERE a.project_id = $1 ORDER BY a.date DESC")
 	if err != nil && err != sql.ErrNoRows {
 		return
 	}
