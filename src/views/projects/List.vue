@@ -53,7 +53,15 @@
                 :id="project.project_id.toString()"
                 :key="index"
               >
-                <td class="px-2 py-3">{{ project.team_name }}</td>
+                <td class="px-2 py-3">
+                  <router-link
+                    :class="['cursor-pointer', classes.aLinks]"
+                    :title="$t('edit.edit')"
+                    :to="'/teams/edit/' + project.team_id"
+                  >
+                    {{ project.project_name }}
+                  </router-link>
+                </td>
                 <td class="px-2 py-3">{{ project.project_name }}</td>
                 <td class="px-2 py-3">{{ project.branch }}</td>
                 <td class="px-2 py-3">
@@ -190,7 +198,15 @@
                 :id="project.project_id.toString()"
                 :key="index"
               >
-                <td class="px-2 py-3">{{ project.team_name }}</td>
+                <td class="px-2 py-3">
+                  <router-link
+                    :class="['cursor-pointer', classes.aLinks]"
+                    :title="$t('edit.edit')"
+                    :to="'/teams/edit/' + project.team_id"
+                  >
+                    {{ project.project_name }}
+                  </router-link>
+                </td>
                 <td class="px-2 py-3">{{ project.project_name }}</td>
                 <td class="px-2 py-3">{{ project.branch }}</td>
                 <td class="px-2 py-3">
