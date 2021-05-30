@@ -1,0 +1,4 @@
+#!/bin/bash
+
+eslint --fix --ext .js,.vue,.ts src
+npm run build
