@@ -45,7 +45,7 @@ class TeamsService {
   }
 
   async delete(id: number): Promise<any> {
-    return await axiosClient.delete<Teams[]>(
+    return await axiosClient.delete<any>(
       `/api/v1/cypress-parallel-api/teams/${id}`,
     )
   }
