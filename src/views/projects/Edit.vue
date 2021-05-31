@@ -157,7 +157,7 @@ export default defineComponent({
         scheduling: '',
         schedulingEnabled: false,
         maxPods: 10,
-        cypress_docker_version: '7.2.0-0.0.2',
+        cypress_docker_version: '7.2.0-0.0.3',
         timeout: 10,
         browser: 'chrome',
         config_file: 'cypress.json',
