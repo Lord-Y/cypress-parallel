@@ -53,13 +53,13 @@
                     {{ execution.spec }}
                   </router-link>
                 </td>
-                <td class="px-2 py-3" :class="classes.status.global">
-                  {{ getGlobalStatus(execution) }}
+                <td class="px-2 py-3" :class="getGlobalStatus(execution, 'classes')">
+                  {{ getGlobalStatus(execution, '') }}
                 </td>
-                <td class="px-2 py-3" :class="classes.status.system">
-                  {{ getSystemStatus(execution.execution_status) }}
+                <td class="px-2 py-3" :class="getSystemStatus(execution.execution_status)">
+                  {{ execution.execution_status }}
                 </td>
-                <td class="px-2 py-3" :class="classes.status.global">
+                <td class="px-2 py-3" :class="getGlobalStatus(execution, 'classes')">
                   {{ getSpecStatus(execution) }}
                 </td>
                 <td class="px-2 py-3">{{ execution.date }}</td>
@@ -105,10 +105,6 @@ export default defineComponent({
       },
       classes: {
         aLinks: 'hover:text-green-500 hover:font-extrabold',
-        status: {
-          global: '',
-          system: '',
-        },
       },
     })
     const route = useRoute()
@@ -131,10 +127,12 @@ export default defineComponent({
             state.alert.message = t('alert.http.errorOccured')
             break
         }
+        state.loading.loading.active = false
       })
       .catch((error: any) => {
         state.alert.class = 'red'
         state.alert.message = t('alert.http.errorOccured')
+        state.loading.loading.active = false
         throw error
       })
 
@@ -143,40 +141,45 @@ export default defineComponent({
     }
 
     function getSystemStatus(s: string): string {
+      let classes: string
       switch (s) {
         case 'DONE':
-          state.classes.status.system = 'text-green-500 font-semibold'
-          break
-        case 'NOT_STARTED':
-          state.classes.status.system = 'text-gray-500 font-semibold'
-          break
-        default:
-          state.classes.status.system = 'text-red-500 font-semibold'
-          break
-      }
-      return s
-    }
-
-    function getGlobalStatus(execution: Execution): string {
-      let status: string
-      status = Statuses.global(execution)
-      switch (status) {
-        case 'PASSED':
-          state.classes.status.global = 'text-green-500 font-semibold'
+          classes = 'text-green-500 font-semibold'
           break
         case 'NOT_STARTED':
         case 'SCHEDULED':
         case 'CANCELLED':
-          state.classes.status.global = 'text-gray-500 font-semibold'
+          classes = 'text-gray-500 font-semibold'
           break
         default:
-          state.classes.status.global = 'text-red-500 font-semibold'
+          classes = 'text-red-500 font-semibold'
           break
       }
-      return Statuses.global(execution)
+      return classes
     }
 
-    state.loading.loading.active = false
+    function getGlobalStatus(execution: Execution, mode: string): string {
+      let status: string, classes: string
+      status = Statuses.global(execution)
+      switch (status) {
+        case 'PASSED':
+          classes = 'text-green-500 font-semibold'
+          break
+        case 'NOT_STARTED':
+        case 'SCHEDULED':
+        case 'CANCELLED':
+          classes = 'text-gray-500 font-semibold'
+          break
+        default:
+          classes = 'text-red-500 font-semibold'
+          break
+      }
+      if (mode === 'classes') {
+        return classes
+      } else {
+        return status
+      }
+    }
 
     let { executions, loading, alert, classes } = toRefs(state)
 
