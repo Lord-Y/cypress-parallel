@@ -53,13 +53,22 @@
                     {{ execution.spec }}
                   </router-link>
                 </td>
-                <td class="px-2 py-3" :class="getGlobalStatus(execution, 'classes')">
+                <td
+                  class="px-2 py-3"
+                  :class="getGlobalStatus(execution, 'classes')"
+                >
                   {{ getGlobalStatus(execution, '') }}
                 </td>
-                <td class="px-2 py-3" :class="getSystemStatus(execution.execution_status)">
+                <td
+                  class="px-2 py-3"
+                  :class="getSystemStatus(execution.execution_status)"
+                >
                   {{ execution.execution_status }}
                 </td>
-                <td class="px-2 py-3" :class="getGlobalStatus(execution, 'classes')">
+                <td
+                  class="px-2 py-3"
+                  :class="getGlobalStatus(execution, 'classes')"
+                >
                   {{ getSpecStatus(execution) }}
                 </td>
                 <td class="px-2 py-3">{{ execution.date }}</td>
