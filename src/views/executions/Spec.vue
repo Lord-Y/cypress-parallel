@@ -42,7 +42,7 @@
                   >
                     {{ execution.project_name }}
                   </router-link>
-                  </td>
+                </td>
                 <td class="px-2 py-3">
                   <router-link
                     :class="['cursor-pointer', classes.aLinks]"
@@ -54,7 +54,7 @@
                 </td>
                 <td class="px-2 py-3">{{ execution.branch }}</td>
                 <td class="px-2 py-3">
-                    {{ execution.spec }}
+                  {{ execution.spec }}
                 </td>
                 <td
                   class="px-2 py-3"
