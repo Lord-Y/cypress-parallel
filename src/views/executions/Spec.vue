@@ -34,7 +34,15 @@
             </thead>
             <tbody class="divide-y">
               <tr class="hover:bg-gray-100 hover:font-semibold">
-                <td class="px-2 py-3">{{ execution.project_name }}</td>
+                <td class="px-2 py-3">
+                  <router-link
+                    :class="['cursor-pointer', classes.aLinks]"
+                    :title="$t('projects.name') + ' ' + execution.project_name"
+                    :to="'/projects/edit/' + execution.project_id"
+                  >
+                    {{ execution.project_name }}
+                  </router-link>
+                  </td>
                 <td class="px-2 py-3">
                   <router-link
                     :class="['cursor-pointer', classes.aLinks]"
@@ -46,13 +54,7 @@
                 </td>
                 <td class="px-2 py-3">{{ execution.branch }}</td>
                 <td class="px-2 py-3">
-                  <router-link
-                    :class="['cursor-pointer', classes.aLinks]"
-                    :title="$t('see.by.spec')"
-                    :to="'/executions/' + execution.execution_id"
-                  >
                     {{ execution.spec }}
-                  </router-link>
                 </td>
                 <td
                   class="px-2 py-3"
