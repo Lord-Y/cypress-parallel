@@ -86,15 +86,19 @@ const (
 // Plain handle requirements to start unit testing
 func Plain(c *gin.Context) {
 	var (
-		p           plain
-		pj          projects
-		exs         executions
+		p  plain
+		pj projects
+		// exs         executions
 		ex          execution
 		pod         models.Pods
 		gitc        git.Repository
 		targetSpecs string
 		branch      string
 		specs       []string
+		tmpSecs     []string
+		finalSecs   []string
+		nbSpec      int
+		reset       bool
 	)
 	if err := c.ShouldBind(&p); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -205,15 +209,35 @@ func Plain(c *gin.Context) {
 		}
 	}
 
-	for _, spec := range specs {
+	for k, v := range specs {
+		tmpSecs = append(tmpSecs, v)
+		if (nbSpec + 1) == commons.GetMaxSpecs() {
+			finalSecs = append(finalSecs, strings.Join(tmpSecs, ","))
+			tmpSecs = nil
+			nbSpec = 0
+			reset = true
+		}
+		if !reset {
+			nbSpec++
+		}
+		if nbSpec == 0 {
+			reset = false
+		}
+		if k == len(specs)-1 && commons.GetMaxSpecs()%2 == 1 {
+			finalSecs = append(finalSecs, strings.Join(tmpSecs, ","))
+		}
+	}
+
+	uniqID := md5.Sum([]byte(fmt.Sprintf("%s%s%s", pj.Repository, finalSecs, time.Now())))
+	runidID := fmt.Sprintf("%x", uniqID)
+	uniqID_ := runidID[0:10]
+
+	for _, spec := range finalSecs {
 		var (
 			pdn     updatePodName
 			tag     string
 			command []string
 		)
-		uniqID := md5.Sum([]byte(fmt.Sprintf("%s%s%s", pj.Repository, spec, time.Now())))
-		runidID := fmt.Sprintf("%x", uniqID)
-		uniqID_ := runidID[0:10]
 		projecID, err := strconv.Atoi(pj.Project_id)
 		if err != nil {
 			log.Error().Err(err).Msg("Error occured while converting string to int")
@@ -221,19 +245,20 @@ func Plain(c *gin.Context) {
 			return
 		}
 
-		ex.projectID = projecID
-		ex.uniqID = uniqID_
-		ex.executionStatus = "NOT_STARTED"
-		ex.spec = spec
-		ex.result = `{}`
-		ex.branch = branch
-		exs.executions = append(exs.executions, ex)
+		for _, splittedSpec := range strings.Split(spec, ",") {
+			ex.projectID = projecID
+			ex.uniqID = uniqID_
+			ex.executionStatus = "NOT_STARTED"
+			ex.spec = splittedSpec
+			ex.result = `{}`
+			ex.branch = branch
 
-		_, err = ex.create()
-		if err != nil {
-			log.Error().Err(err).Msg("Error occured while performing db query")
-			c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
-			return
+			_, err = ex.create()
+			if err != nil {
+				log.Error().Err(err).Msg("Error occured while performing db query")
+				c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
+				return
+			}
 		}
 
 		annotations, err := pj.getProjectAnnotations()
@@ -295,18 +320,18 @@ func Plain(c *gin.Context) {
 		command = append(command, "--repository")
 		command = append(command, gitc.Repository)
 		command = append(command, "--api-url")
-		if strings.TrimSpace(os.Getenv("CYPRESS_PARALLEL_API_URL")) == "" {
-			command = append(command, "http://127.0.0.1:8080")
-		} else {
-			command = append(command, strings.TrimSpace(os.Getenv("CYPRESS_PARALLEL_API_URL")))
-		}
+		command = append(command, commons.GetAPIUrl())
 		command = append(command, "--report-back")
 		command = append(command, "--timeout")
 		command = append(command, pj.Timeout)
-		command = append(command, "--username")
-		command = append(command, pj.Username)
-		command = append(command, "--password")
-		command = append(command, pj.Password)
+		if pj.Username != "" {
+			command = append(command, "--username")
+			command = append(command, pj.Username)
+		}
+		if pj.Password != "" {
+			command = append(command, "--password")
+			command = append(command, pj.Password)
+		}
 		if p.CypressDockerVersion != "" {
 			tag = p.CypressDockerVersion
 		} else {
@@ -325,15 +350,17 @@ func Plain(c *gin.Context) {
 		}
 		log.Debug().Msgf("Pod name %s created", podName)
 
-		pdn.podName = podName
-		pdn.uniqID = uniqID_
-		pdn.spec = spec
+		for _, splittedSpec := range strings.Split(spec, ",") {
+			pdn.podName = podName
+			pdn.uniqID = uniqID_
+			pdn.spec = splittedSpec
 
-		err = pdn.update()
-		if err != nil {
-			log.Error().Err(err).Msg("Error occured while performing update db query")
-			c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
-			return
+			err = pdn.update()
+			if err != nil {
+				log.Error().Err(err).Msg("Error occured while performing update db query")
+				c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
+				return
+			}
 		}
 	}
 	c.JSON(http.StatusCreated, "OK")
