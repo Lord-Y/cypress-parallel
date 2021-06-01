@@ -3,6 +3,7 @@ package executions
 
 import (
 	"encoding/hex"
+	"fmt"
 	"net/http"
 	"strconv"
 
@@ -128,23 +129,41 @@ func UpdateResultExecution(c *gin.Context) {
 		p.Result = string(decoded)
 	}
 
-	result, err := p.updateResult()
+	_, err := p.updateResult()
 	if err != nil {
 		log.Error().Err(err).Msg("Error occured while performing db query")
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
 	} else {
 		c.JSON(http.StatusOK, "OK")
 	}
-	clientset, err := kubernetes.Client()
-	if err != nil {
-		log.Error().Err(err).Msg("Error occured while initializing kubernetes client")
-		return
-	}
 	log.Debug().Msgf("POST body %+v", p)
-	err = kubernetes.DeletePod(clientset, commons.GetKubernetesJobsNamespace(), result)
+
+	remaining, err := countExecutions(p.UniqID)
 	if err != nil {
-		log.Error().Err(err).Msgf("Error occured while trying to delete pod name: %s", result)
-		return
+		log.Error().Err(err).Msg("Error occured while performing db query")
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
+	}
+	log.Debug().Msgf("remaining %+v", remaining)
+
+	if remaining["count"] == remaining["total"] || remaining["count"] == "0" {
+		pods, err := getPods(p.UniqID)
+		if err != nil {
+			log.Error().Err(err).Msg("Error occured while performing db query")
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
+			return
+		}
+		for _, pod := range pods {
+			clientset, err := kubernetes.Client()
+			if err != nil {
+				log.Error().Err(err).Msg("Error occured while initializing kubernetes client")
+				return
+			}
+			err = kubernetes.DeletePod(clientset, commons.GetKubernetesJobsNamespace(), fmt.Sprintf("%s", pod["pod_name"]))
+			if err != nil {
+				log.Error().Err(err).Msgf("Error occured while trying to delete pod name: %s", fmt.Sprintf("%s", pod["pod_name"]))
+				return
+			}
+		}
 	}
 }
 

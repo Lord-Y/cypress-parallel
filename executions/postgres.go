@@ -189,6 +189,124 @@ func (p *updateResultExecution) updateResult() (z string, err error) {
 	return z, nil
 }
 
+// countExecutions will count number of executions not in specified values
+func countExecutions(uniq_id string) (z map[string]string, err error) {
+	db, err := sql.Open(
+		"postgres",
+		commons.BuildDSN(),
+	)
+	if err != nil {
+		log.Error().Err(err).Msg("Failed to connect to DB")
+		return z, err
+	}
+	defer db.Close()
+
+	stmt, err := db.Prepare("SELECT COUNT(execution_id), (SELECT COUNT(execution_id) FROM executions WHERE uniq_id = $1) total FROM executions WHERE uniq_id = $1 AND execution_status NOT IN ('RUNNING','NOT_STARTED','SCHEDULED')")
+	if err != nil && err != sql.ErrNoRows {
+		return z, err
+	}
+	defer stmt.Close()
+
+	rows, err := stmt.Query(
+		php2go.Addslashes(uniq_id),
+	)
+	if err != nil && err != sql.ErrNoRows {
+		return z, err
+	}
+
+	columns, err := rows.Columns()
+	if err != nil {
+		return z, err
+	}
+
+	values := make([]sql.RawBytes, len(columns))
+	scanArgs := make([]interface{}, len(values))
+	for i := range values {
+		scanArgs[i] = &values[i]
+	}
+
+	m := make(map[string]string)
+	for rows.Next() {
+		err = rows.Scan(scanArgs...)
+		if err != nil {
+			return
+		}
+		var value string
+		for i, col := range values {
+			if col == nil {
+				value = ""
+			} else {
+				value = php2go.Stripslashes(string(col))
+			}
+			m[columns[i]] = value
+		}
+	}
+	if err = rows.Err(); err != nil {
+		return z, err
+	}
+	return m, nil
+}
+
+// getPods will count number of executions not in specified values
+func getPods(uniq_id string) (z []map[string]interface{}, err error) {
+	db, err := sql.Open(
+		"postgres",
+		commons.BuildDSN(),
+	)
+	if err != nil {
+		log.Error().Err(err).Msg("Failed to connect to DB")
+		return z, err
+	}
+	defer db.Close()
+
+	stmt, err := db.Prepare("SELECT DISTINCT pod_name FROM executions WHERE uniq_id = $1")
+	if err != nil && err != sql.ErrNoRows {
+		return z, err
+	}
+	defer stmt.Close()
+
+	rows, err := stmt.Query(
+		php2go.Addslashes(uniq_id),
+	)
+	if err != nil && err != sql.ErrNoRows {
+		return z, err
+	}
+
+	columns, err := rows.Columns()
+	if err != nil {
+		return z, err
+	}
+
+	values := make([]sql.RawBytes, len(columns))
+	scanArgs := make([]interface{}, len(values))
+	for i := range values {
+		scanArgs[i] = &values[i]
+	}
+
+	m := make([]map[string]interface{}, 0)
+	for rows.Next() {
+		err = rows.Scan(scanArgs...)
+		if err != nil {
+			return
+		}
+		var value string
+		sub := make(map[string]interface{})
+		for i, col := range values {
+			if col == nil {
+				value = ""
+			} else {
+				value = php2go.Stripslashes(string(col))
+			}
+			sub[columns[i]] = value
+		}
+		m = append(m, sub)
+	}
+	if err = rows.Err(); err != nil {
+		return
+	}
+	return m, nil
+}
+
 // GetExecutionIDForUnitTesting in only for unit testing purpose and will return annotation_id field
 func GetExecutionIDForUnitTesting() (z map[string]string, err error) {
 	db, err := sql.Open(
