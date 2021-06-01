@@ -3,7 +3,10 @@ package commons
 
 import (
 	"os"
+	"strconv"
 	"strings"
+
+	"github.com/rs/zerolog/log"
 )
 
 // BuildDSN permit to retrieve string url to connect to the sql instance
@@ -33,10 +36,36 @@ func GetKubernetesKubeConfig() string {
 
 // GetKubernetesJobsNamespace permit to retrieve OS env variable
 func GetKubernetesJobsNamespace() string {
-	jobsNamespace := strings.TrimSpace(os.Getenv("CYPRESS_PARALLEL_API_JOBS_NAMESPACE"))
-	if jobsNamespace == "" {
+	z := strings.TrimSpace(os.Getenv("CYPRESS_PARALLEL_API_JOBS_NAMESPACE"))
+	if z == "" {
 		return "cypress-parallel-jobs"
 	} else {
-		return jobsNamespace
+		return z
+	}
+}
+
+// GetMaxSpecs permit to retrieve OS env variable
+func GetMaxSpecs() int {
+	harcoded := 3
+	max := strings.TrimSpace(os.Getenv("CYPRESS_PARALLEL_API_MAX_SPECS"))
+	if max == "" {
+		return harcoded
+	} else {
+		m, err := strconv.Atoi(max)
+		if err != nil {
+			log.Error().Err(err).Msgf("Error occured while converting string to int so let's set it to %d anyway", harcoded)
+			return harcoded
+		}
+		return m
+	}
+}
+
+// GetAPIUrl permit to retrieve OS env variable
+func GetAPIUrl() string {
+	z := strings.TrimSpace(os.Getenv("CYPRESS_PARALLEL_API_URL"))
+	if z == "" {
+		return "http://127.0.0.1:8080"
+	} else {
+		return z
 	}
 }
