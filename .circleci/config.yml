@@ -1,0 +1,188 @@
+---
+version: 2.1
+
+# https://circleci.com/developer/images/image/cimg/go
+
+executors:
+  golang:
+    machine:
+      image: ubuntu-2004:202104-01
+
+jobs:
+  build:
+    executor: golang
+    environment:
+      KIND_VERSION: 0.11.0
+      KIND_VERSION_NODE: 1.19.4
+      KIND_CLUSTER_NAME: cypress-parallel
+      HELM_VERSION: 3.6.0
+      IMAGE_NAME: docker.pkg.github.com/lord-y/cypress-parallel-api/cypress-parallel-api
+      CLI_IMAGE: docker.pkg.github.com/lord-y/cypress-parallel-docker-images/cypress-parallel-docker-images:7.2.0-0.0.3
+      NAMESPACE: cypress-parallel
+      CYPRESS_PARALLEL_API_K8S_CLIENT_OUTSIDE: "true"
+      CYPRESS_PARALLEL_API_PORT: 40000
+      CYPRESS_PARALLEL_API_URL: http://192.168.115.128:${CYPRESS_PARALLEL_API_PORT}
+
+    steps:
+    - checkout
+
+    - restore_cache:
+        keys:
+        - ${CIRCLE_PROJECT_REPONAME}-{{ checksum "go.mod" }}
+
+    - run:
+        name: Install curl, kind, kubectl, and helm
+        command: |
+          sudo apt update
+          sudo apt install -yyq --no-install-recommends curl git
+
+          curl --fail --retry 3 -Lo ./kind https://kind.sigs.k8s.io/dl/v${KIND_VERSION}/kind-linux-amd64
+          chmod +x ./kind
+          sudo mv ./kind /usr/local/bin/kind
+
+          curl --fail --retry 3 -LO "https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl"
+          chmod +x ./kubectl
+          sudo mv ./kubectl /usr/local/bin/kubectl
+          
+          curl --fail --retry 3 -LO https://get.helm.sh/helm-v${HELM_VERSION}-linux-amd64.tar.gz
+          tar xzf helm-v${HELM_VERSION}-linux-amd64.tar.gz
+          chmod +x linux-amd64/helm
+          sudo mv linux-amd64/helm /usr/local/bin
+
+    - run:
+        name: Create kind clusters
+        command: |
+          kind create cluster --name ${KIND_CLUSTER_NAME} --image kindest/node:v${KIND_VERSION_NODE} --wait 5m --config .circleci/kind-config.yaml
+
+    - run:
+        name: Get kind clusters / kubectl get cluster-info
+        command: |
+          kind get clusters
+          kubectl cluster-info --context kind-${KIND_CLUSTER_NAME}
+
+    - run:
+        name: Load CLI docker image in kind cluster
+        command: |
+          for i in cypress-parallel-worker cypress-parallel-worker2; do sudo kind load docker-image ${CLI_IMAGE} --name ${KIND_CLUSTER_NAME} --nodes $i;done
+
+    - save_cache:
+        key: ${CIRCLE_PROJECT_REPONAME}-{{ checksum "go.mod" }}
+        paths:
+        - /go/pkg/mod
+
+    # - run:
+    #     name: Perform unit testing
+    #     no_output_timeout: 30m
+    #     command: go test -v ./... -coverprofile=coverage.out
+
+    # - run:
+    #     name: Print result of unit testing
+    #     command: go tool cover -func=coverage.out
+
+  build-tags-and-publish-prerelease:
+    executor: golang
+
+    steps:
+    - checkout
+
+    - restore_cache:
+        keys:
+        - ${CIRCLE_PROJECT_REPONAME}-{{ checksum "go.mod" }}
+
+    - run:
+        name: download mage
+        command: go get -u github.com/magefile/mage
+
+    - run:
+        name: Install golang dependencies
+        command: mage installDeps
+
+    - run:
+        name: Generate binaries
+        command: |
+          export BUILD_VERSION=${CIRCLE_TAG}
+          export BUILD_REVISION=$(git rev-list -1 HEAD)
+          mage build
+
+    - run:
+        name: Compress binaries
+        command: mage compress
+
+    - run:
+        name: Publish prerelease
+        command: |
+          go get github.com/tcnksm/ghr
+          git checkout .
+          ghr -t ${GITHUB_TOKEN} -u ${CIRCLE_PROJECT_USERNAME} -r ${CIRCLE_PROJECT_REPONAME} -c ${CIRCLE_SHA1} -n ${CIRCLE_TAG} -b "See changelog [here](https://github.com/Lord-Y/cypress-parallel-api/blob/main/CHANGELOG.md)" -prerelease ${CIRCLE_TAG} artifacts/
+
+    - run:
+        name: Cleaning binaries
+        command: mage clean
+
+  build-tags-and-publish-release:
+    executor: golang
+
+    steps:
+    - checkout
+
+    - restore_cache:
+        keys:
+        - ${CIRCLE_PROJECT_REPONAME}-{{ checksum "go.mod" }}
+
+    - run:
+        name: download mage
+        command: go get -u github.com/magefile/mage
+
+    - run:
+        name: Install golang dependencies
+        command: mage installDeps
+
+    - run:
+        name: Generate binaries
+        command: |
+          export BUILD_VERSION=${CIRCLE_TAG}
+          export BUILD_REVISION=$(git rev-list -1 HEAD)
+          mage build
+
+    - run:
+        name: Compress binaries
+        command: mage compress
+
+    - run:
+        name: Publish release
+        command: |
+          go get github.com/tcnksm/ghr
+          git checkout .
+          ghr -t ${GITHUB_TOKEN} -u ${CIRCLE_PROJECT_USERNAME} -r ${CIRCLE_PROJECT_REPONAME} -c ${CIRCLE_SHA1} -n ${CIRCLE_TAG} -b "See changelog [here](https://github.com/Lord-Y/cypress-parallel-api/blob/main/CHANGELOG.md)" ${CIRCLE_TAG} artifacts/
+
+    - run:
+        name: Cleaning binaries
+        command: mage clean
+
+# https://circleci.com/docs/2.0/workflows/#git-tag-job-execution
+workflows:
+  version: 2
+  test-and-build:
+    jobs:
+    - build:
+        filters:
+          tags:
+            only: /.*/
+    - build-tags-and-publish-prerelease:
+        context: GITHUB
+        requires:
+        - build
+        filters:
+          tags:
+            only: /^v\d+\.\d+\.\d+-(.*)$/
+          branches:
+            ignore: /.*/
+    - build-tags-and-publish-release:
+        context: GITHUB
+        requires:
+        - build
+        filters:
+          tags:
+            only: /^v\d+\.\d+\.\d+$/
+          branches:
+            ignore: /.*/
