@@ -71,7 +71,7 @@ func TestEnvironmentsUpdate(t *testing.T) {
 	router := SetupRouter()
 	payload := fmt.Sprintf("projectId=%s", result["project_id"])
 	payload += fmt.Sprintf("&environmentId=%s", result["environment_id"])
-	payload += fmt.Sprintf("&key=%s", fake.CharactersN(5))
+	payload += fmt.Sprintf("&key=%s", fake.Word())
 	payload += fmt.Sprintf("&value=%s", fake.CharactersN(5))
 	w, _ := performRequest(router, headers, "PUT", "/api/v1/cypress-parallel-api/environments", payload)
 	assert.Equal(200, w.Code)
