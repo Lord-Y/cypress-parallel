@@ -17,7 +17,7 @@ jobs:
       KIND_CLUSTER_NAME: cypress-parallel
       HELM_VERSION: 3.6.0
       IMAGE_NAME: docker.pkg.github.com/lord-y/cypress-parallel-api/cypress-parallel-api
-      CLI_IMAGE_VERSION: 7.2.0-0.0.3
+      CLI_IMAGE: docker.pkg.github.com/lord-y/cypress-parallel-docker-images/cypress-parallel-docker-images:7.2.0-0.0.3
       NAMESPACE: cypress-parallel
       CYPRESS_PARALLEL_API_K8S_CLIENT_OUTSIDE: "true"
       CYPRESS_PARALLEL_API_PORT: 40000
@@ -64,9 +64,8 @@ jobs:
     - run:
         name: Load CLI docker image in kind cluster
         command: |
-          export CLI_IMAGE="docker.pkg.github.com/lord-y/cypress-parallel-docker-images/cypress-parallel-docker-images:${CLI_IMAGE_VERSION}"
           echo "$GITHUB_TOKEN" | docker login https://docker.pkg.github.com -u ${CIRCLE_USERNAME} --password-stdin
-          sudo docker pull ${CLI_IMAGE}
+          docker pull ${CLI_IMAGE}
           for i in cypress-parallel-worker cypress-parallel-worker2; do sudo kind load docker-image ${CLI_IMAGE} --name ${KIND_CLUSTER_NAME} --nodes $i;done
 
     - run:
