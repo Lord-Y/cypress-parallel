@@ -21,6 +21,7 @@ jobs:
       NAMESPACE: cypress-parallel
       CYPRESS_PARALLEL_API_K8S_CLIENT_OUTSIDE: "true"
       CYPRESS_PARALLEL_API_PORT: 40000
+      GO111MODULE: "on"
 
     steps:
     - checkout
@@ -33,20 +34,21 @@ jobs:
         name: Install curl, kind, kubectl, and helm
         command: |
           sudo apt update
-          sudo apt install -yyq --no-install-recommends curl git
+          which curl || sudo apt install -yyq --no-install-recommends curl
+          which git || sudo apt install -yyq --no-install-recommends git
 
-          curl --fail --retry 3 -Lo ./kind https://kind.sigs.k8s.io/dl/v${KIND_VERSION}/kind-linux-amd64
-          chmod +x ./kind
-          sudo mv ./kind /usr/local/bin/kind
+          which kind || curl --fail --retry 3 -Lo ./kind https://kind.sigs.k8s.io/dl/v${KIND_VERSION}/kind-linux-amd64
+          which kind || chmod +x ./kind
+          which kind || sudo mv ./kind /usr/local/bin/kind
 
-          curl --fail --retry 3 -LO "https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl"
-          chmod +x ./kubectl
-          sudo mv ./kubectl /usr/local/bin/kubectl
+          which kubectl || curl --fail --retry 3 -LO "https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl"
+          which kubectl || chmod +x ./kubectl
+          which kubectl || sudo mv ./kubectl /usr/local/bin/kubectl
           
-          curl --fail --retry 3 -LO https://get.helm.sh/helm-v${HELM_VERSION}-linux-amd64.tar.gz
+          which helm || curl --fail --retry 3 -LO https://get.helm.sh/helm-v${HELM_VERSION}-linux-amd64.tar.gz
           tar xzf helm-v${HELM_VERSION}-linux-amd64.tar.gz
-          chmod +x linux-amd64/helm
-          sudo mv linux-amd64/helm /usr/local/bin
+          which helm || chmod +x linux-amd64/helm
+          which helm || sudo mv linux-amd64/helm /usr/local/bin
 
     - run:
         name: Create kind clusters
@@ -62,7 +64,13 @@ jobs:
     - run:
         name: Load CLI docker image in kind cluster
         command: |
+          echo "$GITHUB_TOKEN" | docker login https://docker.pkg.github.com -u ${CIRCLE_USERNAME} --password-stdin
+          sudo docker pull ${CLI_IMAGE}
           for i in cypress-parallel-worker cypress-parallel-worker2; do sudo kind load docker-image ${CLI_IMAGE} --name ${KIND_CLUSTER_NAME} --nodes $i;done
+
+    - run:
+        name: Start Postgres DB
+        command: sudo docker-compose -f docker-compose.yaml up -d
 
     - save_cache:
         key: ${CIRCLE_PROJECT_REPONAME}-{{ checksum "go.mod" }}
@@ -73,12 +81,19 @@ jobs:
         name: Perform unit testing
         no_output_timeout: 30m
         command: |
-          export CYPRESS_PARALLEL_API_URL=http://192.168.115.128:${CYPRESS_PARALLEL_API_PORT}
-          #go test -v ./... -coverprofile=coverage.out
+          export CYPRESS_PARALLEL_API_DB_URI="postgres://cypress_parallel:cypress_parallel@$(hostname -i):5432/cypress_parallel?sslmode=disable"
+          export CYPRESS_PARALLEL_API_URL=http://$(hostname -i):${CYPRESS_PARALLEL_API_PORT}
+          go test -v ./... -coverprofile=coverage.out
 
-    # - run:
-    #     name: Print result of unit testing
-    #     command: go tool cover -func=coverage.out
+    - run:
+        name: Print result of unit testing
+        command: go tool cover -func=coverage.out
+
+    - run:
+        name: Build docker image
+        command: |
+          export CUSTOM_TAG=$(git rev-parse --short HEAD)
+          docker build -t ${IMAGE_NAME}:${CUSTOM_TAG} .
 
   build-tags-and-publish-prerelease:
     executor: golang
@@ -166,6 +181,7 @@ workflows:
   test-and-build:
     jobs:
     - build:
+        context: GITHUB
         filters:
           tags:
             only: /.*/
