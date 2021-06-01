@@ -1,16 +1,46 @@
-# cypress-parallel-api
+# cypress-parallel-api [![CircleCI](https://circleci.com/gh/Lord-Y/cypress-parallel-api/tree/main.svg?style=svg)](https://circleci.com/gh/Lord-Y/cypress-parallel-api?branch=main)
 
 `cypress-parallel-api` is the api used by `cypress-parallel` frontend UI.
+The api permit to create pods inside your kubernetes cluster triggered by curl commands or via UI.
 
 ## API url
 
-By default, the api url is `http://127.0.0.1` but it can be override with os environment variable `CYPRESS_PARALLEL_API_URL`.
+By default, the api url is `http://127.0.0.1:8080` but it can be override with os environment variable `CYPRESS_PARALLEL_API_URL`.
 
 ## Database
 
 Our api is developped with PostgresSQL database so the environment variable CYPRESS_PARALLEL_API_DB_URI must be set:
 ```bash
 export CYPRESS_PARALLEL_API_DB_URI="postgres://USERNAME:PASSWORD@HOST:PORT/DB_NAME?sslmode=disable"
+```
+
+## Development
+### Kind
+
+During you local development, you must set the variable `CYPRESS_PARALLEL_API_K8S_CLIENT_OUTSIDE` in order to create to make the api loggued in with your `.kube/config`
+
+```bash
+export CYPRESS_PARALLEL_API_K8S_CLIENT_OUTSIDE=true
+```
+
+Please read `Kind` setup [here](./_developments/README.md)
+
+### Start your postgres sql instance
+
+```bash
+sudo docker-compose up -d -f docker-compose.yml.yaml
+```
+
+### Debugging
+
+To enable the debug mode on the api:
+```bash
+CYPRESS_PARALLEL_API_LOG_LEVEL=true
+```
+
+To enable the debug mode on the cli:
+```bash
+CYPRESS_PARALLEL_CLI_LOG_LEVEL=true
 ```
 
 ## Content types
@@ -21,7 +51,7 @@ Supported content types are:
 
 ## Unit testing
 
-Unit testing must be close to 100% to avoid any shitty bug as the application will continue to grow. By reaching this percentage, we make sure that when a bug is discovered, that's not a dummy one.
+Make sure to add unit testing for almost every new features in order to ensure the quality of the api.
 
 Run tests with:
 ```bash
