@@ -54,7 +54,7 @@ jobs:
     - run:
         name: Create kind clusters
         command: |
-          kind create cluster --name ${KIND_CLUSTER_NAME} --image kindest/node:v${KIND_VERSION_NODE} --wait 5m --config .circleci/kind-config.yaml
+          kind get clusters || kind create cluster --name ${KIND_CLUSTER_NAME} --image kindest/node:v${KIND_VERSION_NODE} --wait 5m --config .circleci/kind-config.yaml
 
     - run:
         name: Get kind clusters / kubectl get cluster-info
