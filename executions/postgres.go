@@ -201,7 +201,7 @@ func countExecutions(uniq_id string) (z map[string]string, err error) {
 	}
 	defer db.Close()
 
-	stmt, err := db.Prepare("SELECT COUNT(execution_id), (SELECT COUNT(execution_id) FROM executions WHERE uniq_id = $1) total FROM executions WHERE uniq_id = $1 AND execution_status NOT IN ('RUNNING','NOT_STARTED','SCHEDULED')")
+	stmt, err := db.Prepare("SELECT COUNT(execution_id), (SELECT COUNT(execution_id) FROM executions WHERE uniq_id = $1) total FROM executions WHERE uniq_id = $1 AND execution_status NOT IN ('RUNNING','NOT_STARTED','QUEUED','SCHEDULED')")
 	if err != nil && err != sql.ErrNoRows {
 		return z, err
 	}

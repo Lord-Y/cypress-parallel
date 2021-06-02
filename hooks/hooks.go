@@ -61,7 +61,7 @@ type execution struct {
 	projectID       int
 	uniqID          string
 	branch          string
-	executionStatus string // must be, NOT_STARTED, SCHEDULED, RUNNING, CANCELLED, FAILED, DONE
+	executionStatus string // must be, NOT_STARTED, QUEUED, SCHEDULED, RUNNING, CANCELLED, FAILED, DONE
 	spec            string
 	result          string
 }
@@ -99,6 +99,7 @@ func Plain(c *gin.Context) {
 		finalSecs   []string
 		nbSpec      int
 		reset       bool
+		maxPods     int
 	)
 	if err := c.ShouldBind(&p); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -235,7 +236,14 @@ func Plain(c *gin.Context) {
 	runidID := fmt.Sprintf("%x", uniqID)
 	uniqID_ := runidID[0:10]
 
-	for _, spec := range finalSecs {
+	maxPods, err = strconv.Atoi(p.MaxPods)
+	if err != nil {
+		log.Error().Err(err).Msg("Error occured while converting string to int")
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
+		return
+	}
+
+	for count, spec := range finalSecs {
 		var (
 			pdn     updatePodName
 			tag     string
@@ -248,121 +256,139 @@ func Plain(c *gin.Context) {
 			return
 		}
 
-		for _, splittedSpec := range strings.Split(spec, ",") {
-			ex.projectID = projecID
-			ex.uniqID = uniqID_
-			ex.executionStatus = "NOT_STARTED"
-			ex.spec = splittedSpec
-			ex.result = `{}`
-			ex.branch = branch
+		if count < maxPods {
+			for _, splittedSpec := range strings.Split(spec, ",") {
+				ex.projectID = projecID
+				ex.uniqID = uniqID_
+				ex.executionStatus = "NOT_STARTED"
+				ex.spec = splittedSpec
+				ex.result = `{}`
+				ex.branch = branch
 
-			_, err = ex.create()
+				_, err = ex.create()
+				if err != nil {
+					log.Error().Err(err).Msg("Error occured while performing db query")
+					c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
+					return
+				}
+			}
+
+			annotations, err := pj.getProjectAnnotations()
 			if err != nil {
 				log.Error().Err(err).Msg("Error occured while performing db query")
 				c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
 				return
 			}
-		}
-
-		annotations, err := pj.getProjectAnnotations()
-		if err != nil {
-			log.Error().Err(err).Msg("Error occured while performing db query")
-			c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
-			return
-		}
-		if len(annotations) > 0 {
-			annotation := make(map[string]string)
-			for _, k := range annotations {
-				annotation[fmt.Sprintf("%s", k["key"])] = fmt.Sprintf("%s", k["value"])
+			if len(annotations) > 0 {
+				annotation := make(map[string]string)
+				for _, k := range annotations {
+					annotation[fmt.Sprintf("%s", k["key"])] = fmt.Sprintf("%s", k["value"])
+				}
+				pod.Annotations = annotation
 			}
-			pod.Annotations = annotation
-		}
 
-		envVars, err := pj.getProjectEnvironments()
-		if err != nil {
-			log.Error().Err(err).Msg("Error occured while performing db query")
-			c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
-			return
-		}
-		if len(envVars) > 0 {
-			var (
-				envs   []models.EnvironmentVar
-				envVar models.EnvironmentVar
-			)
-			for _, k := range envVars {
-				envVar.Key = fmt.Sprintf("CYPRESS_%s", k["key"])
-				envVar.Value = fmt.Sprintf("%s", k["value"])
-				envs = append(envs, envVar)
-			}
-			if strings.TrimSpace(os.Getenv("CYPRESS_PARALLEL_CLI_LOG_LEVEL")) != "" {
-				envVar.Key = "CYPRESS_PARALLEL_CLI_LOG_LEVEL"
-				envVar.Value = strings.TrimSpace(os.Getenv("CYPRESS_PARALLEL_CLI_LOG_LEVEL"))
-				envs = append(envs, envVar)
-			}
-			pod.Container.EnvironmentVars = envs
-		}
-		pod.Namespace = commons.GetKubernetesJobsNamespace()
-		pod.GenerateName = "cypress-parallel-jobs-"
-		pod.Labels = map[string]string{
-			"worker": "kubernetes",
-			"app":    "cypress-parallel-jobs",
-		}
-
-		command = append(command, "cypress-parallel-cli")
-		command = append(command, "cypress")
-		command = append(command, "--browser")
-		command = append(command, p.Browser)
-		command = append(command, "--config-file")
-		command = append(command, p.ConfigFile)
-		command = append(command, "--specs")
-		command = append(command, spec)
-		command = append(command, "--uid")
-		command = append(command, uniqID_)
-		command = append(command, "--branch")
-		command = append(command, branch)
-		command = append(command, "--repository")
-		command = append(command, gitc.Repository)
-		command = append(command, "--api-url")
-		command = append(command, commons.GetAPIUrl())
-		command = append(command, "--report-back")
-		command = append(command, "--timeout")
-		command = append(command, pj.Timeout)
-		if pj.Username != "" {
-			command = append(command, "--username")
-			command = append(command, pj.Username)
-		}
-		if pj.Password != "" {
-			command = append(command, "--password")
-			command = append(command, pj.Password)
-		}
-		if p.CypressDockerVersion != "" {
-			tag = p.CypressDockerVersion
-		} else {
-			tag = pj.CypressDockerVersion
-		}
-
-		pod.Container.Command = command
-		pod.Container.Name = "cypress-parallel-jobs"
-		pod.Container.Image = fmt.Sprintf("%s:%s", ghr, tag)
-
-		podName, err := kubernetes.CreatePod(clientset, pod)
-		if err != nil {
-			log.Error().Err(err).Msg("Error occured while creating pod")
-			c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
-			return
-		}
-		log.Debug().Msgf("Pod name %s created", podName)
-
-		for _, splittedSpec := range strings.Split(spec, ",") {
-			pdn.podName = podName
-			pdn.uniqID = uniqID_
-			pdn.spec = splittedSpec
-
-			err = pdn.update()
+			envVars, err := pj.getProjectEnvironments()
 			if err != nil {
-				log.Error().Err(err).Msg("Error occured while performing update db query")
+				log.Error().Err(err).Msg("Error occured while performing db query")
 				c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
 				return
+			}
+			if len(envVars) > 0 {
+				var (
+					envs   []models.EnvironmentVar
+					envVar models.EnvironmentVar
+				)
+				for _, k := range envVars {
+					envVar.Key = fmt.Sprintf("CYPRESS_%s", k["key"])
+					envVar.Value = fmt.Sprintf("%s", k["value"])
+					envs = append(envs, envVar)
+				}
+				if strings.TrimSpace(os.Getenv("CYPRESS_PARALLEL_CLI_LOG_LEVEL")) != "" {
+					envVar.Key = "CYPRESS_PARALLEL_CLI_LOG_LEVEL"
+					envVar.Value = strings.TrimSpace(os.Getenv("CYPRESS_PARALLEL_CLI_LOG_LEVEL"))
+					envs = append(envs, envVar)
+				}
+				pod.Container.EnvironmentVars = envs
+			}
+			pod.Namespace = commons.GetKubernetesJobsNamespace()
+			pod.GenerateName = "cypress-parallel-jobs-"
+			pod.Labels = map[string]string{
+				"worker": "kubernetes",
+				"app":    "cypress-parallel-jobs",
+			}
+
+			command = append(command, "cypress-parallel-cli")
+			command = append(command, "cypress")
+			command = append(command, "--browser")
+			command = append(command, p.Browser)
+			command = append(command, "--config-file")
+			command = append(command, p.ConfigFile)
+			command = append(command, "--specs")
+			command = append(command, spec)
+			command = append(command, "--uid")
+			command = append(command, uniqID_)
+			command = append(command, "--branch")
+			command = append(command, branch)
+			command = append(command, "--repository")
+			command = append(command, gitc.Repository)
+			command = append(command, "--api-url")
+			command = append(command, commons.GetAPIUrl())
+			command = append(command, "--report-back")
+			command = append(command, "--timeout")
+			command = append(command, pj.Timeout)
+			if pj.Username != "" {
+				command = append(command, "--username")
+				command = append(command, pj.Username)
+			}
+			if pj.Password != "" {
+				command = append(command, "--password")
+				command = append(command, pj.Password)
+			}
+			if p.CypressDockerVersion != "" {
+				tag = p.CypressDockerVersion
+			} else {
+				tag = pj.CypressDockerVersion
+			}
+
+			pod.Container.Command = command
+			pod.Container.Name = "cypress-parallel-jobs"
+			pod.Container.Image = fmt.Sprintf("%s:%s", ghr, tag)
+
+			podName, err := kubernetes.CreatePod(clientset, pod)
+			if err != nil {
+				log.Error().Err(err).Msg("Error occured while creating pod")
+				c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
+				return
+			}
+			log.Debug().Msgf("Pod name %s created", podName)
+
+			for _, splittedSpec := range strings.Split(spec, ",") {
+				pdn.podName = podName
+				pdn.uniqID = uniqID_
+				pdn.spec = splittedSpec
+
+				err = pdn.update()
+				if err != nil {
+					log.Error().Err(err).Msg("Error occured while performing update db query")
+					c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
+					return
+				}
+			}
+		} else {
+			for _, splittedSpec := range strings.Split(spec, ",") {
+				ex.projectID = projecID
+				ex.uniqID = uniqID_
+				ex.executionStatus = "QUEUED"
+				ex.spec = splittedSpec
+				ex.result = `{}`
+				ex.branch = branch
+
+				_, err = ex.create()
+				if err != nil {
+					log.Error().Err(err).Msg("Error occured while performing db query")
+					c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
+					return
+				}
 			}
 		}
 	}
