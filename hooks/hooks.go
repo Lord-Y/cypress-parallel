@@ -139,6 +139,8 @@ func Plain(c *gin.Context) {
 		}
 	}
 	gitc.Repository = pj.Repository
+	gitc.Username = pj.Username
+	gitc.Password = pj.Password
 
 	gitdir, statusCode, err := gitc.Clone()
 	defer os.RemoveAll(gitdir)
@@ -149,6 +151,7 @@ func Plain(c *gin.Context) {
 		} else {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		}
+		return
 	}
 
 	if p.Specs != "" {
@@ -287,7 +290,7 @@ func Plain(c *gin.Context) {
 				envVar models.EnvironmentVar
 			)
 			for _, k := range envVars {
-				envVar.Key = fmt.Sprintf("%s", k["key"])
+				envVar.Key = fmt.Sprintf("CYPRESS_%s", k["key"])
 				envVar.Value = fmt.Sprintf("%s", k["value"])
 				envs = append(envs, envVar)
 			}
