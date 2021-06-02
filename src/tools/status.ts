@@ -2,6 +2,7 @@ import { Execution } from '../api/executionsService'
 
 const executionStatus: Array<string> = [
   'NOT_STARTED',
+  'QUEUED',
   'SCHEDULED',
   'RUNNING',
   'FAILED',
@@ -36,9 +37,7 @@ class Statuses {
   global(execution: Execution): string {
     if (
       Object.keys(execution).length > 0 &&
-      (execution.execution_status === 'FAILED' ||
-        execution.execution_status === 'NOT_STARTED' ||
-        execution.execution_status === 'RUNNING')
+      (executionStatus.includes(execution.execution_status))
     ) {
       return execution.execution_status
     }
