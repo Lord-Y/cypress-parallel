@@ -15,9 +15,6 @@ jobs:
     steps:
     - checkout
 
-    - setup_remote_docker:
-        docker_layer_caching: true
-
     - run:
         name: Build docker image
         command: docker build -t ${IMAGE_NAME}:latest .
@@ -50,9 +47,6 @@ jobs:
 
     steps:
     - checkout
-
-    - setup_remote_docker:
-        docker_layer_caching: true
 
     - run:
         name: Build and publish docker image
