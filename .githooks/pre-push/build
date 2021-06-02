@@ -3,6 +3,5 @@
 branch=$(git rev-parse --abbrev-ref HEAD)
 if [ "$BRANCH" != "main" ]
 then
-  eslint --fix --ext .js,.vue,.ts src
-  npm run build
+  rm -rf dist && npm run build
 fi
