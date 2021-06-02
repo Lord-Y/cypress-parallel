@@ -477,6 +477,7 @@ export default defineComponent({
         cypress_docker_version: project.cypress_docker_version,
         browser: project.browser,
         config_file: project.config_file,
+        max_pods: project.max_pods,
       })
         .then((response: any) => {
           if (response.status === 201) {
