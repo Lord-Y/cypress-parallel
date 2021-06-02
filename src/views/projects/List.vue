@@ -627,8 +627,7 @@ export default defineComponent({
         })
         .catch((error: any) => {
           if (error.response.status === 404) {
-            state.alert.class = 'mute'
-            state.alert.message = t('alert.http.pageNotFound')
+            return true
           } else {
             state.alert.class = 'red'
             state.alert.message = t('alert.http.errorOccured')
@@ -693,8 +692,7 @@ export default defineComponent({
         })
         .catch((error: any) => {
           if (error.response.status === 404) {
-            state.alert.class = 'mute'
-            state.alert.message = t('alert.http.pageNotFound')
+            return true
           } else {
             state.alert.class = 'red'
             state.alert.message = t('alert.http.errorOccured')
