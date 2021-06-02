@@ -29,7 +29,7 @@ type plain struct {
 	ConfigFile           string `form:"config_file,default=cypress.json" json:"config_file,default=cypress.json" binding:"max=100"`
 	Browser              string `form:"browser,default=chrome" json:"browser,default=chrome" binding:"max=100,oneof=chrome firefox"`
 	MaxPods              string `form:"max_pods" json:"max_pods"`
-	CypressDockerVersion string `form:"cypress_docker_version,default=7.2.0-0.0.3,max=20" json:"cypress_docker_version,max=20"`
+	CypressDockerVersion string `form:"cypress_docker_version,default=7.2.0-0.0.4,max=20" json:"cypress_docker_version,max=20"`
 	plain                bool
 }
 
@@ -106,7 +106,7 @@ func Plain(c *gin.Context) {
 	}
 
 	if p.CypressDockerVersion == "" {
-		p.CypressDockerVersion = "7.2.0-0.0.3"
+		p.CypressDockerVersion = "7.2.0-0.0.4"
 	}
 	if p.ConfigFile == "" {
 		p.ConfigFile = "cypress.json"
