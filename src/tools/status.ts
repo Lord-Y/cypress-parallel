@@ -37,7 +37,7 @@ class Statuses {
   global(execution: Execution): string {
     if (
       Object.keys(execution).length > 0 &&
-      (executionStatus.includes(execution.execution_status))
+      executionStatus.includes(execution.execution_status)
     ) {
       return execution.execution_status
     }
