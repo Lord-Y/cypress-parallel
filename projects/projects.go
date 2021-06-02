@@ -18,6 +18,9 @@ type projects struct {
 	Repository           string `form:"repository" json:"repository" binding:"required"`
 	Branch               string `form:"branch" json:"branch" binding:"required"`
 	Specs                string `form:"specs" json:"specs" binding:"required"`
+	Scheduling           string `form:"scheduling" json:"scheduling" binding:"max=15"`
+	SchedulingEnabled    bool   `form:"schedulingEnabled" json:"schedulingEnabled"`
+	MaxPods              int    `form:"maxPods,default=10" json:"maxPods,default=10"`
 	CypressDockerVersion string `form:"cypress_docker_version,default=7.2.0-0.0.4" json:"cypress_docker_version"`
 	Timeout              int    `form:"timeout,default=10" json:"timeout,default=10"`
 	Username             string `form:"username" json:"username"`
@@ -90,6 +93,9 @@ func Create(c *gin.Context) {
 	}
 	if p.ConfigFile == "" {
 		p.ConfigFile = "cypress.json"
+	}
+	if p.MaxPods == 0 {
+		p.MaxPods = 10
 	}
 
 	result, err := p.create()
@@ -193,6 +199,9 @@ func Update(c *gin.Context) {
 	}
 	if p.ConfigFile == "" {
 		p.ConfigFile = "cypress.json"
+	}
+	if p.MaxPods == 0 {
+		p.MaxPods = 10
 	}
 
 	err := p.update()

@@ -22,7 +22,7 @@ func (p *projects) create() (z int64, err error) {
 	}
 	defer db.Close()
 
-	stmt, err := db.Prepare("INSERT INTO projects(project_name, team_id, repository, branch, specs, cypress_docker_version, username, password, browser, config_file, timeout) VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) RETURNING project_id")
+	stmt, err := db.Prepare("INSERT INTO projects(project_name, team_id, repository, branch, specs, scheduling, scheduling_enabled, max_pods, cypress_docker_version, username, password, browser, config_file, timeout) VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14) RETURNING project_id")
 	if err != nil && err != sql.ErrNoRows {
 		return z, err
 	}
@@ -33,6 +33,9 @@ func (p *projects) create() (z int64, err error) {
 		php2go.Addslashes(p.Repository),
 		php2go.Addslashes(p.Branch),
 		php2go.Addslashes(p.Specs),
+		php2go.Addslashes(p.Scheduling),
+		p.SchedulingEnabled,
+		p.MaxPods,
 		php2go.Addslashes(p.CypressDockerVersion),
 		php2go.Addslashes(p.Username),
 		php2go.Addslashes(p.Password),
