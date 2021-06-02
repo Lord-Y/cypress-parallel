@@ -17,6 +17,7 @@ v0.1.0 release
 
 ### Changed
 - Fix css classes in executions
+- Fix spec icon color
 - Update default version of cypress docker image
 
 ## [v0.1.0-beta1](https://github.com/Lord-Y/cypress-parallel/releases/tag/v0.0.1-beta1) - 2021-06-02
