@@ -102,6 +102,7 @@ jobs:
         name: Cleaning
         command: |
           kubectl -n cypress-parallel-jobs delete po --all
+          export CYPRESS_PARALLEL_API_DB_URI="postgres://cypress_parallel:cypress_parallel@$(hostname -i):5432/cypress_parallel?sslmode=disable"
           psql ${CYPRESS_PARALLEL_API_DB_URI} -f .circleci/truncate.sql
 
     - run:
