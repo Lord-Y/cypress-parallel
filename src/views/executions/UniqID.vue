@@ -156,6 +156,7 @@ export default defineComponent({
           classes = 'text-green-500 font-semibold'
           break
         case 'NOT_STARTED':
+        case 'QUEUED':
         case 'SCHEDULED':
         case 'CANCELLED':
           classes = 'text-gray-500 font-semibold'
@@ -175,6 +176,7 @@ export default defineComponent({
           classes = 'text-green-500 font-semibold'
           break
         case 'NOT_STARTED':
+        case 'QUEUED':
         case 'SCHEDULED':
         case 'CANCELLED':
           classes = 'text-gray-500 font-semibold'
