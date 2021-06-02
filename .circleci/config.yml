@@ -87,6 +87,7 @@ jobs:
         - /home/circleci/.go_workspace/pkg/mod
         - /var/lib/docker
         - /home/circleci/.kube
+        - /usr/local/bin
 
     - run:
         name: Perform unit testing
