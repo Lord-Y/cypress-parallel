@@ -35,12 +35,12 @@ sudo docker-compose up -d -f docker-compose.yml.yaml
 
 To enable the debug mode on the api:
 ```bash
-CYPRESS_PARALLEL_API_LOG_LEVEL=true
+export CYPRESS_PARALLEL_API_LOG_LEVEL=debug
 ```
 
 To enable the debug mode on the cli:
 ```bash
-CYPRESS_PARALLEL_CLI_LOG_LEVEL=true
+export CYPRESS_PARALLEL_CLI_LOG_LEVEL=debug
 ```
 
 ## Content types
