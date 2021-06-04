@@ -30,8 +30,8 @@ type plain struct {
 	Specs                string `form:"specs" json:"specs"`
 	ConfigFile           string `form:"config_file,default=cypress.json" json:"config_file,default=cypress.json" binding:"max=100"`
 	Browser              string `form:"browser,default=chrome" json:"browser,default=chrome" binding:"max=100,oneof=chrome firefox"`
-	MaxPods              string `form:"max_pods" json:"max_pods"`
-	CypressDockerVersion string `form:"cypress_docker_version,default=7.2.0-0.0.4,max=20" json:"cypress_docker_version,max=20"`
+	MaxPods              int    `form:"maxPods,default=10" json:"maxPods,default=10"`
+	CypressDockerVersion string `form:"cypress_docker_version,default=7.2.0-0.0.5,max=20" json:"cypress_docker_version,max=20"`
 	plain                bool
 }
 
@@ -121,7 +121,6 @@ func Plain(c *gin.Context) {
 		finalSecs   []string
 		nbSpec      int
 		reset       bool
-		maxPods     int
 	)
 	if err := c.ShouldBind(&p); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -129,10 +128,13 @@ func Plain(c *gin.Context) {
 	}
 
 	if p.CypressDockerVersion == "" {
-		p.CypressDockerVersion = "7.2.0-0.0.4"
+		p.CypressDockerVersion = "7.2.0-0.0.5"
 	}
 	if p.ConfigFile == "" {
 		p.ConfigFile = "cypress.json"
+	}
+	if p.MaxPods == 0 {
+		p.MaxPods = 10
 	}
 
 	result, err := p.getProjectInfos()
@@ -258,13 +260,6 @@ func Plain(c *gin.Context) {
 	runidID := fmt.Sprintf("%x", uniqID)
 	uniqID_ := runidID[0:10]
 
-	maxPods, err = strconv.Atoi(p.MaxPods)
-	if err != nil {
-		log.Error().Err(err).Msg("Error occured while converting string to int")
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
-		return
-	}
-
 	for count, spec := range finalSecs {
 		var (
 			pdn     updatePodName
@@ -278,7 +273,7 @@ func Plain(c *gin.Context) {
 			return
 		}
 
-		if count < maxPods {
+		if count < p.MaxPods {
 			for _, splittedSpec := range strings.Split(spec, ",") {
 				ex.projectID = projecID
 				ex.uniqID = uniqID_
