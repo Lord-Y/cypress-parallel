@@ -138,21 +138,20 @@ func UpdateResultExecution(c *gin.Context) {
 	}
 	log.Debug().Msgf("POST body %+v", p)
 
-	remaining, err := countExecutions(p.UniqID)
+	remaining, err := p.countExecutions()
 	if err != nil {
 		log.Error().Err(err).Msg("Error occured while performing db query")
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
 	}
 	log.Debug().Msgf("remaining %+v", remaining)
 
-	if remaining["count"] == remaining["total"] || remaining["count"] == "0" {
-		pods, err := getPods(p.UniqID)
+	if len(remaining) == 0 {
+		pod, err := p.countExecutionsInverted()
 		if err != nil {
 			log.Error().Err(err).Msg("Error occured while performing db query")
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
-			return
 		}
-		for _, pod := range pods {
+		if len(pod) > 0 {
 			clientset, err := kubernetes.Client()
 			if err != nil {
 				log.Error().Err(err).Msg("Error occured while initializing kubernetes client")

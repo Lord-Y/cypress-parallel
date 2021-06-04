@@ -244,3 +244,179 @@ func (p *updatePodName) update() (err error) {
 	}
 	return nil
 }
+
+// executionStatus get executions by status
+func executionStatus(execution_status string) (z []map[string]interface{}, err error) {
+	db, err := sql.Open(
+		"postgres",
+		commons.BuildDSN(),
+	)
+	if err != nil {
+		return
+	}
+	defer db.Close()
+
+	stmt, err := db.Prepare("SELECT DISTINCT uniq_id FROM executions WHERE execution_status = $1")
+	if err != nil && err != sql.ErrNoRows {
+		return
+	}
+	defer stmt.Close()
+
+	rows, err := stmt.Query(
+		execution_status,
+	)
+	if err != nil && err != sql.ErrNoRows {
+		return
+	}
+
+	columns, err := rows.Columns()
+	if err != nil {
+		return
+	}
+
+	values := make([]sql.RawBytes, len(columns))
+	scanArgs := make([]interface{}, len(values))
+	for i := range values {
+		scanArgs[i] = &values[i]
+	}
+
+	m := make([]map[string]interface{}, 0)
+	for rows.Next() {
+		err = rows.Scan(scanArgs...)
+		if err != nil {
+			return
+		}
+		var value string
+		sub := make(map[string]interface{})
+		for i, col := range values {
+			if col == nil {
+				value = ""
+			} else {
+				value = php2go.Stripslashes(string(col))
+			}
+			sub[columns[i]] = value
+		}
+		m = append(m, sub)
+	}
+	if err = rows.Err(); err != nil {
+		return
+	}
+	return m, nil
+}
+
+// pgqueued get queued executions
+func pgqueued(uniqId string) (z []map[string]interface{}, err error) {
+	db, err := sql.Open(
+		"postgres",
+		commons.BuildDSN(),
+	)
+	if err != nil {
+		return
+	}
+	defer db.Close()
+
+	stmt, err := db.Prepare("SELECT e.*, p.project_name FROM executions e LEFT JOIN projects p ON e.project_id = p.project_id WHERE e.execution_status = 'QUEUED' AND e.uniq_id = $1")
+	if err != nil && err != sql.ErrNoRows {
+		return
+	}
+	defer stmt.Close()
+
+	rows, err := stmt.Query(
+		php2go.Addslashes(uniqId),
+	)
+	if err != nil && err != sql.ErrNoRows {
+		return
+	}
+
+	columns, err := rows.Columns()
+	if err != nil {
+		return
+	}
+
+	values := make([]sql.RawBytes, len(columns))
+	scanArgs := make([]interface{}, len(values))
+	for i := range values {
+		scanArgs[i] = &values[i]
+	}
+
+	m := make([]map[string]interface{}, 0)
+	for rows.Next() {
+		err = rows.Scan(scanArgs...)
+		if err != nil {
+			return
+		}
+		var value string
+		sub := make(map[string]interface{})
+		for i, col := range values {
+			if col == nil {
+				value = ""
+			} else {
+				value = php2go.Stripslashes(string(col))
+			}
+			sub[columns[i]] = value
+		}
+		m = append(m, sub)
+	}
+	if err = rows.Err(); err != nil {
+		return
+	}
+	return m, nil
+}
+
+// countExecutions will count number of executions not in specified values
+func countExecutions(uniq_id string) (z map[string]string, err error) {
+	db, err := sql.Open(
+		"postgres",
+		commons.BuildDSN(),
+	)
+	if err != nil {
+		log.Error().Err(err).Msg("Failed to connect to DB")
+		return z, err
+	}
+	defer db.Close()
+
+	stmt, err := db.Prepare("SELECT COUNT(execution_id) FROM executions WHERE uniq_id = $1 AND execution_status = 'RUNNING'")
+	if err != nil && err != sql.ErrNoRows {
+		return z, err
+	}
+	defer stmt.Close()
+
+	rows, err := stmt.Query(
+		php2go.Addslashes(uniq_id),
+	)
+	if err != nil && err != sql.ErrNoRows {
+		return z, err
+	}
+
+	columns, err := rows.Columns()
+	if err != nil {
+		return z, err
+	}
+
+	values := make([]sql.RawBytes, len(columns))
+	scanArgs := make([]interface{}, len(values))
+	for i := range values {
+		scanArgs[i] = &values[i]
+	}
+
+	m := make(map[string]string)
+	for rows.Next() {
+		err = rows.Scan(scanArgs...)
+		if err != nil {
+			return
+		}
+		var value string
+		for i, col := range values {
+			if col == nil {
+				value = ""
+			} else {
+				value = php2go.Stripslashes(string(col))
+			}
+			m[columns[i]] = value
+		}
+	}
+	if err = rows.Err(); err != nil {
+		return z, err
+	}
+	return m, nil
+}

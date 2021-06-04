@@ -10,6 +10,7 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/Lord-Y/cypress-parallel-api/hooks"
 	customLogger "github.com/Lord-Y/cypress-parallel-api/logger"
 	"github.com/Lord-Y/cypress-parallel-api/postgres"
 	"github.com/Lord-Y/cypress-parallel-api/routers"
@@ -54,6 +55,8 @@ func main() {
 		}
 	}()
 
+	go queued()
+
 	// Wait for interrupt signal to gracefully shutdown the server with
 	// a timeout of 5 seconds.
 	quit := make(chan os.Signal, 1)
@@ -70,4 +73,15 @@ func main() {
 		log.Fatal().Err(err).Msg("Server shutted down abruptly")
 	}
 	log.Info().Msg("Server exited successfully")
+}
+
+func queued() {
+	dateTicker := time.NewTicker(30 * time.Second)
+
+	for {
+		select {
+		case <-dateTicker.C:
+			hooks.Queued()
+		}
+	}
 }

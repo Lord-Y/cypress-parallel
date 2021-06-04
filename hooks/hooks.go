@@ -4,11 +4,13 @@ package hooks
 import (
 	"crypto/md5"
 	"fmt"
+	"math"
 	"net/http"
 	"os"
 	"path/filepath"
 	"strconv"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/Lord-Y/cypress-parallel-api/commons"
@@ -35,20 +37,22 @@ type plain struct {
 
 // projects will be use to "mapstructure" data from db
 type projects struct {
-	Team_id              string
-	Project_id           string
-	Project_name         string
-	Date                 string
-	Repository           string
-	Branch               string
-	Specs                string
-	Scheduling           string
-	SchedulingEnabled    bool
-	Max_pods             string
-	CypressDockerVersion string
-	Timeout              string
-	Username             string
-	Password             string
+	Team_id                string
+	Project_id             string
+	Project_name           string
+	Date                   string
+	Repository             string
+	Branch                 string
+	Specs                  string
+	Scheduling             string
+	Scheduling_enabled     bool
+	Max_pods               string
+	Cypress_docker_version string
+	Config_file            string
+	Timeout                string
+	Username               string
+	Password               string
+	Browser                string
 }
 
 // executions is a slice of execution struct
@@ -79,6 +83,25 @@ type updatePodName struct {
 	spec    string
 }
 
+// executionQueue will be use to "mapstructure" data from db
+type executionQueue struct {
+	Execution_id     string
+	Project_name     string
+	Project_id       string
+	Branch           string
+	Execution_status string
+	Uniq_id          string
+	Spec             string
+	running          string
+}
+
+var (
+	commonLabels = map[string]string{
+		"worker": "kubernetes",
+		"app":    "cypress-parallel-jobs",
+	}
+)
+
 const (
 	ghr = "docker.pkg.github.com/lord-y/cypress-parallel-docker-images/cypress-parallel-docker-images"
 )
@@ -86,9 +109,8 @@ const (
 // Plain handle requirements to start unit testing
 func Plain(c *gin.Context) {
 	var (
-		p  plain
-		pj projects
-		// exs         executions
+		p           plain
+		pj          projects
 		ex          execution
 		pod         models.Pods
 		gitc        git.Repository
@@ -308,14 +330,14 @@ func Plain(c *gin.Context) {
 					envVar.Value = strings.TrimSpace(os.Getenv("CYPRESS_PARALLEL_CLI_LOG_LEVEL"))
 					envs = append(envs, envVar)
 				}
+				envVar.Key = "NO_COLOR"
+				envVar.Value = "1"
+				envs = append(envs, envVar)
 				pod.Container.EnvironmentVars = envs
 			}
 			pod.Namespace = commons.GetKubernetesJobsNamespace()
 			pod.GenerateName = "cypress-parallel-jobs-"
-			pod.Labels = map[string]string{
-				"worker": "kubernetes",
-				"app":    "cypress-parallel-jobs",
-			}
+			pod.Labels = commonLabels
 
 			command = append(command, "cypress-parallel-cli")
 			command = append(command, "cypress")
@@ -347,7 +369,7 @@ func Plain(c *gin.Context) {
 			if p.CypressDockerVersion != "" {
 				tag = p.CypressDockerVersion
 			} else {
-				tag = pj.CypressDockerVersion
+				tag = pj.Cypress_docker_version
 			}
 
 			pod.Container.Command = command
@@ -393,4 +415,240 @@ func Plain(c *gin.Context) {
 		}
 	}
 	c.JSON(http.StatusCreated, "OK")
+}
+
+func Queued() {
+	log.Debug().Msg("Checking QUEUED execution list")
+	status, err := executionStatus("RUNNING")
+	if err != nil {
+		log.Error().Err(err).Msg("Error occured while performing db query")
+		return
+	}
+
+	if len(status) > 0 {
+		wg := sync.WaitGroup{}
+		log.Debug().Msgf("execution status running %+v length %d", status, len(status))
+		for _, run := range status {
+			wg.Add(1)
+			go func(run map[string]interface{}) {
+				defer wg.Done()
+				queuing(run)
+			}(run)
+		}
+	} else {
+		status, err := executionStatus("QUEUED")
+		if err != nil {
+			log.Error().Err(err).Msg("Error occured while performing db query")
+			return
+		}
+		if len(status) > 0 {
+			wg := sync.WaitGroup{}
+			log.Debug().Msgf("execution status queued %+v length %d", status, len(status))
+			for _, run := range status {
+				wg.Add(1)
+				go func(run map[string]interface{}) {
+					defer wg.Done()
+					queuing(run)
+				}(run)
+			}
+		}
+	}
+}
+
+func queuing(run map[string]interface{}) {
+	var (
+		p           plain
+		pj          projects
+		resultQueue []executionQueue
+	)
+
+	clientset, err := kubernetes.Client()
+	if err != nil {
+		log.Error().Err(err).Msg("Error occured while initializing kubernetes client")
+		return
+	}
+	err = kubernetes.GetNamespace(clientset, commons.GetKubernetesJobsNamespace())
+	if err != nil {
+		log.Warn().Err(err).Msg("Error occured while getting kubernetes namespace")
+		err = kubernetes.CreateNamespace(clientset, commons.GetKubernetesJobsNamespace())
+		if err != nil {
+			log.Error().Err(err).Msg("Error occured while creating kubernetes namespace")
+			return
+		}
+	}
+	err = kubernetes.GetServiceAccountName(clientset, commons.GetKubernetesJobsNamespace(), commons.GetKubernetesJobsNamespace())
+	if err != nil {
+		log.Warn().Err(err).Msgf("Error occured while getting kubernetes service account %s", commons.GetKubernetesJobsNamespace())
+		_, err = kubernetes.CreateServiceAccountName(clientset, commons.GetKubernetesJobsNamespace(), commons.GetKubernetesJobsNamespace())
+		if err != nil {
+			log.Error().Err(err).Msgf("Error occured while creating kubernetes service account %s", commons.GetKubernetesJobsNamespace())
+			return
+		}
+	}
+
+	uniqID := fmt.Sprintf("%s", run["uniq_id"])
+	countExecution, err := countExecutions(uniqID)
+	if err != nil {
+		log.Error().Err(err).Msg("Error occured while performing db query")
+		return
+	}
+
+	queued, err := pgqueued(uniqID)
+	if err != nil {
+		log.Error().Err(err).Msg("Error occured while performing db query")
+		return
+	}
+
+	log.Debug().Msgf("queued %s length length %d", uniqID, len(queued))
+	if len(queued) > 0 {
+		var (
+			tmpSecs   []string
+			finalSecs []string
+			nbSpec    int
+			reset     bool
+			pdn       updatePodName
+			command   []string
+			pod       models.Pods
+		)
+		mapstructure.Decode(queued, &resultQueue)
+		p.ProjectName = resultQueue[0].Project_name
+		p.Branch = resultQueue[0].Branch
+
+		for k, v := range resultQueue {
+			tmpSecs = append(tmpSecs, v.Spec)
+			if (nbSpec + 1) == commons.GetMaxSpecs() {
+				finalSecs = append(finalSecs, strings.Join(tmpSecs, ","))
+				tmpSecs = nil
+				nbSpec = 0
+				reset = true
+			}
+			if !reset {
+				nbSpec++
+			}
+			if nbSpec == 0 {
+				reset = false
+			}
+			if k == len(resultQueue)-1 && commons.GetMaxSpecs()%2 == 1 {
+				finalSecs = append(finalSecs, strings.Join(tmpSecs, ","))
+			}
+		}
+		log.Debug().Msgf("queued %s finalSecs %s", uniqID, finalSecs)
+
+		result, err := p.getProjectInfos()
+		if err != nil {
+			log.Error().Err(err).Msg("Error occured while performing db query")
+			return
+		}
+		mapstructure.Decode(result, &pj)
+
+		count, err := strconv.Atoi(countExecution["count"])
+		if err != nil {
+			log.Error().Err(err).Msg("Error occured while converting string to int")
+			return
+		}
+		count = int(math.Floor(float64(count) / float64(commons.GetMaxSpecs())))
+
+		maxPods, err := strconv.Atoi(pj.Max_pods)
+		if err != nil {
+			log.Error().Err(err).Msg("Error occured while converting string to int")
+			return
+		}
+
+		log.Debug().Msgf("queued %s running pods count %d VS max pods %d", uniqID, count, maxPods)
+		if count < maxPods {
+			annotations, err := pj.getProjectAnnotations()
+			if err != nil {
+				log.Error().Err(err).Msg("Error occured while performing db query")
+				return
+			}
+			if len(annotations) > 0 {
+				annotation := make(map[string]string)
+				for _, k := range annotations {
+					annotation[fmt.Sprintf("%s", k["key"])] = fmt.Sprintf("%s", k["value"])
+				}
+				pod.Annotations = annotation
+			}
+
+			envVars, err := pj.getProjectEnvironments()
+			if err != nil {
+				log.Error().Err(err).Msg("Error occured while performing db query")
+				return
+			}
+			if len(envVars) > 0 {
+				var (
+					envs   []models.EnvironmentVar
+					envVar models.EnvironmentVar
+				)
+				for _, k := range envVars {
+					envVar.Key = fmt.Sprintf("CYPRESS_%s", k["key"])
+					envVar.Value = fmt.Sprintf("%s", k["value"])
+					envs = append(envs, envVar)
+				}
+				if strings.TrimSpace(os.Getenv("CYPRESS_PARALLEL_CLI_LOG_LEVEL")) != "" {
+					envVar.Key = "CYPRESS_PARALLEL_CLI_LOG_LEVEL"
+					envVar.Value = strings.TrimSpace(os.Getenv("CYPRESS_PARALLEL_CLI_LOG_LEVEL"))
+					envs = append(envs, envVar)
+				}
+				envVar.Key = "NO_COLOR"
+				envVar.Value = "1"
+				envs = append(envs, envVar)
+				pod.Container.EnvironmentVars = envs
+			}
+			pod.Namespace = commons.GetKubernetesJobsNamespace()
+			pod.GenerateName = "cypress-parallel-jobs-"
+			pod.Labels = commonLabels
+
+			command = append(command, "cypress-parallel-cli")
+			command = append(command, "cypress")
+			command = append(command, "--browser")
+			command = append(command, pj.Browser)
+			command = append(command, "--config-file")
+			command = append(command, pj.Config_file)
+			command = append(command, "--specs")
+			command = append(command, finalSecs[0])
+			command = append(command, "--uid")
+			command = append(command, uniqID)
+			command = append(command, "--branch")
+			command = append(command, p.Branch)
+			command = append(command, "--repository")
+			command = append(command, pj.Repository)
+			command = append(command, "--api-url")
+			command = append(command, commons.GetAPIUrl())
+			command = append(command, "--report-back")
+			command = append(command, "--timeout")
+			command = append(command, pj.Timeout)
+			if pj.Username != "" {
+				command = append(command, "--username")
+				command = append(command, pj.Username)
+			}
+			if pj.Password != "" {
+				command = append(command, "--password")
+				command = append(command, pj.Password)
+			}
+			tag := pj.Cypress_docker_version
+
+			pod.Container.Command = command
+			pod.Container.Name = "cypress-parallel-jobs"
+			pod.Container.Image = fmt.Sprintf("%s:%s", ghr, tag)
+
+			podName, err := kubernetes.CreatePod(clientset, pod)
+			if err != nil {
+				log.Error().Err(err).Msg("Error occured while creating pod")
+				return
+			}
+			log.Debug().Msgf("Pod name %s created for specs %s", podName, finalSecs[0])
+
+			for _, splittedSpec := range strings.Split(finalSecs[0], ",") {
+				pdn.podName = podName
+				pdn.uniqID = uniqID
+				pdn.spec = splittedSpec
+
+				err = pdn.update()
+				if err != nil {
+					log.Error().Err(err).Msg("Error occured while performing update db query")
+					return
+				}
+			}
+		}
+	}
 }

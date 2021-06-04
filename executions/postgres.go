@@ -190,7 +190,7 @@ func (p *updateResultExecution) updateResult() (z string, err error) {
 }
 
 // countExecutions will count number of executions not in specified values
-func countExecutions(uniq_id string) (z map[string]string, err error) {
+func (p *updateResultExecution) countExecutions() (z map[string]string, err error) {
 	db, err := sql.Open(
 		"postgres",
 		commons.BuildDSN(),
@@ -201,14 +201,15 @@ func countExecutions(uniq_id string) (z map[string]string, err error) {
 	}
 	defer db.Close()
 
-	stmt, err := db.Prepare("SELECT COUNT(execution_id), (SELECT COUNT(execution_id) FROM executions WHERE uniq_id = $1) total FROM executions WHERE uniq_id = $1 AND execution_status NOT IN ('RUNNING','NOT_STARTED','QUEUED','SCHEDULED')")
+	stmt, err := db.Prepare("SELECT pod_name, execution_status FROM executions WHERE uniq_id = $1 AND execution_status = 'RUNNING' AND pod_name = (SELECT pod_name FROM executions WHERE uniq_id = $1 AND spec = $2)")
 	if err != nil && err != sql.ErrNoRows {
 		return z, err
 	}
 	defer stmt.Close()
 
 	rows, err := stmt.Query(
-		php2go.Addslashes(uniq_id),
+		php2go.Addslashes(p.UniqID),
+		php2go.Addslashes(p.Spec),
 	)
 	if err != nil && err != sql.ErrNoRows {
 		return z, err
@@ -247,8 +248,8 @@ func countExecutions(uniq_id string) (z map[string]string, err error) {
 	return m, nil
 }
 
-// getPods will count number of executions not in specified values
-func getPods(uniq_id string) (z []map[string]interface{}, err error) {
+// countExecutionsInverted will count number of executions not in specified values
+func (p *updateResultExecution) countExecutionsInverted() (z map[string]string, err error) {
 	db, err := sql.Open(
 		"postgres",
 		commons.BuildDSN(),
@@ -259,14 +260,15 @@ func getPods(uniq_id string) (z []map[string]interface{}, err error) {
 	}
 	defer db.Close()
 
-	stmt, err := db.Prepare("SELECT DISTINCT pod_name FROM executions WHERE uniq_id = $1")
+	stmt, err := db.Prepare("SELECT pod_name, execution_status FROM executions WHERE uniq_id = $1 AND spec = $2")
 	if err != nil && err != sql.ErrNoRows {
 		return z, err
 	}
 	defer stmt.Close()
 
 	rows, err := stmt.Query(
-		php2go.Addslashes(uniq_id),
+		php2go.Addslashes(p.UniqID),
+		php2go.Addslashes(p.Spec),
 	)
 	if err != nil && err != sql.ErrNoRows {
 		return z, err
@@ -283,26 +285,24 @@ func getPods(uniq_id string) (z []map[string]interface{}, err error) {
 		scanArgs[i] = &values[i]
 	}
 
-	m := make([]map[string]interface{}, 0)
+	m := make(map[string]string)
 	for rows.Next() {
 		err = rows.Scan(scanArgs...)
 		if err != nil {
 			return
 		}
 		var value string
-		sub := make(map[string]interface{})
 		for i, col := range values {
 			if col == nil {
 				value = ""
 			} else {
 				value = php2go.Stripslashes(string(col))
 			}
-			sub[columns[i]] = value
+			m[columns[i]] = value
 		}
-		m = append(m, sub)
 	}
 	if err = rows.Err(); err != nil {
-		return
+		return z, err
 	}
 	return m, nil
 }
