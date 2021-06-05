@@ -28,7 +28,7 @@ jobs:
 
     - restore_cache:
         keys:
-        - ${CIRCLE_PROJECT_REPONAME}-{{ checksum "go.mod" }}-3
+        - ${CIRCLE_PROJECT_REPONAME}-{{ checksum "go.mod" }}-4
 
     - run:
         name: Install curl, kind, kubectl, and helm
@@ -82,7 +82,7 @@ jobs:
         command: go vet
 
     - save_cache:
-        key: ${CIRCLE_PROJECT_REPONAME}-{{ checksum "go.mod" }}-3
+        key: ${CIRCLE_PROJECT_REPONAME}-{{ checksum "go.mod" }}-4
         paths:
         - /home/circleci/.go_workspace/pkg/mod
         - /var/lib/docker
@@ -121,7 +121,7 @@ jobs:
 
     - restore_cache:
         keys:
-        - ${CIRCLE_PROJECT_REPONAME}-{{ checksum "go.mod" }}-3
+        - ${CIRCLE_PROJECT_REPONAME}-{{ checksum "go.mod" }}-4
 
     - run:
         name: Build docker image
@@ -145,7 +145,7 @@ jobs:
 
     - restore_cache:
         keys:
-        - ${CIRCLE_PROJECT_REPONAME}-{{ checksum "go.mod" }}-3
+        - ${CIRCLE_PROJECT_REPONAME}-{{ checksum "go.mod" }}-4
 
     - run:
         name: Build docker image
