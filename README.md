@@ -67,3 +67,12 @@ See covering in the shell with:
 ```bash
 go tool cover -func=coverage.out
 ```
+
+## Linter
+```bash
+# https://freshman.tech/linting-golang/
+go install github.com/nametake/golangci-lint-langserver@latest
+# https://pre-commit.com/#install
+pip3 install pre-commit
+pre-commit install
+```
