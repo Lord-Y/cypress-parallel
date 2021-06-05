@@ -28,11 +28,10 @@ type plain struct {
 	ProjectName          string `form:"project_name" json:"project_name" binding:"required,max=100"`
 	Branch               string `form:"branch" json:"branch"`
 	Specs                string `form:"specs" json:"specs"`
-	ConfigFile           string `form:"config_file,default=cypress.json" json:"config_file,default=cypress.json" binding:"max=100"`
-	Browser              string `form:"browser,default=chrome" json:"browser,default=chrome" binding:"max=100,oneof=chrome firefox"`
-	MaxPods              int    `form:"maxPods,default=10" json:"maxPods,default=10"`
-	CypressDockerVersion string `form:"cypress_docker_version,default=7.2.0-0.0.5,max=20" json:"cypress_docker_version,max=20"`
-	plain                bool
+	ConfigFile           string `form:"config_file,default=cypress.json" json:"config_file" binding:"max=100"`
+	Browser              string `form:"browser,default=chrome" json:"browser" binding:"max=100,oneof=chrome firefox"`
+	MaxPods              int    `form:"maxPods,default=10" json:"maxPods"`
+	CypressDockerVersion string `form:"cypress_docker_version,default=7.2.0-0.0.5,max=20" json:"cypress_docker_version"`
 }
 
 // projects will be use to "mapstructure" data from db
@@ -45,7 +44,7 @@ type projects struct {
 	Branch                 string
 	Specs                  string
 	Scheduling             string
-	Scheduling_enabled     bool
+	Scheduling_enabled     string
 	Max_pods               string
 	Cypress_docker_version string
 	Config_file            string
@@ -53,11 +52,6 @@ type projects struct {
 	Username               string
 	Password               string
 	Browser                string
-}
-
-// executions is a slice of execution struct
-type executions struct {
-	executions []execution
 }
 
 // execution handle all requirements to insert execution in DB
@@ -68,12 +62,6 @@ type execution struct {
 	executionStatus string // must be, NOT_STARTED, QUEUED, SCHEDULED, RUNNING, CANCELLED, FAILED, DONE
 	spec            string
 	result          string
-}
-
-// environmentVar k/v to set inside of the container
-type environmentVar struct {
-	Key   string // Variable key
-	Value string // Variable value
 }
 
 // updatePodName will be used to update pod name in DB
@@ -92,7 +80,6 @@ type executionQueue struct {
 	Execution_status string
 	Uniq_id          string
 	Spec             string
-	running          string
 }
 
 var (
@@ -143,7 +130,12 @@ func Plain(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
 		return
 	}
-	mapstructure.Decode(result, &pj)
+	err = mapstructure.Decode(result, &pj)
+	if err != nil {
+		log.Error().Err(err).Msg("Error occured while decoding structure")
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
+		return
+	}
 
 	// original branch must remain for POST "executions" with update db otherwise, pod will stay up forever
 	if p.Branch != "" {
@@ -505,7 +497,11 @@ func queuing(run map[string]interface{}) {
 			command   []string
 			pod       models.Pods
 		)
-		mapstructure.Decode(queued, &resultQueue)
+		err := mapstructure.Decode(queued, &resultQueue)
+		if err != nil {
+			log.Error().Err(err).Msg("Error occured while decoding structure")
+			return
+		}
 		p.ProjectName = resultQueue[0].Project_name
 		p.Branch = resultQueue[0].Branch
 
@@ -534,7 +530,11 @@ func queuing(run map[string]interface{}) {
 			log.Error().Err(err).Msg("Error occured while performing db query")
 			return
 		}
-		mapstructure.Decode(result, &pj)
+		err = mapstructure.Decode(result, &pj)
+		if err != nil {
+			log.Error().Err(err).Msg("Error occured while decoding structure")
+			return
+		}
 
 		count, err := strconv.Atoi(countExecution["count"])
 		if err != nil {

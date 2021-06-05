@@ -5,6 +5,8 @@ import (
 	"os/signal"
 	"testing"
 	"time"
+
+	"github.com/stretchr/testify/assert"
 )
 
 var (
@@ -13,6 +15,7 @@ var (
 
 // Test example found here: https://github.com/golang/go/issues/21000
 func TestMain(t *testing.T) {
+	assert := assert.New(t)
 	os.Setenv("CYPRESS_PARALLEL_API_DB_URI", pg_uri)
 	defer os.Unsetenv("CYPRESS_PARALLEL_API_DB_URI")
 
@@ -30,11 +33,13 @@ func TestMain(t *testing.T) {
 		signal.Stop(sigc)
 	}()
 
-	proc.Signal(os.Interrupt)
+	err = proc.Signal(os.Interrupt)
+	assert.NoError(err)
 	time.Sleep(1 * time.Second)
 }
 
 func TestMain_set_port(t *testing.T) {
+	assert := assert.New(t)
 	os.Setenv("CYPRESS_PARALLEL_API_DB_URI", pg_uri)
 	defer os.Unsetenv("CYPRESS_PARALLEL_API_DB_URI")
 	os.Setenv("CYPRESS_PARALLEL_API_PORT", "10000")
@@ -53,6 +58,8 @@ func TestMain_set_port(t *testing.T) {
 		signal.Stop(sigc)
 	}()
 
-	proc.Signal(os.Interrupt)
+	err = proc.Signal(os.Interrupt)
+	assert.NoError(err)
 	time.Sleep(1 * time.Second)
+
 }

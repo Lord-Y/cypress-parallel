@@ -109,13 +109,13 @@ func (p *readExecutions) read() (z []interface{}, err error) {
 			switch v.DatabaseTypeName() {
 			case "VARCHAR", "TEXT", "UUID", "TIMESTAMP":
 				scanArgs[i] = new(sql.NullString)
-				break
+				break //nolint:gosimple
 			case "BOOL":
 				scanArgs[i] = new(sql.NullBool)
-				break
+				break //nolint:gosimple
 			case "INT4":
 				scanArgs[i] = new(sql.NullInt64)
-				break
+				break //nolint:gosimple
 			default:
 				scanArgs[i] = new(sql.NullString)
 			}
@@ -405,13 +405,13 @@ func (p *searchExecutions) search() (z []interface{}, err error) {
 			switch v.DatabaseTypeName() {
 			case "VARCHAR", "TEXT", "UUID", "TIMESTAMP":
 				scanArgs[i] = new(sql.NullString)
-				break
+				break //nolint:gosimple
 			case "BOOL":
 				scanArgs[i] = new(sql.NullBool)
-				break
+				break //nolint:gosimple
 			case "INT4":
 				scanArgs[i] = new(sql.NullInt64)
-				break
+				break //nolint:gosimple
 			default:
 				scanArgs[i] = new(sql.NullString)
 			}
@@ -492,13 +492,13 @@ func (p *uniqIDExecutions) uniqId() (z []interface{}, err error) {
 			switch v.DatabaseTypeName() {
 			case "VARCHAR", "TEXT", "UUID", "TIMESTAMP":
 				scanArgs[i] = new(sql.NullString)
-				break
+				break //nolint:gosimple
 			case "BOOL":
 				scanArgs[i] = new(sql.NullBool)
-				break
+				break //nolint:gosimple
 			case "INT4":
 				scanArgs[i] = new(sql.NullInt64)
-				break
+				break //nolint:gosimple
 			default:
 				scanArgs[i] = new(sql.NullString)
 			}

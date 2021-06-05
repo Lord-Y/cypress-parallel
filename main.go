@@ -76,12 +76,7 @@ func main() {
 }
 
 func queued() {
-	dateTicker := time.NewTicker(30 * time.Second)
-
-	for {
-		select {
-		case <-dateTicker.C:
-			hooks.Queued()
-		}
+	for range time.Tick(30 * time.Second) {
+		hooks.Queued()
 	}
 }

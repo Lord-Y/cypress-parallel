@@ -3,7 +3,6 @@ package executions
 
 import (
 	"encoding/hex"
-	"fmt"
 	"net/http"
 	"strconv"
 
@@ -157,9 +156,9 @@ func UpdateResultExecution(c *gin.Context) {
 				log.Error().Err(err).Msg("Error occured while initializing kubernetes client")
 				return
 			}
-			err = kubernetes.DeletePod(clientset, commons.GetKubernetesJobsNamespace(), fmt.Sprintf("%s", pod["pod_name"]))
+			err = kubernetes.DeletePod(clientset, commons.GetKubernetesJobsNamespace(), pod["pod_name"])
 			if err != nil {
-				log.Error().Err(err).Msgf("Error occured while trying to delete pod name: %s", fmt.Sprintf("%s", pod["pod_name"]))
+				log.Error().Err(err).Msgf("Error occured while trying to delete pod name: %s", pod["pod_name"])
 				return
 			}
 		}

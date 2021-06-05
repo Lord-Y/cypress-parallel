@@ -18,6 +18,7 @@ func TestGetNamespace(t *testing.T) {
 	defer os.Unsetenv("CYPRESS_PARALLEL_API_K8S_CLIENT_OUTSIDE")
 	namespace := fake.CharactersN(10)
 	client, err := Client()
+	assert.NoError(err)
 	err = GetNamespace(client, namespace)
 	assert.Error(err)
 }
@@ -29,6 +30,7 @@ func TestCreateDeleteNamespace(t *testing.T) {
 	defer os.Unsetenv("CYPRESS_PARALLEL_API_K8S_CLIENT_OUTSIDE")
 	namespace := fake.CharactersN(10)
 	client, err := Client()
+	assert.NoError(err)
 	err = CreateNamespace(client, namespace)
 	assert.NoError(err)
 
@@ -49,6 +51,7 @@ func TestCreatePod(t *testing.T) {
 	name := fake.CharactersN(10)
 
 	client, err := Client()
+	assert.NoError(err)
 	err = CreateNamespace(client, name)
 	assert.NoError(err)
 
@@ -83,25 +86,24 @@ func TestCreatePod(t *testing.T) {
 }
 
 func TestClient_fail_client(t *testing.T) {
+	assert := assert.New(t)
 	os.Unsetenv("CYPRESS_PARALLEL_API_K8S_CLIENT_OUTSIDE")
-	defer func() { recover() }()
-	name := fake.CharactersN(10)
 
-	client, _ := Client()
-	_ = CreateNamespace(client, name)
-	t.Errorf("Code did not panic")
+	_, err := Client()
+	assert.Error(err)
 }
 
 func TestClient_fail_client_kubeconfig(t *testing.T) {
+	assert := assert.New(t)
 	os.Setenv("CYPRESS_PARALLEL_API_K8S_KUBE_CONFIG", os.TempDir())
 	defer os.Unsetenv("CYPRESS_PARALLEL_API_K8S_KUBE_CONFIG")
 	os.Setenv("CYPRESS_PARALLEL_API_K8S_CLIENT_OUTSIDE", "true")
 	defer os.Unsetenv("CYPRESS_PARALLEL_API_K8S_CLIENT_OUTSIDE")
 
-	defer func() { recover() }()
 	name := fake.CharactersN(10)
 
 	client, _ := Client()
-	_ = CreateNamespace(client, name)
-	t.Errorf("Code did not panic")
+	assert.Panics(func() {
+		_ = CreateNamespace(client, name)
+	})
 }

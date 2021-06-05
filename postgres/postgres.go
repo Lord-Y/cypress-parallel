@@ -61,11 +61,11 @@ func Ping() (b bool) {
 		"postgres",
 		commons.BuildDSN(),
 	)
-	defer db.Close()
 	if err != nil {
 		log.Error().Err(err).Msg("Error occured while connecting to DB")
 		return
 	}
+	defer db.Close()
 	err = db.Ping()
 	if err != nil {
 		log.Error().Err(err).Msg("Error occured while pinging DB")
