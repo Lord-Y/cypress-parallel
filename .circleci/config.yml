@@ -135,9 +135,9 @@ jobs:
     - run:
         name: Publish prerelease
         command: |
-          go get github.com/tcnksm/ghr
+          go get github.com/github-release/github-release
           git checkout .
-          ghr -t ${GITHUB_TOKEN} -u ${CIRCLE_PROJECT_USERNAME} -r ${CIRCLE_PROJECT_REPONAME} -c ${CIRCLE_SHA1} -n ${CIRCLE_TAG} -b "See changelog [here](https://github.com/Lord-Y/cypress-parallel-api/blob/main/CHANGELOG.md)" -prerelease ${CIRCLE_TAG} artifacts/
+          github-release release -t ${CIRCLE_TAG} -u ${CIRCLE_PROJECT_USERNAME} -r ${CIRCLE_PROJECT_REPONAME} -c ${CIRCLE_SHA1} -d "See changelog [here](https://github.com/Lord-Y/cypress-parallel/blob/main/CHANGELOG.md)" -p
 
   build-tags-and-publish-release:
     executor: golang
@@ -161,9 +161,9 @@ jobs:
     - run:
         name: Publish release
         command: |
-          go get github.com/tcnksm/ghr
+          go get github.com/github-release/github-release
           git checkout .
-          ghr -t ${GITHUB_TOKEN} -u ${CIRCLE_PROJECT_USERNAME} -r ${CIRCLE_PROJECT_REPONAME} -c ${CIRCLE_SHA1} -n ${CIRCLE_TAG} -b "See changelog [here](https://github.com/Lord-Y/cypress-parallel-api/blob/main/CHANGELOG.md)" ${CIRCLE_TAG} artifacts/
+          github-release release -t ${CIRCLE_TAG} -u ${CIRCLE_PROJECT_USERNAME} -r ${CIRCLE_PROJECT_REPONAME} -c ${CIRCLE_SHA1} -d "See changelog [here](https://github.com/Lord-Y/cypress-parallel/blob/main/CHANGELOG.md)" -p
 
 # https://circleci.com/docs/2.0/workflows/#git-tag-job-execution
 workflows:
