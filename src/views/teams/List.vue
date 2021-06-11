@@ -307,9 +307,9 @@ export default defineComponent({
               if (state.teams.byFilter.length == 0) {
                 state.alert.class = 'mute'
                 state.alert.message = t('alert.http.noDataFound')
-                state.loading.delete.active = false
               }
             }
+            state.loading.delete.active = false
           })
           .catch((error: any) => {
             state.alert.class = 'red'
