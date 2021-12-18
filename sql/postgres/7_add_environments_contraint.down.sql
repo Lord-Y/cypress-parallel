@@ -1,0 +1,1 @@
+ALTER TABLE environments DROP CONSTRAINT fk_environments_projects;

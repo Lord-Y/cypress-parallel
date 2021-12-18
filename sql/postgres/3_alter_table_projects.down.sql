@@ -1,0 +1,1 @@
+ALTER TABLE projects DROP COLUMN team_id, DROP COLUMN repository, DROP COLUMN branch;

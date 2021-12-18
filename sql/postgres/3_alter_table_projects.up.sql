@@ -1,0 +1,1 @@
+ALTER TABLE projects ADD team_id INT NOT NULL, ADD repository TEXT NOT NULL, ADD branch VARCHAR(100) NOT NULL;

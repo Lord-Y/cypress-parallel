@@ -1,0 +1,6 @@
+ALTER TABLE projects
+ADD CONSTRAINT fk_projects_teams
+FOREIGN KEY (team_id)
+REFERENCES teams(team_id)
+ON DELETE CASCADE
+ON UPDATE CASCADE;

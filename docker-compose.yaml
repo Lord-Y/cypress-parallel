@@ -1,0 +1,19 @@
+version: '3'
+
+services:
+  postgres:
+    image: postgres:13.2
+    container_name: cypress-parallel-postgres
+    environment:
+    - POSTGRES_DB=cypress_parallel
+    - POSTGRES_USER=cypress_parallel
+    - POSTGRES_PASSWORD=cypress_parallel
+    ports:
+    - 5432:5432
+    volumes:
+    - /var/lib/postgresql
+    networks:
+    - cypress_parallel
+
+networks:
+  cypress_parallel:

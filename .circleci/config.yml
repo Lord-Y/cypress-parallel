@@ -1,0 +1,195 @@
+---
+version: 2.1
+
+# https://circleci.com/docs/2.0/configuration-reference/#machine
+
+executors:
+  golang:
+    machine:
+      image: ubuntu-2004:202104-01
+
+jobs:
+  build:
+    executor: golang
+    environment:
+      KIND_VERSION: 0.11.0
+      KIND_VERSION_NODE: 1.19.4
+      KIND_CLUSTER_NAME: cypress-parallel
+      HELM_VERSION: 3.6.0
+      IMAGE_NAME: docker.pkg.github.com/lord-y/cypress-parallel-api/cypress-parallel-api
+      CLI_IMAGE: docker.pkg.github.com/lord-y/cypress-parallel-docker-images/cypress-parallel-docker-images:7.2.0-0.0.5
+      NAMESPACE: cypress-parallel
+      CYPRESS_PARALLEL_API_K8S_CLIENT_OUTSIDE: "true"
+      CYPRESS_PARALLEL_API_PORT: 40000
+      GO111MODULE: "on"
+
+    steps:
+    - checkout
+
+    - restore_cache:
+        keys:
+        - ${CIRCLE_PROJECT_REPONAME}-{{ checksum "go.mod" }}-4
+
+    - run:
+        name: Install curl, kind, kubectl, and helm
+        command: |
+          sudo apt update
+          which curl || sudo apt install -yyq --no-install-recommends curl
+          which git || sudo apt install -yyq --no-install-recommends git
+          which psql || sudo apt install -yyq --no-install-recommends postgresql-client
+
+          which kind || curl --fail --retry 3 -Lo ./kind https://kind.sigs.k8s.io/dl/v${KIND_VERSION}/kind-linux-amd64
+          which kind || chmod +x ./kind
+          which kind || sudo mv ./kind /usr/local/bin/kind
+
+          which kubectl || curl --fail --retry 3 -LO "https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl"
+          which kubectl || chmod +x ./kubectl
+          which kubectl || sudo mv ./kubectl /usr/local/bin/kubectl
+          
+          which helm || curl --fail --retry 3 -LO https://get.helm.sh/helm-v${HELM_VERSION}-linux-amd64.tar.gz
+          tar xzf helm-v${HELM_VERSION}-linux-amd64.tar.gz
+          which helm || chmod +x linux-amd64/helm
+          which helm || sudo mv linux-amd64/helm /usr/local/bin
+
+    - run:
+        name: Create kind clusters
+        command: |
+          kind get clusters | grep ${KIND_CLUSTER_NAME} || kind create cluster --name ${KIND_CLUSTER_NAME} --image kindest/node:v${KIND_VERSION_NODE} --wait 5m --config .circleci/kind-config.yaml
+
+    - run:
+        name: Get kind clusters / kubectl get cluster-info
+        command: |
+          kind get clusters
+          kubectl cluster-info --context kind-${KIND_CLUSTER_NAME}
+
+    - run:
+        name: Load CLI docker image in kind cluster
+        command: |
+          echo "$GITHUB_TOKEN" | docker login https://docker.pkg.github.com -u ${CIRCLE_USERNAME} --password-stdin
+          docker pull ${CLI_IMAGE}
+          for i in cypress-parallel-worker cypress-parallel-worker2; do sudo kind load docker-image ${CLI_IMAGE} --name ${KIND_CLUSTER_NAME} --nodes $i;done
+
+    - run:
+        name: Start Postgres DB
+        command: sudo docker-compose -f docker-compose.yaml up -d
+
+    - run:
+        name: go mod download
+        command: go mod download
+
+    - run:
+        name: go vet
+        command: go vet
+
+    - save_cache:
+        key: ${CIRCLE_PROJECT_REPONAME}-{{ checksum "go.mod" }}-4
+        paths:
+        - /home/circleci/.go_workspace/pkg/mod
+        - /var/lib/docker
+        - /home/circleci/.kube
+
+    - run:
+        name: Perform unit testing
+        no_output_timeout: 30m
+        command: |
+          export CYPRESS_PARALLEL_API_DB_URI="postgres://cypress_parallel:cypress_parallel@$(hostname -i):5432/cypress_parallel?sslmode=disable"
+          export CYPRESS_PARALLEL_API_URL=http://$(hostname -i):${CYPRESS_PARALLEL_API_PORT}
+          go test -v ./... -coverprofile=coverage.out
+
+    - run:
+        name: Print result of unit testing
+        command: go tool cover -func=coverage.out
+
+    - run:
+        name: Cleaning
+        command: |
+          kubectl -n cypress-parallel-jobs delete po --all
+          export CYPRESS_PARALLEL_API_DB_URI="postgres://cypress_parallel:cypress_parallel@$(hostname -i):5432/cypress_parallel?sslmode=disable"
+          psql ${CYPRESS_PARALLEL_API_DB_URI} -f .circleci/truncate.sql
+
+    - run:
+        name: Build docker image
+        command: |
+          export CUSTOM_TAG=$(git rev-parse --short HEAD)
+          docker build -t ${IMAGE_NAME}:${CUSTOM_TAG} .
+
+  build-tags-and-publish-prerelease:
+    executor: golang
+    environment:
+      IMAGE_NAME: docker.pkg.github.com/lord-y/cypress-parallel-api/cypress-parallel-api
+
+    steps:
+    - checkout
+
+    - restore_cache:
+        keys:
+        - ${CIRCLE_PROJECT_REPONAME}-{{ checksum "go.mod" }}-4
+
+    - run:
+        name: Build docker image
+        command: |
+          echo "$GITHUB_TOKEN" | docker login https://docker.pkg.github.com -u ${CIRCLE_USERNAME} --password-stdin
+          docker build -t ${IMAGE_NAME}:${CIRCLE_TAG} .
+          docker push ${IMAGE_NAME}:${CIRCLE_TAG}
+
+    - run:
+        name: Publish prerelease
+        command: |
+          go get github.com/github-release/github-release
+          git checkout .
+          github-release release -t ${CIRCLE_TAG} -u ${CIRCLE_PROJECT_USERNAME} -r ${CIRCLE_PROJECT_REPONAME} -c ${CIRCLE_SHA1} -d "See changelog [here](https://github.com/Lord-Y/cypress-parallel-api/blob/main/CHANGELOG.md)" -p
+
+  build-tags-and-publish-release:
+    executor: golang
+    environment:
+      IMAGE_NAME: docker.pkg.github.com/lord-y/cypress-parallel-api/cypress-parallel-api
+
+    steps:
+    - checkout
+
+    - restore_cache:
+        keys:
+        - ${CIRCLE_PROJECT_REPONAME}-{{ checksum "go.mod" }}-4
+
+    - run:
+        name: Build docker image
+        command: |
+          echo "$GITHUB_TOKEN" | docker login https://docker.pkg.github.com -u ${CIRCLE_USERNAME} --password-stdin
+          docker build -t ${IMAGE_NAME}:${CIRCLE_TAG} .
+          docker push ${IMAGE_NAME}:${CIRCLE_TAG}
+
+    - run:
+        name: Publish release
+        command: |
+          go get github.com/github-release/github-release
+          git checkout .
+          github-release release -t ${CIRCLE_TAG} -u ${CIRCLE_PROJECT_USERNAME} -r ${CIRCLE_PROJECT_REPONAME} -c ${CIRCLE_SHA1} -d "See changelog [here](https://github.com/Lord-Y/cypress-parallel-api/blob/main/CHANGELOG.md)"
+
+# https://circleci.com/docs/2.0/workflows/#git-tag-job-execution
+workflows:
+  version: 2
+  test-and-build:
+    jobs:
+    - build:
+        context: GITHUB
+        filters:
+          tags:
+            only: /.*/
+    - build-tags-and-publish-prerelease:
+        context: GITHUB
+        requires:
+        - build
+        filters:
+          tags:
+            only: /^v\d+\.\d+\.\d+-(.*)$/
+          branches:
+            ignore: /.*/
+    - build-tags-and-publish-release:
+        context: GITHUB
+        requires:
+        - build
+        filters:
+          tags:
+            only: /^v\d+\.\d+\.\d+$/
+          branches:
+            ignore: /.*/
