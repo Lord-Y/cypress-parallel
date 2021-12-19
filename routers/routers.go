@@ -2,6 +2,7 @@
 package routers
 
 import (
+	"net/http"
 	"os"
 
 	"github.com/Lord-Y/cypress-parallel-api/annotations"
@@ -97,5 +98,23 @@ func SetupRouter() *gin.Engine {
 		v1.GET("/executions/:executionId", executions.Read)
 		v1.GET("/executions/search", executions.Search)
 	}
+
+	router.Static("/ui/assets", "ui/dist/assets")
+	router.StaticFile("/ui/logo.png", "ui/dist/logo.png")
+	router.StaticFile("/ui/favicon.ico", "ui/dist/favicon.ico")
+
+	ui := router.Group("/ui", func(c *gin.Context) {
+		c.File("ui/dist/index.html")
+	})
+	if ui.BasePath() == "/ui" {
+		router.NoRoute(func(c *gin.Context) {
+			c.File("ui/dist/index.html")
+		})
+	}
+
+	router.GET("/", func(c *gin.Context) {
+		c.Redirect(http.StatusPermanentRedirect, "/ui/")
+	})
+
 	return router
 }
