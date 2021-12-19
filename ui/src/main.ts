@@ -4,6 +4,7 @@ import router from './router'
 import { createI18n } from 'vue-i18n'
 import messages from '@intlify/vite-plugin-vue-i18n/messages'
 import './tailwind.css'
+import { createHead } from '@vueuse/head'
 import { configure } from 'vee-validate'
 import { localize } from '@vee-validate/i18n'
 import en from '@vee-validate/i18n/dist/locale/en.json'
@@ -24,6 +25,8 @@ configure({
 })
 
 const app = createApp(App)
+const head = createHead()
 app.use(router)
 app.use(i18n)
+app.use(head)
 app.mount('#app')
