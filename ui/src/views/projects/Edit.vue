@@ -233,7 +233,7 @@ export default defineComponent({
         .then((response: any) => {
           if (response.status === 200) {
             state.alert.class = 'green'
-            state.alert.message = t('alert.http.team.updated', {
+            state.alert.message = t('alert.http.project.updated', {
               field: state.form.project_name,
             })
           } else {
