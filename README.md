@@ -5,22 +5,22 @@ The api permit to create pods inside your kubernetes cluster triggered by curl c
 
 ## API url
 
-By default, the api url is `http://127.0.0.1:8080` but it can be override with os environment variable `CYPRESS_PARALLEL_API_URL`.
+By default, the api url is `http://127.0.0.1:8080` but it can be override with os environment variable `CYPRESS_PARALLEL_URL`.
 
 ## Database
 
-Our api is developped with PostgresSQL database so the environment variable CYPRESS_PARALLEL_API_DB_URI must be set:
+Our api is developped with PostgresSQL database so the environment variable CYPRESS_PARALLEL_DB_URI must be set:
 ```bash
-export CYPRESS_PARALLEL_API_DB_URI="postgres://USERNAME:PASSWORD@HOST:PORT/DB_NAME?sslmode=disable"
+export CYPRESS_PARALLEL_DB_URI="postgres://USERNAME:PASSWORD@HOST:PORT/DB_NAME?sslmode=disable"
 ```
 
 ## Development
 ### Kind
 
-During you local development, you must set the variable `CYPRESS_PARALLEL_API_K8S_CLIENT_OUTSIDE` in order to create to make the api loggued in with your `.kube/config`
+During you local development, you must set the variable `CYPRESS_PARALLEL_K8S_CLIENT_OUTSIDE` in order to create to make the api loggued in with your `.kube/config`
 
 ```bash
-export CYPRESS_PARALLEL_API_K8S_CLIENT_OUTSIDE=true
+export CYPRESS_PARALLEL_K8S_CLIENT_OUTSIDE=true
 ```
 
 Please read `Kind` setup [here](./_developments/README.md)
@@ -35,7 +35,7 @@ sudo docker-compose up -d -f docker-compose.yml.yaml
 
 To enable the debug mode on the api:
 ```bash
-export CYPRESS_PARALLEL_API_LOG_LEVEL=debug
+export CYPRESS_PARALLEL_LOG_LEVEL=debug
 ```
 
 To enable the debug mode on the cli:

@@ -11,7 +11,7 @@ import (
 
 // SetLoggerLogLevel permit to set default log level
 func SetLoggerLogLevel() {
-	switch strings.TrimSpace(os.Getenv("CYPRESS_PARALLEL_API_LOG_LEVEL")) {
+	switch strings.TrimSpace(os.Getenv("CYPRESS_PARALLEL_LOG_LEVEL")) {
 	case "panic":
 		zerolog.SetGlobalLevel(zerolog.PanicLevel)
 	case "fatal":

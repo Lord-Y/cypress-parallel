@@ -14,8 +14,8 @@ import (
 func TestGetNamespace(t *testing.T) {
 	assert := assert.New(t)
 
-	os.Setenv("CYPRESS_PARALLEL_API_K8S_CLIENT_OUTSIDE", "true")
-	defer os.Unsetenv("CYPRESS_PARALLEL_API_K8S_CLIENT_OUTSIDE")
+	os.Setenv("CYPRESS_PARALLEL_K8S_CLIENT_OUTSIDE", "true")
+	defer os.Unsetenv("CYPRESS_PARALLEL_K8S_CLIENT_OUTSIDE")
 	namespace := fake.CharactersN(10)
 	client, err := Client()
 	assert.NoError(err)
@@ -26,8 +26,8 @@ func TestGetNamespace(t *testing.T) {
 func TestCreateDeleteNamespace(t *testing.T) {
 	assert := assert.New(t)
 
-	os.Setenv("CYPRESS_PARALLEL_API_K8S_CLIENT_OUTSIDE", "true")
-	defer os.Unsetenv("CYPRESS_PARALLEL_API_K8S_CLIENT_OUTSIDE")
+	os.Setenv("CYPRESS_PARALLEL_K8S_CLIENT_OUTSIDE", "true")
+	defer os.Unsetenv("CYPRESS_PARALLEL_K8S_CLIENT_OUTSIDE")
 	namespace := fake.CharactersN(10)
 	client, err := Client()
 	assert.NoError(err)
@@ -46,8 +46,8 @@ func TestCreatePod(t *testing.T) {
 		envVar models.EnvironmentVar
 	)
 
-	os.Setenv("CYPRESS_PARALLEL_API_K8S_CLIENT_OUTSIDE", "true")
-	defer os.Unsetenv("CYPRESS_PARALLEL_API_K8S_CLIENT_OUTSIDE")
+	os.Setenv("CYPRESS_PARALLEL_K8S_CLIENT_OUTSIDE", "true")
+	defer os.Unsetenv("CYPRESS_PARALLEL_K8S_CLIENT_OUTSIDE")
 	name := fake.CharactersN(10)
 
 	client, err := Client()
@@ -87,7 +87,7 @@ func TestCreatePod(t *testing.T) {
 
 func TestClient_fail_client(t *testing.T) {
 	assert := assert.New(t)
-	os.Unsetenv("CYPRESS_PARALLEL_API_K8S_CLIENT_OUTSIDE")
+	os.Unsetenv("CYPRESS_PARALLEL_K8S_CLIENT_OUTSIDE")
 
 	_, err := Client()
 	assert.Error(err)
@@ -95,10 +95,10 @@ func TestClient_fail_client(t *testing.T) {
 
 func TestClient_fail_client_kubeconfig(t *testing.T) {
 	assert := assert.New(t)
-	os.Setenv("CYPRESS_PARALLEL_API_K8S_KUBE_CONFIG", os.TempDir())
-	defer os.Unsetenv("CYPRESS_PARALLEL_API_K8S_KUBE_CONFIG")
-	os.Setenv("CYPRESS_PARALLEL_API_K8S_CLIENT_OUTSIDE", "true")
-	defer os.Unsetenv("CYPRESS_PARALLEL_API_K8S_CLIENT_OUTSIDE")
+	os.Setenv("CYPRESS_PARALLEL_K8S_KUBE_CONFIG", os.TempDir())
+	defer os.Unsetenv("CYPRESS_PARALLEL_K8S_KUBE_CONFIG")
+	os.Setenv("CYPRESS_PARALLEL_K8S_CLIENT_OUTSIDE", "true")
+	defer os.Unsetenv("CYPRESS_PARALLEL_K8S_CLIENT_OUTSIDE")
 
 	name := fake.CharactersN(10)
 

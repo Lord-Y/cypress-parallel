@@ -21,8 +21,8 @@ import (
 func init() {
 	customLogger.SetLoggerLogLevel()
 
-	if strings.TrimSpace(os.Getenv("CYPRESS_PARALLEL_API_DB_URI")) == "" {
-		msg := "CYPRESS_PARALLEL_API_DB_URI environment variable must be set"
+	if strings.TrimSpace(os.Getenv("CYPRESS_PARALLEL_DB_URI")) == "" {
+		msg := "CYPRESS_PARALLEL_DB_URI environment variable must be set"
 		log.Fatal().Err(fmt.Errorf(msg)).Msg(msg)
 		return
 	}
@@ -34,7 +34,7 @@ func main() {
 	var srv *http.Server
 	router := routers.SetupRouter()
 
-	appPort := strings.TrimSpace(os.Getenv("CYPRESS_PARALLEL_API_PORT"))
+	appPort := strings.TrimSpace(os.Getenv("CYPRESS_PARALLEL_PORT"))
 	if appPort != "" {
 		srv = &http.Server{
 			Addr:    fmt.Sprintf(":%s", appPort),

@@ -48,7 +48,7 @@ func SetupRouter() *gin.Engine {
 	}
 	router.Use(headerHandler)
 	// disable during unit testing
-	if os.Getenv("CYPRESS_PARALLEL_API_PROMETHEUS") != "" {
+	if os.Getenv("CYPRESS_PARALLEL_PROMETHEUS") != "" {
 		p := ginprometheus.NewPrometheus("http")
 		p.SetListenAddress(":9101")
 		p.Use(router)

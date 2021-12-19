@@ -59,11 +59,11 @@ func TestSetLoggerLogLevel(t *testing.T) {
 	}
 
 	for _, tc := range tests {
-		os.Setenv("CYPRESS_PARALLEL_API_LOG_LEVEL", tc.logLevel)
+		os.Setenv("CYPRESS_PARALLEL_LOG_LEVEL", tc.logLevel)
 		SetLoggerLogLevel()
 		z := zerolog.GlobalLevel().String()
 
 		assert.Equal(tc.expected, z)
-		os.Unsetenv("CYPRESS_PARALLEL_API_LOG_LEVEL")
+		os.Unsetenv("CYPRESS_PARALLEL_LOG_LEVEL")
 	}
 }

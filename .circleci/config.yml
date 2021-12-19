@@ -19,8 +19,8 @@ jobs:
       IMAGE_NAME: docker.pkg.github.com/lord-y/cypress-parallel-api/cypress-parallel-api
       CLI_IMAGE: docker.pkg.github.com/lord-y/cypress-parallel-docker-images/cypress-parallel-docker-images:7.2.0-0.0.5
       NAMESPACE: cypress-parallel
-      CYPRESS_PARALLEL_API_K8S_CLIENT_OUTSIDE: "true"
-      CYPRESS_PARALLEL_API_PORT: 40000
+      CYPRESS_PARALLEL_K8S_CLIENT_OUTSIDE: "true"
+      CYPRESS_PARALLEL_PORT: 40000
       GO111MODULE: "on"
 
     steps:
@@ -92,8 +92,8 @@ jobs:
         name: Perform unit testing
         no_output_timeout: 30m
         command: |
-          export CYPRESS_PARALLEL_API_DB_URI="postgres://cypress_parallel:cypress_parallel@$(hostname -i):5432/cypress_parallel?sslmode=disable"
-          export CYPRESS_PARALLEL_API_URL=http://$(hostname -i):${CYPRESS_PARALLEL_API_PORT}
+          export CYPRESS_PARALLEL_DB_URI="postgres://cypress_parallel:cypress_parallel@$(hostname -i):5432/cypress_parallel?sslmode=disable"
+          export CYPRESS_PARALLEL_URL=http://$(hostname -i):${CYPRESS_PARALLEL_PORT}
           go test -v ./... -coverprofile=coverage.out
 
     - run:
@@ -104,8 +104,8 @@ jobs:
         name: Cleaning
         command: |
           kubectl -n cypress-parallel-jobs delete po --all
-          export CYPRESS_PARALLEL_API_DB_URI="postgres://cypress_parallel:cypress_parallel@$(hostname -i):5432/cypress_parallel?sslmode=disable"
-          psql ${CYPRESS_PARALLEL_API_DB_URI} -f .circleci/truncate.sql
+          export CYPRESS_PARALLEL_DB_URI="postgres://cypress_parallel:cypress_parallel@$(hostname -i):5432/cypress_parallel?sslmode=disable"
+          psql ${CYPRESS_PARALLEL_DB_URI} -f .circleci/truncate.sql
 
     - run:
         name: Build docker image
