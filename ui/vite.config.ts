@@ -5,6 +5,7 @@ import vueI18n from '@intlify/vite-plugin-vue-i18n'
 
 // https://vitejs.dev/config/
 export default defineConfig({
+  base: '/ui/',
   resolve: {
     alias: {
       'vue-i18n': 'vue-i18n/dist/vue-i18n.runtime.esm-bundler.js',

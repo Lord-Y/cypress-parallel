@@ -7,8 +7,7 @@ import annotations from './annotations'
 import environments from './environments'
 
 const router = createRouter({
-  // history: createWebHistory(process.env.BASE_URL),
-  history: createWebHistory(),
+  history: createWebHistory('/ui/'),
   routes: [
     ...home,
     ...teams,
