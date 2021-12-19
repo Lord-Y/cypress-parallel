@@ -23,8 +23,7 @@
   </div>
 </template>
 
-<script lang="ts">
-import { defineComponent, reactive, toRefs } from 'vue'
+<script setup lang="ts">
 import Menu from '@/views/menu/Menu.vue'
 import Title from '@/components/commons/Title.vue'
 import SpinnerCommon from '@/components/commons/SpinnerCommon.vue'
@@ -32,72 +31,7 @@ import AlertMessage from '@/components/commons/AlertMessage.vue'
 import { Form } from 'vee-validate'
 import CreateUpdateName from '@/components/commons/CreateUpdateName.vue'
 import SubmitButton from '@/components/buttons/SubmitButton.vue'
-import teamsService from '@/api/teamsService'
-import { useI18n } from 'vue-i18n'
+import create from '@/compositions/teams/create'
 
-export default defineComponent({
-  components: {
-    Menu,
-    Title,
-    SpinnerCommon,
-    AlertMessage,
-    Form,
-    CreateUpdateName,
-    SubmitButton,
-  },
-  setup() {
-    let state = reactive({
-      loading: {
-        loading: {
-          active: false,
-        },
-      },
-      alert: {
-        class: '',
-        message: '',
-      },
-      form: {
-        name: '',
-      },
-    })
-    const { t } = useI18n({
-      useScope: 'global',
-    })
-
-    function submit() {
-      state.loading.loading.active = true
-      teamsService
-        .create({
-          name: state.form.name,
-        })
-        .then((response: any) => {
-          if (response.status === 201) {
-            state.alert.class = 'green'
-            state.alert.message = t('alert.http.team.created', {
-              field: state.form.name,
-            })
-          } else {
-            state.alert.class = 'red'
-            state.alert.message = t('alert.http.errorOccured')
-          }
-          state.loading.loading.active = false
-        })
-        .catch((error: any) => {
-          state.alert.class = 'red'
-          state.alert.message = t('alert.http.errorOccured')
-          state.loading.loading.active = false
-          throw error
-        })
-    }
-
-    let { loading, alert, form } = toRefs(state)
-
-    return {
-      loading,
-      alert,
-      form,
-      submit,
-    }
-  },
-})
+const { loading, alert, form, submit } = create()
 </script>

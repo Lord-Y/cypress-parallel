@@ -1,2 +1,4 @@
 src/shims-vue.d.ts
 .tmp
+node_modules
+dist

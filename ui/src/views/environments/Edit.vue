@@ -38,10 +38,7 @@
   </div>
 </template>
 
-<script lang="ts">
-import { defineComponent, reactive, toRefs } from 'vue'
-import { useRoute } from 'vue-router'
-import { useI18n } from 'vue-i18n'
+<script setup lang="ts">
 import Menu from '@/views/menu/Menu.vue'
 import Title from '@/components/commons/Title.vue'
 import SpinnerCommon from '@/components/commons/SpinnerCommon.vue'
@@ -51,124 +48,7 @@ import CreateUpdateProject from '@/components/commons/CreateUpdateProject.vue'
 import CreateUpdateKey from '@/components/commons/CreateUpdateKey.vue'
 import CreateUpdateValue from '@/components/commons/CreateUpdateValue.vue'
 import SubmitButton from '@/components/buttons/SubmitButton.vue'
-import ProjectsService, { ProjectOnly } from '@/api/projectsService'
-import EnvironmentsService, { Environment } from '@/api/environmentsService'
+import edit from '@/compositions/environments/edit'
 
-export default defineComponent({
-  components: {
-    Menu,
-    Title,
-    SpinnerCommon,
-    AlertMessage,
-    Form,
-    CreateUpdateProject,
-    CreateUpdateKey,
-    CreateUpdateValue,
-    SubmitButton,
-  },
-  setup() {
-    let state = reactive({
-      loading: {
-        loading: {
-          active: false,
-        },
-      },
-      alert: {
-        class: '',
-        message: '',
-      },
-      projects: [] as ProjectOnly[],
-      environment: {} as Environment,
-      form: {
-        project_id: '',
-        key: '',
-        value: '',
-      },
-    })
-    const route = useRoute()
-    const { t } = useI18n({
-      useScope: 'global',
-    })
-
-    ProjectsService.all()
-      .then((response: any) => {
-        switch (response.status) {
-          case 200:
-            state.projects = response.data
-            break
-          default:
-            state.alert.class = 'red'
-            state.alert.message = t('alert.http.errorOccured')
-            break
-        }
-      })
-      .catch((error: any) => {
-        state.alert.class = 'red'
-        state.alert.message = t('alert.http.errorOccured')
-        throw error
-      })
-
-    EnvironmentsService.get(Number(route.params.id))
-      .then((response: any) => {
-        switch (response.status) {
-          case 200:
-            state.environment = response.data
-            break
-          default:
-            state.alert.class = 'red'
-            state.alert.message = t('alert.http.errorOccured')
-            break
-        }
-      })
-      .catch((error: any) => {
-        if (error.response.status === 404) {
-          state.alert.class = 'mute'
-          state.alert.message = t('alert.http.pageNotFound')
-        } else {
-          state.alert.class = 'red'
-          state.alert.message = t('alert.http.errorOccured')
-        }
-        throw error
-      })
-
-    function submit() {
-      state.loading.loading.active = true
-      EnvironmentsService.update({
-        projectId: Number(state.form.project_id),
-        environmentId: Number(state.environment.environment_id),
-        key: state.form.key,
-        value: state.form.value,
-      })
-        .then((response: any) => {
-          if (response.status === 200) {
-            state.alert.class = 'green'
-            state.alert.message = t('alert.http.environment.updated', {
-              field: state.form.key,
-            })
-          } else {
-            state.alert.class = 'red'
-            state.alert.message = t('alert.http.errorOccured')
-          }
-          state.loading.loading.active = false
-        })
-        .catch((error: any) => {
-          state.alert.class = 'red'
-          state.alert.message = t('alert.http.errorOccured')
-          state.loading.loading.active = false
-          throw error
-        })
-    }
-
-    let { loading, alert, projects, environment, form } = toRefs(state)
-
-    return {
-      loading,
-      alert,
-      projects,
-      environment,
-      form,
-      submit,
-    }
-  },
-})
+const { loading, alert, projects, environment, form, submit } = edit()
 </script>

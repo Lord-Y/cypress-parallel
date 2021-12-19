@@ -24,9 +24,7 @@
   </div>
 </template>
 
-<script lang="ts">
-import { defineComponent, reactive, toRefs } from 'vue'
-import { useRoute } from 'vue-router'
+<script setup lang="ts">
 import Menu from '@/views/menu/Menu.vue'
 import Title from '@/components/commons/Title.vue'
 import SpinnerCommon from '@/components/commons/SpinnerCommon.vue'
@@ -34,101 +32,7 @@ import AlertMessage from '@/components/commons/AlertMessage.vue'
 import { Form } from 'vee-validate'
 import CreateUpdateName from '@/components/commons/CreateUpdateName.vue'
 import SubmitButton from '@/components/buttons/SubmitButton.vue'
-import TeamsService, { Team } from '@/api/teamsService'
-import { useI18n } from 'vue-i18n'
+import edit from '@/compositions/teams/edit'
 
-export default defineComponent({
-  components: {
-    Menu,
-    Title,
-    SpinnerCommon,
-    AlertMessage,
-    Form,
-    CreateUpdateName,
-    SubmitButton,
-  },
-  setup() {
-    let state = reactive({
-      loading: {
-        loading: {
-          active: false,
-        },
-      },
-      alert: {
-        class: '',
-        message: '',
-      },
-      form: {
-        name: '',
-      },
-      team: {} as Team,
-    })
-    const route = useRoute()
-    const { t } = useI18n({
-      useScope: 'global',
-    })
-
-    state.loading.loading.active = true
-    TeamsService.get(Number(route.params.id))
-      .then((response: any) => {
-        switch (response.status) {
-          case 200:
-            state.team = response.data
-            break
-          default:
-            state.alert.class = 'red'
-            state.alert.message = t('alert.http.errorOccured')
-            break
-        }
-        state.loading.loading.active = false
-      })
-      .catch((error: any) => {
-        if (error.response.status === 404) {
-          state.alert.class = 'mute'
-          state.alert.message = t('alert.http.pageNotFound')
-        } else {
-          state.alert.class = 'red'
-          state.alert.message = t('alert.http.errorOccured')
-        }
-        state.loading.loading.active = false
-        throw error
-      })
-
-    function submit() {
-      state.loading.loading.active = true
-      TeamsService.update({
-        teamId: Number(state.team.team_id),
-        name: state.form.name,
-      })
-        .then((response: any) => {
-          if (response.status === 200) {
-            state.alert.class = 'green'
-            state.alert.message = t('alert.http.team.updated', {
-              field: state.form.name,
-            })
-          } else {
-            state.alert.class = 'red'
-            state.alert.message = t('alert.http.errorOccured')
-          }
-          state.loading.loading.active = false
-        })
-        .catch((error: any) => {
-          state.alert.class = 'red'
-          state.alert.message = t('alert.http.errorOccured')
-          state.loading.loading.active = false
-          throw error
-        })
-    }
-
-    let { loading, alert, team, form } = toRefs(state)
-
-    return {
-      loading,
-      alert,
-      team,
-      form,
-      submit,
-    }
-  },
-})
+const { loading, alert, form, team, submit } = edit()
 </script>

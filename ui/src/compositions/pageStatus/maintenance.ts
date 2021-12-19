@@ -2,7 +2,6 @@ import { reactive, toRefs } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useHead } from '@vueuse/head'
 
-// eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 export default function () {
   const state = reactive({
     meta: {
@@ -15,10 +14,7 @@ export default function () {
     useScope: 'global',
   })
 
-  state.meta.title =
-    t('brand.name').toUpperCase() +
-    ' | ' +
-    t('alert.http.maintenance.maintenance')
+  state.meta.title = t('alert.http.maintenance.maintenance')
   state.meta.description = t('alert.http.maintenance.maintenance')
 
   useHead({
@@ -30,11 +26,11 @@ export default function () {
       },
       {
         property: 'og:title',
-        content: t('brand.name').toUpperCase() + ' | ' + state.meta.title,
+        content: state.meta.title,
       },
       {
         property: 'og:description',
-        content: t('metaTags.estateAnnounce') + ' - ' + state.meta.description,
+        content: state.meta.description,
       },
     ],
   })

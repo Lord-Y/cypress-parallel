@@ -47,9 +47,10 @@
                     :class="['cursor-pointer', classes.aLinks]"
                     :title="$t('executions.uniqId')"
                     :to="'/executions/uniqid/' + execution.uniq_id"
-                    >{{ $t('see.by.uniqId') }}
-                    {{ execution.uniq_id }}</router-link
                   >
+                    {{ $t('see.by.uniqId') }}
+                    {{ execution.uniq_id }}
+                  </router-link>
                 </td>
                 <td class="px-2 py-3">{{ execution.branch }}</td>
                 <td class="px-2 py-3">
@@ -99,9 +100,10 @@
                     :class="['cursor-pointer', classes.aLinks]"
                     :title="$t('executions.uniqId')"
                     :to="'/executions/uniqid/' + execution.uniq_id"
-                    >{{ $t('see.by.uniqId') }}
-                    {{ execution.uniq_id }}</router-link
                   >
+                    {{ $t('see.by.uniqId') }}
+                    {{ execution.uniq_id }}
+                  </router-link>
                 </td>
                 <td class="px-2 py-3">{{ execution.branch }}</td>
                 <td class="px-2 py-3">
@@ -122,122 +124,14 @@
   </div>
 </template>
 
-<script lang="ts">
-import { defineComponent, reactive, toRefs } from 'vue'
-import { useRoute } from 'vue-router'
+<script setup lang="ts">
 import Menu from '@/views/menu/Menu.vue'
 import Title from '@/components/commons/Title.vue'
 import SpinnerCommon from '@/components/commons/SpinnerCommon.vue'
 import AlertMessage from '@/components/commons/AlertMessage.vue'
 import SearchExecutionsByFilter from '@/components/search/SearchExecutionsByFilter.vue'
 import Pagination from '@/components/commons/Pagination.vue'
-import ExecutionsService, { Execution } from '@/api/executionsService'
-import { useI18n } from 'vue-i18n'
+import list from '@/compositions/executions/list'
 
-export default defineComponent({
-  components: {
-    Menu,
-    Title,
-    SpinnerCommon,
-    AlertMessage,
-    SearchExecutionsByFilter,
-    Pagination,
-  },
-  setup() {
-    let state = reactive({
-      executions: {
-        executions: [] as Execution[],
-        byFilter: [] as Execution[],
-      },
-      alert: {
-        class: '',
-        message: '',
-      },
-      isOpen: false,
-      loading: {
-        loading: {
-          active: true,
-        },
-        delete: {
-          active: false,
-        },
-      },
-      pagination: {
-        enabled: false,
-        data: {
-          url: '',
-          actualPage: 1,
-          total: 0,
-        },
-      },
-      search: {
-        byFilter: '',
-        bar: {
-          enabled: false,
-        },
-        table: {
-          enabled: false,
-        },
-      },
-      classes: {
-        aLinks: 'hover:text-green-500 hover:font-extrabold',
-      },
-    })
-    const route = useRoute()
-    const { t } = useI18n({
-      useScope: 'global',
-    })
-    let page: number, total: number
-
-    if (!route.params.page) {
-      page = 1
-    } else {
-      page = Number(route.params.page)
-    }
-    state.loading.loading.active = true
-    ExecutionsService.list(page)
-      .then((response: any) => {
-        switch (response.status) {
-          case 200:
-            state.executions.executions = response.data
-            total = state.executions.executions[0].total
-            if (total > 25) {
-              state.search.bar.enabled = true
-              state.pagination.data.url = route.path.replace('/' + page, '')
-              state.pagination.data.actualPage = page
-              state.pagination.data.total = total
-              state.pagination.enabled = true
-            }
-            break
-          case 204:
-            state.alert.class = 'mute'
-            state.alert.message = t('alert.http.noDataFound')
-            break
-          default:
-            state.alert.class = 'red'
-            state.alert.message = t('alert.http.errorOccured')
-            break
-        }
-        state.loading.loading.active = false
-      })
-      .catch((error: any) => {
-        state.alert.class = 'red'
-        state.alert.message = t('alert.http.errorOccured')
-        state.loading.loading.active = false
-        throw error
-      })
-
-    let { executions, loading, alert, pagination, search, classes } =
-      toRefs(state)
-
-    return {
-      executions,
-      loading,
-      alert,
-      pagination,
-      search,
-      classes,
-    }
-  },
-})
+const { executions, loading, alert, pagination, search, classes } = list()
 </script>

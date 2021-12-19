@@ -201,154 +201,22 @@
   </div>
 </template>
 
-<script lang="ts">
-import { defineComponent, reactive, toRefs } from 'vue'
-import { useRoute } from 'vue-router'
+<script setup lang="ts">
 import Menu from '@/views/menu/Menu.vue'
 import Title from '@/components/commons/Title.vue'
 import SpinnerCommon from '@/components/commons/SpinnerCommon.vue'
 import AlertMessage from '@/components/commons/AlertMessage.vue'
 import SearchEnvironmentsByFilter from '@/components/search/SearchEnvironmentsByFilter.vue'
 import Pagination from '@/components/commons/Pagination.vue'
-import EnvironmentsService, { Environments } from '@/api/environmentsService'
-import { useI18n } from 'vue-i18n'
+import list from '@/compositions/environments/list'
 
-export default defineComponent({
-  components: {
-    Menu,
-    Title,
-    SpinnerCommon,
-    AlertMessage,
-    SearchEnvironmentsByFilter,
-    Pagination,
-  },
-  setup() {
-    let state = reactive({
-      environments: {
-        environments: [] as Environments[],
-        byFilter: [] as Environments[],
-      },
-      alert: {
-        class: '',
-        message: '',
-      },
-      isOpen: false,
-      loading: {
-        loading: {
-          active: true,
-        },
-        delete: {
-          active: false,
-        },
-      },
-      pagination: {
-        enabled: false,
-        data: {
-          url: '',
-          actualPage: 1,
-          total: 0,
-        },
-      },
-      search: {
-        byFilter: '',
-        bar: {
-          enabled: false,
-        },
-        table: {
-          enabled: false,
-        },
-      },
-      classes: {
-        aLinks: 'hover:text-green-500 hover:font-extrabold',
-      },
-    })
-    const route = useRoute()
-    const { t } = useI18n({
-      useScope: 'global',
-    })
-    let page: number, total: number
-
-    if (!route.params.page) {
-      page = 1
-    } else {
-      page = Number(route.params.page)
-    }
-    state.loading.loading.active = true
-
-    EnvironmentsService.list(page)
-      .then((response: any) => {
-        switch (response.status) {
-          case 200:
-            state.environments.environments = response.data
-            total = state.environments.environments[0].total
-            if (total > 25) {
-              state.search.bar.enabled = true
-              state.pagination.data.url = route.path.replace('/' + page, '')
-              state.pagination.data.actualPage = page
-              state.pagination.data.total = total
-              state.pagination.enabled = true
-            }
-            break
-          case 204:
-            state.alert.class = 'mute'
-            state.alert.message = t('alert.http.noDataFound')
-            break
-          default:
-            state.alert.class = 'red'
-            state.alert.message = t('alert.http.errorOccured')
-            break
-        }
-        state.loading.loading.active = false
-      })
-      .catch((error: any) => {
-        state.alert.class = 'red'
-        state.alert.message = t('alert.http.errorOccured')
-        state.loading.loading.active = false
-        throw error
-      })
-
-    let { environments, loading, alert, pagination, search, classes } =
-      toRefs(state)
-
-    function deleteItem(index: number, type: string, id: number): void {
-      if (confirm(t('confirm.sure'))) {
-        state.alert.message = ''
-        state.loading.delete.active = true
-        EnvironmentsService.delete(id)
-          .then(() => {
-            if (type === 'environments') {
-              state.environments.environments.splice(index, 1)
-              if (state.environments.environments.length == 0) {
-                state.alert.class = 'mute'
-                state.alert.message = t('alert.http.noDataFound')
-              }
-            } else {
-              state.environments.byFilter.splice(index, 1)
-              if (state.environments.byFilter.length == 0) {
-                state.alert.class = 'mute'
-                state.alert.message = t('alert.http.noDataFound')
-              }
-            }
-            state.loading.delete.active = false
-          })
-          .catch((error: any) => {
-            state.alert.class = 'red'
-            state.alert.message = t('alert.http.errorOccured')
-            state.loading.delete.active = false
-            throw error
-          })
-      }
-    }
-
-    return {
-      environments,
-      loading,
-      alert,
-      pagination,
-      search,
-      classes,
-      deleteItem,
-    }
-  },
-})
+const {
+  environments,
+  loading,
+  alert,
+  pagination,
+  search,
+  classes,
+  deleteItem,
+} = list()
 </script>

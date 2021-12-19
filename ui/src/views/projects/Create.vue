@@ -77,9 +77,7 @@
   </div>
 </template>
 
-<script lang="ts">
-import { defineComponent, reactive, toRefs } from 'vue'
-import { useI18n } from 'vue-i18n'
+<script setup lang="ts">
 import Menu from '@/views/menu/Menu.vue'
 import Title from '@/components/commons/Title.vue'
 import SpinnerCommon from '@/components/commons/SpinnerCommon.vue'
@@ -100,133 +98,7 @@ import CreateUpdateTimeout from '@/components/projects/CreateUpdateTimeout.vue'
 import CreateUpdateBrowser from '@/components/projects/CreateUpdateBrowser.vue'
 import CreateUpdateConfigFile from '@/components/projects/CreateUpdateConfigFile.vue'
 import SubmitButton from '@/components/buttons/SubmitButton.vue'
-import TeamsService, { Teams } from '@/api/teamsService'
-import ProjectsService from '@/api/projectsService'
+import create from '@/compositions/projects/create'
 
-export default defineComponent({
-  components: {
-    Menu,
-    Title,
-    SpinnerCommon,
-    AlertMessage,
-    Form,
-    CreateUpdateTeam,
-    CreateUpdateName,
-    CreateUpdateRepository,
-    CreateUpdateUsername,
-    CreateUpdatePassword,
-    CreateUpdateBranch,
-    CreateUpdateSpecs,
-    CreateUpdateSchedulingEnabled,
-    CreateUpdateScheduling,
-    CreateUpdateMaxPods,
-    CreateUpdateCypressDockerVersion,
-    CreateUpdateTimeout,
-    CreateUpdateBrowser,
-    CreateUpdateConfigFile,
-    SubmitButton,
-  },
-  setup() {
-    let state = reactive({
-      loading: {
-        loading: {
-          active: false,
-        },
-      },
-      alert: {
-        class: '',
-        message: '',
-      },
-      teams: [] as Teams[],
-      form: {
-        team_id: '',
-        project_name: '',
-        repository: '',
-        branch: '',
-        username: '',
-        password: '',
-        specs: '',
-        scheduling: '',
-        schedulingEnabled: false,
-        maxPods: 10,
-        cypress_docker_version: '7.2.0-0.0.3',
-        timeout: 10,
-        browser: 'chrome',
-        config_file: 'cypress.json',
-      },
-    })
-    const { t } = useI18n({
-      useScope: 'global',
-    })
-
-    state.loading.loading.active = true
-    TeamsService.all()
-      .then((response: any) => {
-        switch (response.status) {
-          case 200:
-            state.teams = response.data
-            break
-          default:
-            state.alert.class = 'red'
-            state.alert.message = t('alert.http.errorOccured')
-            break
-        }
-        state.loading.loading.active = false
-      })
-      .catch((error: any) => {
-        state.alert.class = 'red'
-        state.alert.message = t('alert.http.errorOccured')
-        state.loading.loading.active = false
-        throw error
-      })
-
-    function submit() {
-      state.loading.loading.active = true
-      ProjectsService.create({
-        teamId: Number(state.form.team_id),
-        name: state.form.project_name,
-        repository: state.form.repository,
-        branch: state.form.branch,
-        username: state.form.username,
-        password: state.form.password,
-        specs: state.form.specs,
-        scheduling: state.form.scheduling,
-        schedulingEnabled: state.form.schedulingEnabled,
-        maxPods: state.form.maxPods,
-        cypress_docker_version: state.form.cypress_docker_version,
-        timeout: state.form.timeout,
-        browser: state.form.browser,
-        config_file: state.form.config_file,
-      })
-        .then((response: any) => {
-          if (response.status === 201) {
-            state.alert.class = 'green'
-            state.alert.message = t('alert.http.team.created', {
-              field: state.form.project_name,
-            })
-          } else {
-            state.alert.class = 'red'
-            state.alert.message = t('alert.http.errorOccured')
-          }
-          state.loading.loading.active = false
-        })
-        .catch((error: any) => {
-          state.alert.class = 'red'
-          state.alert.message = t('alert.http.errorOccured')
-          state.loading.loading.active = false
-          throw error
-        })
-    }
-
-    let { loading, alert, teams, form } = toRefs(state)
-
-    return {
-      loading,
-      alert,
-      teams,
-      form,
-      submit,
-    }
-  },
-})
+const { loading, alert, teams, form, submit } = create()
 </script>

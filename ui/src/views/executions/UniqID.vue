@@ -71,128 +71,20 @@
   </div>
 </template>
 
-<script lang="ts">
-import { defineComponent, reactive, toRefs } from 'vue'
-import { useRoute } from 'vue-router'
+<script setup lang="ts">
 import Menu from '@/views/menu/Menu.vue'
 import Title from '@/components/commons/Title.vue'
 import SpinnerCommon from '@/components/commons/SpinnerCommon.vue'
 import AlertMessage from '@/components/commons/AlertMessage.vue'
-import ExecutionsService, { Execution } from '@/api/executionsService'
-import Statuses from '@/tools/status'
-import { useI18n } from 'vue-i18n'
+import uniqID from '@/compositions/executions/uniqID'
 
-export default defineComponent({
-  components: {
-    Menu,
-    Title,
-    SpinnerCommon,
-    AlertMessage,
-  },
-  setup() {
-    let state = reactive({
-      executions: [] as Execution[],
-      alert: {
-        class: '',
-        message: '',
-      },
-      isOpen: false,
-      loading: {
-        loading: {
-          active: true,
-        },
-      },
-      classes: {
-        aLinks: 'hover:text-green-500 hover:font-extrabold',
-      },
-    })
-    const route = useRoute()
-    const { t } = useI18n({
-      useScope: 'global',
-    })
-    let id: string
-    id = String(route.params.id)
-
-    state.loading.loading.active = true
-
-    ExecutionsService.uniqid(id)
-      .then((response: any) => {
-        switch (response.status) {
-          case 200:
-            state.executions = response.data
-            break
-          default:
-            state.alert.class = 'red'
-            state.alert.message = t('alert.http.errorOccured')
-            break
-        }
-        state.loading.loading.active = false
-      })
-      .catch((error: any) => {
-        state.alert.class = 'red'
-        state.alert.message = t('alert.http.errorOccured')
-        state.loading.loading.active = false
-        throw error
-      })
-
-    function getSpecStatus(execution: Execution): string {
-      return Statuses.tests(execution)
-    }
-
-    function getSystemStatus(s: string): string {
-      let classes: string
-      switch (s) {
-        case 'DONE':
-          classes = 'text-green-500 font-semibold'
-          break
-        case 'NOT_STARTED':
-        case 'QUEUED':
-        case 'SCHEDULED':
-        case 'CANCELLED':
-          classes = 'text-gray-500 font-semibold'
-          break
-        default:
-          classes = 'text-red-500 font-semibold'
-          break
-      }
-      return classes
-    }
-
-    function getGlobalStatus(execution: Execution, mode: string): string {
-      let status: string, classes: string
-      status = Statuses.global(execution)
-      switch (status) {
-        case 'PASSED':
-          classes = 'text-green-500 font-semibold'
-          break
-        case 'NOT_STARTED':
-        case 'QUEUED':
-        case 'SCHEDULED':
-        case 'CANCELLED':
-          classes = 'text-gray-500 font-semibold'
-          break
-        default:
-          classes = 'text-red-500 font-semibold'
-          break
-      }
-      if (mode === 'classes') {
-        return classes
-      } else {
-        return status
-      }
-    }
-
-    let { executions, loading, alert, classes } = toRefs(state)
-
-    return {
-      executions,
-      loading,
-      alert,
-      classes,
-      getSpecStatus,
-      getSystemStatus,
-      getGlobalStatus,
-    }
-  },
-})
+const {
+  executions,
+  loading,
+  alert,
+  classes,
+  getSpecStatus,
+  getSystemStatus,
+  getGlobalStatus,
+} = uniqID()
 </script>

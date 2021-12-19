@@ -34,9 +34,7 @@
   </div>
 </template>
 
-<script lang="ts">
-import { defineComponent, reactive, toRefs } from 'vue'
-import { useI18n } from 'vue-i18n'
+<script setup lang="ts">
 import Menu from '@/views/menu/Menu.vue'
 import Title from '@/components/commons/Title.vue'
 import SpinnerCommon from '@/components/commons/SpinnerCommon.vue'
@@ -46,100 +44,7 @@ import CreateUpdateProject from '@/components/commons/CreateUpdateProject.vue'
 import CreateUpdateKey from '@/components/commons/CreateUpdateKey.vue'
 import CreateUpdateValue from '@/components/commons/CreateUpdateValue.vue'
 import SubmitButton from '@/components/buttons/SubmitButton.vue'
-import ProjectsService, { ProjectOnly } from '@/api/projectsService'
-import AnnotationsService from '@/api/annotationsService'
+import create from '@/compositions/annotations/create'
 
-export default defineComponent({
-  components: {
-    Menu,
-    Title,
-    SpinnerCommon,
-    AlertMessage,
-    Form,
-    CreateUpdateProject,
-    CreateUpdateKey,
-    CreateUpdateValue,
-    SubmitButton,
-  },
-  setup() {
-    let state = reactive({
-      loading: {
-        loading: {
-          active: false,
-        },
-      },
-      alert: {
-        class: '',
-        message: '',
-      },
-      projects: [] as ProjectOnly[],
-      form: {
-        project_id: '',
-        key: '',
-        value: '',
-      },
-    })
-    const { t } = useI18n({
-      useScope: 'global',
-    })
-
-    state.loading.loading.active = true
-    ProjectsService.all()
-      .then((response: any) => {
-        switch (response.status) {
-          case 200:
-            state.projects = response.data
-            break
-          default:
-            state.alert.class = 'red'
-            state.alert.message = t('alert.http.errorOccured')
-            break
-        }
-        state.loading.loading.active = false
-      })
-      .catch((error: any) => {
-        state.alert.class = 'red'
-        state.alert.message = t('alert.http.errorOccured')
-        state.loading.loading.active = false
-        throw error
-      })
-
-    function submit() {
-      state.loading.loading.active = true
-      AnnotationsService.create({
-        projectId: Number(state.form.project_id),
-        key: state.form.key,
-        value: state.form.value,
-      })
-        .then((response: any) => {
-          if (response.status === 201) {
-            state.alert.class = 'green'
-            state.alert.message = t('alert.http.annotation.created', {
-              field: state.form.key,
-            })
-          } else {
-            state.alert.class = 'red'
-            state.alert.message = t('alert.http.errorOccured')
-          }
-          state.loading.loading.active = false
-        })
-        .catch((error: any) => {
-          state.alert.class = 'red'
-          state.alert.message = t('alert.http.errorOccured')
-          state.loading.loading.active = false
-          throw error
-        })
-    }
-
-    let { loading, alert, projects, form } = toRefs(state)
-
-    return {
-      loading,
-      alert,
-      projects,
-      form,
-      submit,
-    }
-  },
-})
+const { loading, alert, projects, form, submit } = create()
 </script>

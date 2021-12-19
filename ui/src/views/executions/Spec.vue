@@ -40,9 +40,10 @@
                     :class="['cursor-pointer', classes.aLinks]"
                     :title="$t('executions.uniqId')"
                     :to="'/executions/uniqid/' + execution.uniq_id"
-                    >{{ $t('see.by.uniqId') }}
-                    {{ execution.uniq_id }}</router-link
                   >
+                    {{ $t('see.by.uniqId') }}
+                    {{ execution.uniq_id }}
+                  </router-link>
                 </td>
                 <td class="px-2 py-3">{{ execution.branch }}</td>
                 <td class="px-2 py-3">{{ execution.spec }}</td>
@@ -168,139 +169,22 @@
   </div>
 </template>
 
-<script lang="ts">
-import { defineComponent, reactive, toRefs } from 'vue'
-import { useRoute } from 'vue-router'
+<script setup lang="ts">
 import Menu from '@/views/menu/Menu.vue'
 import Title from '@/components/commons/Title.vue'
 import SpinnerCommon from '@/components/commons/SpinnerCommon.vue'
 import AlertMessage from '@/components/commons/AlertMessage.vue'
 import HR from '@/components/commons/HR.vue'
-import ExecutionsService, { Execution } from '@/api/executionsService'
-import { useI18n } from 'vue-i18n'
-import moment from 'moment'
-import Statuses from '@/tools/status'
+import spec from '@/compositions/executions/spec'
 
-export default defineComponent({
-  components: {
-    Menu,
-    Title,
-    SpinnerCommon,
-    AlertMessage,
-    HR,
-  },
-  setup() {
-    let state = reactive({
-      execution: {} as Execution,
-      alert: {
-        class: '',
-        message: '',
-      },
-      isOpen: false,
-      loading: {
-        loading: {
-          active: true,
-        },
-      },
-      classes: {
-        aLinks: 'hover:text-green-500 hover:font-extrabold',
-      },
-    })
-    const route = useRoute()
-    const { t } = useI18n({
-      useScope: 'global',
-    })
-    let id: string
-    id = String(route.params.id)
-
-    state.loading.loading.active = true
-    ExecutionsService.get(Number(id))
-      .then((response: any) => {
-        switch (response.status) {
-          case 200:
-            state.execution = response.data
-            break
-          default:
-            state.alert.class = 'red'
-            state.alert.message = t('alert.http.errorOccured')
-            break
-        }
-        state.loading.loading.active = false
-      })
-      .catch((error: any) => {
-        state.alert.class = 'red'
-        state.alert.message = t('alert.http.errorOccured')
-        state.loading.loading.active = false
-        throw error
-      })
-
-    function convertDuration(s: number) {
-      if (s > 60000) {
-        return moment.duration(s).minutes() + 'min'
-      } else {
-        return moment.duration(s).seconds() + 's'
-      }
-    }
-
-    function getSpecStatus(execution: Execution): string {
-      return Statuses.tests(execution)
-    }
-
-    function getSystemStatus(s: string): string {
-      let classes: string
-      switch (s) {
-        case 'DONE':
-          classes = 'text-green-500 font-semibold'
-          break
-        case 'NOT_STARTED':
-        case 'QUEUED':
-        case 'SCHEDULED':
-        case 'CANCELLED':
-          classes = 'text-gray-500 font-semibold'
-          break
-        default:
-          classes = 'text-red-500 font-semibold'
-          break
-      }
-      return classes
-    }
-
-    function getGlobalStatus(execution: Execution, mode: string): string {
-      let status: string, classes: string
-      status = Statuses.global(execution)
-      switch (status) {
-        case 'PASSED':
-          classes = 'text-green-500 font-semibold'
-          break
-        case 'NOT_STARTED':
-        case 'QUEUED':
-        case 'SCHEDULED':
-        case 'CANCELLED':
-          classes = 'text-gray-500 font-semibold'
-          break
-        default:
-          classes = 'text-red-500 font-semibold'
-          break
-      }
-      if (mode === 'classes') {
-        return classes
-      } else {
-        return status
-      }
-    }
-
-    let { execution, loading, alert, classes } = toRefs(state)
-
-    return {
-      execution,
-      loading,
-      alert,
-      classes,
-      convertDuration,
-      getSpecStatus,
-      getSystemStatus,
-      getGlobalStatus,
-    }
-  },
-})
+const {
+  execution,
+  loading,
+  alert,
+  classes,
+  convertDuration,
+  getSpecStatus,
+  getSystemStatus,
+  getGlobalStatus,
+} = spec()
 </script>
