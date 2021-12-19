@@ -3,7 +3,7 @@ import { RouteRecordRaw } from 'vue-router'
 const routes: Array<RouteRecordRaw> = [
   {
     path: '/annotations/create',
-    component: () => import('@views/annotations/Create.vue'),
+    component: () => import('@/views/annotations/Create.vue'),
     meta: {
       root: 'annotations',
       activeLink: '/annotations/create',
@@ -11,7 +11,7 @@ const routes: Array<RouteRecordRaw> = [
   },
   {
     path: '/annotations/edit/:id',
-    component: () => import('@views/annotations/Edit.vue'),
+    component: () => import('@/views/annotations/Edit.vue'),
     meta: {
       root: 'annotations',
       activeLink: '/annotations/edit',
@@ -19,7 +19,7 @@ const routes: Array<RouteRecordRaw> = [
   },
   {
     path: '/annotations/list',
-    component: () => import('@views/annotations/List.vue'),
+    component: () => import('@/views/annotations/List.vue'),
     meta: {
       root: 'annotations',
       activeLink: '/annotations/list',
@@ -27,7 +27,7 @@ const routes: Array<RouteRecordRaw> = [
     children: [
       {
         path: ':page',
-        component: () => import('@views/annotations/List.vue'),
+        component: () => import('@/views/annotations/List.vue'),
         meta: {
           root: 'annotations',
           activeLink: '/annotations/list',

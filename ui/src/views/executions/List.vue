@@ -22,16 +22,7 @@
             executions.executions.length > 0
           "
         >
-          <table
-            class="
-              table-auto
-              w-full
-              text-left
-              border-collapse
-              divide-y
-              border-t-2
-            "
-          >
+          <table class="table-auto w-full text-left border-collapse divide-y border-t-2">
             <thead>
               <tr>
                 <th class="py-3">{{ $t('projects.name') }}</th>
@@ -54,9 +45,7 @@
                     :class="['cursor-pointer', classes.aLinks]"
                     :title="$t('executions.uniqId')"
                     :to="'/executions/uniqid/' + execution.uniq_id"
-                  >
-                    {{ $t('see.by.uniqId') }} {{ execution.uniq_id }}
-                  </router-link>
+                  >{{ $t('see.by.uniqId') }} {{ execution.uniq_id }}</router-link>
                 </td>
                 <td class="px-2 py-3">{{ execution.branch }}</td>
                 <td class="px-2 py-3">
@@ -64,9 +53,7 @@
                     :class="['cursor-pointer', classes.aLinks]"
                     :title="$t('see.by.spec')"
                     :to="'/executions/' + execution.execution_id"
-                  >
-                    {{ execution.spec }}
-                  </router-link>
+                  >{{ execution.spec }}</router-link>
                 </td>
                 <td class="px-2 py-3">{{ execution.date }}</td>
               </tr>
@@ -82,16 +69,7 @@
             executions.byFilter.length > 0
           "
         >
-          <table
-            class="
-              table-auto
-              w-full
-              text-left
-              border-collapse
-              divide-y
-              border-t-2
-            "
-          >
+          <table class="table-auto w-full text-left border-collapse divide-y border-t-2">
             <thead>
               <tr>
                 <th class="py-3">{{ $t('projects.name') }}</th>
@@ -114,9 +92,7 @@
                     :class="['cursor-pointer', classes.aLinks]"
                     :title="$t('executions.uniqId')"
                     :to="'/executions/uniqid/' + execution.uniq_id"
-                  >
-                    {{ $t('see.by.uniqId') }} {{ execution.uniq_id }}
-                  </router-link>
+                  >{{ $t('see.by.uniqId') }} {{ execution.uniq_id }}</router-link>
                 </td>
                 <td class="px-2 py-3">{{ execution.branch }}</td>
                 <td class="px-2 py-3">
@@ -124,9 +100,7 @@
                     :class="['cursor-pointer', classes.aLinks]"
                     :title="$t('see.by.spec')"
                     :to="'/executions/' + execution.execution_id"
-                  >
-                    {{ execution.spec }}
-                  </router-link>
+                  >{{ execution.spec }}</router-link>
                 </td>
                 <td class="px-2 py-3">{{ execution.date }}</td>
               </tr>
@@ -141,13 +115,13 @@
 <script lang="ts">
 import { defineComponent, reactive, toRefs } from 'vue'
 import { useRoute } from 'vue-router'
-import Menu from '@views/menu/Menu.vue'
-import Title from '@components/commons/Title.vue'
-import SpinnerCommon from '@components/commons/SpinnerCommon.vue'
-import AlertMessage from '@components/commons/AlertMessage.vue'
-import SearchExecutionsByFilter from '@components/search/SearchExecutionsByFilter.vue'
-import Pagination from '@components/commons/Pagination.vue'
-import ExecutionsService, { Execution } from '@api/executionsService'
+import Menu from '@/views/menu/Menu.vue'
+import Title from '@/components/commons/Title.vue'
+import SpinnerCommon from '@/components/commons/SpinnerCommon.vue'
+import AlertMessage from '@/components/commons/AlertMessage.vue'
+import SearchExecutionsByFilter from '@/components/search/SearchExecutionsByFilter.vue'
+import Pagination from '@/components/commons/Pagination.vue'
+import ExecutionsService, { Execution } from '@/api/executionsService'
 import { useI18n } from 'vue-i18n'
 
 export default defineComponent({

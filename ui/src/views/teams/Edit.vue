@@ -27,14 +27,14 @@
 <script lang="ts">
 import { defineComponent, reactive, toRefs } from 'vue'
 import { useRoute } from 'vue-router'
-import Menu from '@views/menu/Menu.vue'
-import Title from '@components/commons/Title.vue'
-import SpinnerCommon from '@components/commons/SpinnerCommon.vue'
-import AlertMessage from '@components/commons/AlertMessage.vue'
+import Menu from '@/views/menu/Menu.vue'
+import Title from '@/components/commons/Title.vue'
+import SpinnerCommon from '@/components/commons/SpinnerCommon.vue'
+import AlertMessage from '@/components/commons/AlertMessage.vue'
 import { Form } from 'vee-validate'
 import CreateUpdateName from '@/components/commons/CreateUpdateName.vue'
-import SubmitButton from '@components/buttons/SubmitButton.vue'
-import TeamsService, { Team } from '@api/teamsService'
+import SubmitButton from '@/components/buttons/SubmitButton.vue'
+import TeamsService, { Team } from '@/api/teamsService'
 import { useI18n } from 'vue-i18n'
 
 export default defineComponent({

@@ -23,16 +23,7 @@
             environments.environments.length > 0
           "
         >
-          <table
-            class="
-              table-auto
-              w-full
-              text-left
-              border-collapse
-              divide-y
-              border-t-2
-            "
-          >
+          <table class="table-auto w-full text-left border-collapse divide-y border-t-2">
             <thead>
               <tr>
                 <th class="py-3">{{ $t('projects.name') }}</th>
@@ -54,9 +45,7 @@
                     :class="['cursor-pointer', classes.aLinks]"
                     :title="$t('edit.edit')"
                     :to="'/projects/edit/' + environment.project_id"
-                  >
-                    {{ environment.project_name }}
-                  </router-link>
+                  >{{ environment.project_name }}</router-link>
                 </td>
                 <td class="px-2 py-3">{{ environment.key }}</td>
                 <td class="px-2 py-3">{{ environment.value }}</td>
@@ -77,7 +66,7 @@
                         stroke-linejoin="round"
                         stroke-width="2"
                         d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
-                      ></path>
+                      />
                     </svg>
                   </router-link>
                 </td>
@@ -85,7 +74,7 @@
                   <router-link
                     class="cursor-pointer"
                     :title="$t('delete.delete')"
-                    to=""
+                    to
                     @click="
                       deleteItem(
                         index,
@@ -105,7 +94,7 @@
                         stroke-linejoin="round"
                         stroke-width="2"
                         d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
-                      ></path>
+                      />
                     </svg>
                   </router-link>
                 </td>
@@ -122,16 +111,7 @@
             environments.byFilter.length > 0
           "
         >
-          <table
-            class="
-              table-auto
-              w-full
-              text-left
-              border-collapse
-              divide-y
-              border-t-2
-            "
-          >
+          <table class="table-auto w-full text-left border-collapse divide-y border-t-2">
             <thead>
               <tr>
                 <th class="py-3">{{ $t('projects.name') }}</th>
@@ -153,9 +133,7 @@
                     :class="['cursor-pointer', classes.aLinks]"
                     :title="$t('edit.edit')"
                     :to="'/projects/edit/' + environment.project_id"
-                  >
-                    {{ environment.project_name }}
-                  </router-link>
+                  >{{ environment.project_name }}</router-link>
                 </td>
                 <td class="px-2 py-3">{{ environment.key }}</td>
                 <td class="px-2 py-3">{{ environment.value }}</td>
@@ -176,7 +154,7 @@
                         stroke-linejoin="round"
                         stroke-width="2"
                         d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
-                      ></path>
+                      />
                     </svg>
                   </router-link>
                 </td>
@@ -184,7 +162,7 @@
                   <router-link
                     class="cursor-pointer"
                     :title="$t('delete.delete')"
-                    to=""
+                    to
                     @click="
                       deleteItem(
                         index,
@@ -204,7 +182,7 @@
                         stroke-linejoin="round"
                         stroke-width="2"
                         d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
-                      ></path>
+                      />
                     </svg>
                   </router-link>
                 </td>
@@ -220,13 +198,13 @@
 <script lang="ts">
 import { defineComponent, reactive, toRefs } from 'vue'
 import { useRoute } from 'vue-router'
-import Menu from '@views/menu/Menu.vue'
-import Title from '@components/commons/Title.vue'
-import SpinnerCommon from '@components/commons/SpinnerCommon.vue'
-import AlertMessage from '@components/commons/AlertMessage.vue'
-import SearchEnvironmentsByFilter from '@components/search/SearchEnvironmentsByFilter.vue'
-import Pagination from '@components/commons/Pagination.vue'
-import EnvironmentsService, { Environments } from '@api/environmentsService'
+import Menu from '@/views/menu/Menu.vue'
+import Title from '@/components/commons/Title.vue'
+import SpinnerCommon from '@/components/commons/SpinnerCommon.vue'
+import AlertMessage from '@/components/commons/AlertMessage.vue'
+import SearchEnvironmentsByFilter from '@/components/search/SearchEnvironmentsByFilter.vue'
+import Pagination from '@/components/commons/Pagination.vue'
+import EnvironmentsService, { Environments } from '@/api/environmentsService'
 import { useI18n } from 'vue-i18n'
 
 export default defineComponent({

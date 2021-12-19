@@ -1,7 +1,7 @@
 import { RouteRecordRaw } from 'vue-router'
-import Create from '@views/teams/Create.vue'
-import Edit from '@views/teams/Edit.vue'
-import List from '@views/teams/List.vue'
+import Create from '@/views/teams/Create.vue'
+import Edit from '@/views/teams/Edit.vue'
+import List from '@/views/teams/List.vue'
 
 const routes: Array<RouteRecordRaw> = [
   {

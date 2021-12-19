@@ -3,7 +3,7 @@ import { RouteRecordRaw } from 'vue-router'
 const routes: Array<RouteRecordRaw> = [
   {
     path: '/projects/create',
-    component: () => import('@views/projects/Create.vue'),
+    component: () => import('@/views/projects/Create.vue'),
     meta: {
       root: 'projects',
       activeLink: '/projects/create',
@@ -11,7 +11,7 @@ const routes: Array<RouteRecordRaw> = [
   },
   {
     path: '/projects/edit/:id',
-    component: () => import('@views/projects/Edit.vue'),
+    component: () => import('@/views/projects/Edit.vue'),
     meta: {
       root: 'projects',
       activeLink: '/projects/edit',
@@ -19,7 +19,7 @@ const routes: Array<RouteRecordRaw> = [
   },
   {
     path: '/projects/list',
-    component: () => import('@views/projects/List.vue'),
+    component: () => import('@/views/projects/List.vue'),
     meta: {
       root: 'projects',
       activeLink: '/projects/list',
@@ -27,7 +27,7 @@ const routes: Array<RouteRecordRaw> = [
     children: [
       {
         path: ':page',
-        component: () => import('@views/projects/List.vue'),
+        component: () => import('@/views/projects/List.vue'),
         meta: {
           root: 'projects',
           activeLink: '/projects/list',

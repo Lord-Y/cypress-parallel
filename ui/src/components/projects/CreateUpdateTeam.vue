@@ -1,8 +1,10 @@
 <template>
   <div class="mt-4">
-    <label :for="id" class="block w-full pb-1">{{
-      $t('teams.teams', 2)
-    }}</label>
+    <label :for="id" class="block w-full pb-1">
+      {{
+        $t('teams.teams', 2)
+      }}
+    </label>
     <Field
       as=""
       :name="name"
@@ -14,26 +16,15 @@
       <select
         v-bind="field"
         :id="id"
-        class="
-          block
-          w-full
-          border-gray-300
-          focus:outline-none
-          focus:border-green-500
-          focus:ring-green-500
-        "
+        class="block w-full border-gray-300 focus:outline-none focus:border-green-500 focus:ring-green-500"
         :class="getValidationClass(meta)"
       >
-        <option value="" disabled>
-          {{ $t('select.selectYourChoice') }}
-        </option>
+        <option value disabled>{{ $t('select.selectYourChoice') }}</option>
         <option
           v-for="(team, index) in teams"
           :value="team.team_id"
           :key="index"
-        >
-          {{ team.team_name }}
-        </option>
+        >{{ team.team_name }}</option>
       </select>
       <span v-if="errorMessage" class="text-red-500">{{ errorMessage }}</span>
     </Field>
@@ -43,7 +34,7 @@
 <script lang="ts">
 import { defineComponent, PropType, ref } from 'vue'
 import { Field } from 'vee-validate'
-import { Teams } from '@api/teamsService'
+import { Teams } from '@/api/teamsService'
 import { defineRule } from 'vee-validate'
 import { required } from '@vee-validate/rules'
 defineRule('required', required)

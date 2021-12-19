@@ -18,11 +18,9 @@
       "@intlify/vite-plugin-vue-i18n/client"
     ],
     "paths": {
-      "@/*": ["./src/*"],
-      "@router/*": ["./src/router/*"],
-      "@components/*": ["./src/components/*"],
-      "@views/*": ["./src/views/*"],
-      "@api/*": ["./src/api/*"]
+      "@/*": [
+        "./src/*"
+      ],
     },
   },
   "include": [

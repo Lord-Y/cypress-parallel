@@ -37,17 +37,17 @@
 <script lang="ts">
 import { defineComponent, reactive, toRefs } from 'vue'
 import { useI18n } from 'vue-i18n'
-import Menu from '@views/menu/Menu.vue'
-import Title from '@components/commons/Title.vue'
-import SpinnerCommon from '@components/commons/SpinnerCommon.vue'
-import AlertMessage from '@components/commons/AlertMessage.vue'
+import Menu from '@/views/menu/Menu.vue'
+import Title from '@/components/commons/Title.vue'
+import SpinnerCommon from '@/components/commons/SpinnerCommon.vue'
+import AlertMessage from '@/components/commons/AlertMessage.vue'
 import { Form } from 'vee-validate'
-import CreateUpdateProject from '@components/commons/CreateUpdateProject.vue'
+import CreateUpdateProject from '@/components/commons/CreateUpdateProject.vue'
 import CreateUpdateKey from '@/components/commons/CreateUpdateKey.vue'
 import CreateUpdateValue from '@/components/commons/CreateUpdateValue.vue'
-import SubmitButton from '@components/buttons/SubmitButton.vue'
-import ProjectsService, { ProjectOnly } from '@api/projectsService'
-import EnvironmentsService from '@api/environmentsService'
+import SubmitButton from '@/components/buttons/SubmitButton.vue'
+import ProjectsService, { ProjectOnly } from '@/api/projectsService'
+import EnvironmentsService from '@/api/environmentsService'
 
 export default defineComponent({
   components: {

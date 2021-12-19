@@ -1,8 +1,10 @@
 <template>
   <div class="mt-4">
-    <label :for="id" class="block w-full pb-1">{{
+    <label :for="id" class="block w-full pb-1">
+      {{
       $t('projects.name', 2)
-    }}</label>
+      }}
+    </label>
     <Field
       as=""
       :name="name"
@@ -14,26 +16,15 @@
       <select
         v-bind="field"
         :id="id"
-        class="
-          block
-          w-full
-          border-gray-300
-          focus:outline-none
-          focus:border-green-500
-          focus:ring-green-500
-        "
+        class="block w-full border-gray-300 focus:outline-none focus:border-green-500 focus:ring-green-500"
         :class="getValidationClass(meta)"
       >
-        <option value="" disabled>
-          {{ $t('select.selectYourChoice') }}
-        </option>
+        <option value disabled>{{ $t('select.selectYourChoice') }}</option>
         <option
           v-for="(project, index) in projects"
           :value="String(project.project_id)"
           :key="index"
-        >
-          {{ project.project_name }}
-        </option>
+        >{{ project.project_name }}</option>
       </select>
       <span v-if="errorMessage" class="text-red-500">{{ errorMessage }}</span>
     </Field>
@@ -43,7 +34,7 @@
 <script lang="ts">
 import { defineComponent, PropType, ref } from 'vue'
 import { Field } from 'vee-validate'
-import { ProjectOnly } from '@api/projectsService'
+import { ProjectOnly } from '@/api/projectsService'
 import { defineRule } from 'vee-validate'
 import { required } from '@vee-validate/rules'
 defineRule('required', required)

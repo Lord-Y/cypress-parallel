@@ -5,15 +5,7 @@
         type="text"
         :id="id"
         name="searchByFilter"
-        class="
-          block
-          w-full
-          border-gray-300
-          focus:outline-none
-          focus:border-green-500
-          focus:ring-green-500
-          text-center
-        "
+        class="block w-full border-gray-300 focus:outline-none focus:border-green-500 focus:ring-green-500 text-center"
         :placeholder="$t('projects.search')"
         autocomplete="off"
         v-model.trim="search.byFilter"
@@ -21,31 +13,16 @@
       />
       <button
         type="button"
-        class="
-          absolute
-          inset-y-0
-          right-0
-          flex
-          items-center
-          px-4
-          font-bold
-          text-white
-          bg-green-500
-        "
+        class="absolute inset-y-0 right-0 flex items-center px-4 font-bold text-white bg-green-500"
         @click="clear"
       >
-        <svg
-          class="w-6 h-6"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-        >
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path
             stroke-linecap="round"
             stroke-linejoin="round"
             stroke-width="2"
             d="M6 18L18 6M6 6l12 12"
-          ></path>
+          />
         </svg>
       </button>
     </div>
@@ -54,7 +31,7 @@
 
 <script lang="ts">
 import { defineComponent, reactive, toRefs } from 'vue'
-import ExecutionsService, { Execution } from '@api/executionsService'
+import ExecutionsService, { Execution } from '@/api/executionsService'
 import { useI18n } from 'vue-i18n'
 
 export default defineComponent({

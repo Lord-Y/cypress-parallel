@@ -3,7 +3,7 @@ import { RouteRecordRaw } from 'vue-router'
 const routes: Array<RouteRecordRaw> = [
   {
     path: '/environments/create',
-    component: () => import('@views/environments/Create.vue'),
+    component: () => import('@/views/environments/Create.vue'),
     meta: {
       root: 'environments',
       activeLink: '/environments/create',
@@ -11,7 +11,7 @@ const routes: Array<RouteRecordRaw> = [
   },
   {
     path: '/environments/edit/:id',
-    component: () => import('@views/environments/Edit.vue'),
+    component: () => import('@/views/environments/Edit.vue'),
     meta: {
       root: 'environments',
       activeLink: '/environments/edit',
@@ -19,7 +19,7 @@ const routes: Array<RouteRecordRaw> = [
   },
   {
     path: '/environments/list',
-    component: () => import('@views/environments/List.vue'),
+    component: () => import('@/views/environments/List.vue'),
     meta: {
       root: 'environments',
       activeLink: '/environments/list',
@@ -27,7 +27,7 @@ const routes: Array<RouteRecordRaw> = [
     children: [
       {
         path: ':page',
-        component: () => import('@views/environments/List.vue'),
+        component: () => import('@/views/environments/List.vue'),
         meta: {
           root: 'environments',
           activeLink: '/environments/list',

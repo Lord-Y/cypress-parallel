@@ -38,14 +38,8 @@
               :password="project.password"
               v-model:updatePassword="form.password"
             />
-            <CreateUpdateBranch
-              :branch="project.branch"
-              v-model:updateBranch="form.branch"
-            />
-            <CreateUpdateSpecs
-              :specs="project.specs"
-              v-model:updateSpecs="form.specs"
-            />
+            <CreateUpdateBranch :branch="project.branch" v-model:updateBranch="form.branch" />
+            <CreateUpdateSpecs :specs="project.specs" v-model:updateSpecs="form.specs" />
             <CreateUpdateSchedulingEnabled
               :scheduling-enabled="project.scheduling_enabled"
               v-model:updateSchedulingEnabled="form.schedulingEnabled"
@@ -67,10 +61,7 @@
               :timeout="Number(project.timeout)"
               v-model:updateTimeout="form.timeout"
             />
-            <CreateUpdateBrowser
-              :browser="project.browser"
-              v-model:updateBrowser="form.browser"
-            />
+            <CreateUpdateBrowser :browser="project.browser" v-model:updateBrowser="form.browser" />
             <CreateUpdateConfigFile
               :config-file="project.config_file"
               v-model:updateConfigFile="form.config_file"
@@ -87,28 +78,28 @@
 import { defineComponent, reactive, toRefs } from 'vue'
 import { useRoute } from 'vue-router'
 import { useI18n } from 'vue-i18n'
-import Menu from '@views/menu/Menu.vue'
-import Title from '@components/commons/Title.vue'
-import SpinnerCommon from '@components/commons/SpinnerCommon.vue'
-import AlertMessage from '@components/commons/AlertMessage.vue'
+import Menu from '@/views/menu/Menu.vue'
+import Title from '@/components/commons/Title.vue'
+import SpinnerCommon from '@/components/commons/SpinnerCommon.vue'
+import AlertMessage from '@/components/commons/AlertMessage.vue'
 import { Form } from 'vee-validate'
-import CreateUpdateTeam from '@components/projects/CreateUpdateTeam.vue'
-import CreateUpdateName from '@components/commons/CreateUpdateName.vue'
-import CreateUpdateRepository from '@components/projects/CreateUpdateRepository.vue'
-import CreateUpdateUsername from '@components/projects/CreateUpdateUsername.vue'
-import CreateUpdatePassword from '@components/projects/CreateUpdatePassword.vue'
-import CreateUpdateBranch from '@components/projects/CreateUpdateBranch.vue'
-import CreateUpdateSpecs from '@components/projects/CreateUpdateSpecs.vue'
-import CreateUpdateSchedulingEnabled from '@components/projects/CreateUpdateSchedulingEnabled.vue'
-import CreateUpdateScheduling from '@components/projects/CreateUpdateScheduling.vue'
-import CreateUpdateMaxPods from '@components/projects/CreateUpdateMaxPods.vue'
-import CreateUpdateCypressDockerVersion from '@components/projects/CreateUpdateCypressDockerVersion.vue'
-import CreateUpdateTimeout from '@components/projects/CreateUpdateTimeout.vue'
-import CreateUpdateBrowser from '@components/projects/CreateUpdateBrowser.vue'
-import CreateUpdateConfigFile from '@components/projects/CreateUpdateConfigFile.vue'
-import SubmitButton from '@components/buttons/SubmitButton.vue'
-import TeamsService, { Teams } from '@api/teamsService'
-import ProjectsService, { Project } from '@api/projectsService'
+import CreateUpdateTeam from '@/components/projects/CreateUpdateTeam.vue'
+import CreateUpdateName from '@/components/commons/CreateUpdateName.vue'
+import CreateUpdateRepository from '@/components/projects/CreateUpdateRepository.vue'
+import CreateUpdateUsername from '@/components/projects/CreateUpdateUsername.vue'
+import CreateUpdatePassword from '@/components/projects/CreateUpdatePassword.vue'
+import CreateUpdateBranch from '@/components/projects/CreateUpdateBranch.vue'
+import CreateUpdateSpecs from '@/components/projects/CreateUpdateSpecs.vue'
+import CreateUpdateSchedulingEnabled from '@/components/projects/CreateUpdateSchedulingEnabled.vue'
+import CreateUpdateScheduling from '@/components/projects/CreateUpdateScheduling.vue'
+import CreateUpdateMaxPods from '@/components/projects/CreateUpdateMaxPods.vue'
+import CreateUpdateCypressDockerVersion from '@/components/projects/CreateUpdateCypressDockerVersion.vue'
+import CreateUpdateTimeout from '@/components/projects/CreateUpdateTimeout.vue'
+import CreateUpdateBrowser from '@/components/projects/CreateUpdateBrowser.vue'
+import CreateUpdateConfigFile from '@/components/projects/CreateUpdateConfigFile.vue'
+import SubmitButton from '@/components/buttons/SubmitButton.vue'
+import TeamsService, { Teams } from '@/api/teamsService'
+import ProjectsService, { Project } from '@/api/projectsService'
 
 export default defineComponent({
   components: {
