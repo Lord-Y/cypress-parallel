@@ -27,46 +27,34 @@ export interface Annotation {
 
 class AnnotationsService {
   async create(data: any): Promise<any> {
-    return await axiosClient.post(
-      '/api/v1/cypress-parallel-api/annotations',
-      data,
-    )
+    return await axiosClient.post('/api/v1/annotations', data)
   }
 
   async get(id: number): Promise<any> {
-    return await axiosClient.get<any>(
-      `/api/v1/cypress-parallel-api/annotations/${id}`,
-    )
+    return await axiosClient.get<any>(`/api/v1/annotations/${id}`)
   }
 
   async list(page = 1): Promise<any> {
-    return await axiosClient.get<any>(
-      `/api/v1/cypress-parallel-api/annotations/list?page=${page}`,
-    )
+    return await axiosClient.get<any>(`/api/v1/annotations/list?page=${page}`)
   }
 
   async update(data: any): Promise<any> {
-    return await axiosClient.put(
-      '/api/v1/cypress-parallel-api/annotations',
-      data,
-    )
+    return await axiosClient.put('/api/v1/annotations', data)
   }
 
   async delete(id: number): Promise<any> {
-    return await axiosClient.delete<any>(
-      `/api/v1/cypress-parallel-api/annotations/${id}`,
-    )
+    return await axiosClient.delete<any>(`/api/v1/annotations/${id}`)
   }
 
   async search(q: string, page = 1): Promise<any> {
     return await axiosClient.get<any>(
-      `/api/v1/cypress-parallel-api/annotations/search?q=${q}&page=${page}`,
+      `/api/v1/annotations/search?q=${q}&page=${page}`,
     )
   }
 
   async projectID(id: number): Promise<any> {
     return await axiosClient.get<any>(
-      `/api/v1/cypress-parallel-api/annotations/list/by/projectid/${id}`,
+      `/api/v1/annotations/list/by/projectid/${id}`,
     )
   }
 }

@@ -1,9 +1,7 @@
 <template>
   <div class="mt-4">
     <label :for="id" class="block w-full pb-1">
-      {{
-      $t('projects.name', 2)
-      }}
+      {{ $t('projects.name', 2) }}
     </label>
     <Field
       as=""
@@ -24,7 +22,9 @@
           v-for="(project, index) in projects"
           :value="String(project.project_id)"
           :key="index"
-        >{{ project.project_name }}</option>
+        >
+          {{ project.project_name }}
+        </option>
       </select>
       <span v-if="errorMessage" class="text-red-500">{{ errorMessage }}</span>
     </Field>

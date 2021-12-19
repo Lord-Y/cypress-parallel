@@ -38,8 +38,14 @@
               :password="project.password"
               v-model:updatePassword="form.password"
             />
-            <CreateUpdateBranch :branch="project.branch" v-model:updateBranch="form.branch" />
-            <CreateUpdateSpecs :specs="project.specs" v-model:updateSpecs="form.specs" />
+            <CreateUpdateBranch
+              :branch="project.branch"
+              v-model:updateBranch="form.branch"
+            />
+            <CreateUpdateSpecs
+              :specs="project.specs"
+              v-model:updateSpecs="form.specs"
+            />
             <CreateUpdateSchedulingEnabled
               :scheduling-enabled="project.scheduling_enabled"
               v-model:updateSchedulingEnabled="form.schedulingEnabled"
@@ -61,7 +67,10 @@
               :timeout="Number(project.timeout)"
               v-model:updateTimeout="form.timeout"
             />
-            <CreateUpdateBrowser :browser="project.browser" v-model:updateBrowser="form.browser" />
+            <CreateUpdateBrowser
+              :browser="project.browser"
+              v-model:updateBrowser="form.browser"
+            />
             <CreateUpdateConfigFile
               :config-file="project.config_file"
               v-model:updateConfigFile="form.config_file"

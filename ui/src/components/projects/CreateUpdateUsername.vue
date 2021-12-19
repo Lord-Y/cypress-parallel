@@ -10,14 +10,7 @@
       :name="name"
       :placeholder="$t('projects.username').toLowerCase()"
       autocomplete="off"
-      class="
-        block
-        w-full
-        border-gray-300
-        focus:outline-none
-        focus:border-green-500
-        focus:ring-green-500
-      "
+      class="block w-full border-gray-300 focus:outline-none focus:border-green-500 focus:ring-green-500"
     />
   </div>
 </template>

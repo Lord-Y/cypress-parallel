@@ -21,38 +21,32 @@ export interface Team {
 
 class TeamsService {
   async create(data: any): Promise<any> {
-    return await axiosClient.post('/api/v1/cypress-parallel-api/teams', data)
+    return await axiosClient.post('/api/v1/teams', data)
   }
 
   async get(id: number): Promise<any> {
-    return await axiosClient.get<any>(
-      `/api/v1/cypress-parallel-api/teams/${id}`,
-    )
+    return await axiosClient.get<any>(`/api/v1/teams/${id}`)
   }
 
   async list(page = 1): Promise<any> {
-    return await axiosClient.get<any>(
-      `/api/v1/cypress-parallel-api/teams/list?page=${page}`,
-    )
+    return await axiosClient.get<any>(`/api/v1/teams/list?page=${page}`)
   }
 
   async all(): Promise<any> {
-    return await axiosClient.get<any>(`/api/v1/cypress-parallel-api/teams/all`)
+    return await axiosClient.get<any>(`/api/v1/teams/all`)
   }
 
   async update(data: any): Promise<any> {
-    return await axiosClient.put('/api/v1/cypress-parallel-api/teams', data)
+    return await axiosClient.put('/api/v1/teams', data)
   }
 
   async delete(id: number): Promise<any> {
-    return await axiosClient.delete<any>(
-      `/api/v1/cypress-parallel-api/teams/${id}`,
-    )
+    return await axiosClient.delete<any>(`/api/v1/teams/${id}`)
   }
 
   async search(q: string, page = 1): Promise<any> {
     return await axiosClient.get<any>(
-      `/api/v1/cypress-parallel-api/teams/search?q=${q}&page=${page}`,
+      `/api/v1/teams/search?q=${q}&page=${page}`,
     )
   }
 }

@@ -6,9 +6,15 @@
         <Title :title="$t('teams.create')" />
         <SpinnerCommon v-if="loading.loading.active" />
         <AlertMessage :message="alert.message" :classes="alert.class" />
-        <div class="mx-auto px-3 mt-20 w-full sm:max-w-2xl" v-if="!loading.loading.active">
+        <div
+          class="mx-auto px-3 mt-20 w-full sm:max-w-2xl"
+          v-if="!loading.loading.active"
+        >
           <Form @submit="submit">
-            <CreateUpdateName v-model:updateName="form.name" :translation="$t('teams.name')" />
+            <CreateUpdateName
+              v-model:updateName="form.name"
+              :translation="$t('teams.name')"
+            />
             <SubmitButton :text="$t('button.submit')" />
           </Form>
         </div>

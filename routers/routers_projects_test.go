@@ -38,7 +38,7 @@ func TestProjectsCreate(t *testing.T) {
 	payload += "&browser=chrome"
 
 	router := SetupRouter()
-	w, _ := performRequest(router, headers, "POST", "/api/v1/cypress-parallel-api/projects", payload)
+	w, _ := performRequest(router, headers, "POST", "/api/v1/projects", payload)
 	assert.Equal(201, w.Code)
 }
 
@@ -65,7 +65,7 @@ func TestProjectsCreate_fail(t *testing.T) {
 	payload += fmt.Sprintf("&cypress_docker_version=%s", tools.RandomValueFromSlice(cypressVersions))
 
 	router := SetupRouter()
-	w, _ := performRequest(router, headers, "POST", "/api/v1/cypress-parallel-api/projects", payload)
+	w, _ := performRequest(router, headers, "POST", "/api/v1/projects", payload)
 	assert.Equal(201, w.Code)
 }
 
@@ -81,7 +81,7 @@ func TestProjectsRead(t *testing.T) {
 		return
 	}
 	router := SetupRouter()
-	w, _ := performRequest(router, headers, "GET", fmt.Sprintf("/api/v1/cypress-parallel-api/projects/%s", result["project_id"]), "")
+	w, _ := performRequest(router, headers, "GET", fmt.Sprintf("/api/v1/projects/%s", result["project_id"]), "")
 	assert.Contains(w.Body.String(), "name")
 }
 
@@ -91,7 +91,7 @@ func TestProjectsList(t *testing.T) {
 	headers["Content-Type"] = "application/x-www-form-urlencoded"
 
 	router := SetupRouter()
-	w, _ := performRequest(router, headers, "GET", "/api/v1/cypress-parallel-api/projects/list", "")
+	w, _ := performRequest(router, headers, "GET", "/api/v1/projects/list", "")
 	assert.Contains(w.Body.String(), "name")
 }
 
@@ -119,7 +119,7 @@ func TestProjectsCreateMulti(t *testing.T) {
 		payload += fmt.Sprintf("&maxPods=%d", fake.MonthNum())
 		payload += "&browser=chrome"
 
-		w, _ := performRequest(router, headers, "POST", "/api/v1/cypress-parallel-api/projects", payload)
+		w, _ := performRequest(router, headers, "POST", "/api/v1/projects", payload)
 		assert.Equal(201, w.Code)
 	}
 }
@@ -147,7 +147,7 @@ func TestProjectsUpdate(t *testing.T) {
 	payload += fmt.Sprintf("&browser=%s", result["browser"])
 
 	router := SetupRouter()
-	w, _ := performRequest(router, headers, "PUT", "/api/v1/cypress-parallel-api/projects", payload)
+	w, _ := performRequest(router, headers, "PUT", "/api/v1/projects", payload)
 	assert.Equal(200, w.Code)
 }
 
@@ -164,7 +164,7 @@ func TestProjectsDelete(t *testing.T) {
 	}
 
 	router := SetupRouter()
-	w, _ := performRequest(router, headers, "DELETE", fmt.Sprintf("/api/v1/cypress-parallel-api/projects/%s", result["project_id"]), "")
+	w, _ := performRequest(router, headers, "DELETE", fmt.Sprintf("/api/v1/projects/%s", result["project_id"]), "")
 	assert.Equal(200, w.Code)
 }
 
@@ -181,12 +181,12 @@ func TestProjectsSearch(t *testing.T) {
 	}
 
 	router := SetupRouter()
-	w, _ := performRequest(router, headers, "GET", fmt.Sprintf("/api/v1/cypress-parallel-api/projects/search?q=%s", result["project_name"]), "")
+	w, _ := performRequest(router, headers, "GET", fmt.Sprintf("/api/v1/projects/search?q=%s", result["project_name"]), "")
 	if len(result) > 0 {
 		assert.Contains(w.Body.String(), "project_name")
 		return
 	}
-	w, _ = performRequest(router, headers, "GET", "/api/v1/cypress-parallel-api/projects/search?q=", "")
+	w, _ = performRequest(router, headers, "GET", "/api/v1/projects/search?q=", "")
 	assert.Equal(400, w.Code)
 }
 
@@ -197,6 +197,6 @@ func TestProjectsAll(t *testing.T) {
 
 	TestTeamsCreate(t)
 	router := SetupRouter()
-	w, _ := performRequest(router, headers, "GET", "/api/v1/cypress-parallel-api/projects/all", "")
+	w, _ := performRequest(router, headers, "GET", "/api/v1/projects/all", "")
 	assert.Contains(w.Body.String(), "name")
 }

@@ -10,7 +10,9 @@
           class="mx-auto px-3 mt-20 w-full overflow-auto"
           v-if="!loading.loading.active && executions.length > 0"
         >
-          <table class="table-auto w-full text-left border-collapse divide-y border-t-2">
+          <table
+            class="table-auto w-full text-left border-collapse divide-y border-t-2"
+          >
             <thead>
               <tr>
                 <th class="py-3">{{ $t('projects.name') }}</th>
@@ -38,20 +40,27 @@
                     :class="['cursor-pointer', classes.aLinks]"
                     :title="$t('see.by.spec')"
                     :to="'/executions/' + execution.execution_id"
-                  >{{ execution.spec }}</router-link>
+                    >{{ execution.spec }}</router-link
+                  >
                 </td>
                 <td
                   class="px-2 py-3"
                   :class="getGlobalStatus(execution, 'classes')"
-                >{{ getGlobalStatus(execution, '') }}</td>
+                >
+                  {{ getGlobalStatus(execution, '') }}
+                </td>
                 <td
                   class="px-2 py-3"
                   :class="getSystemStatus(execution.execution_status)"
-                >{{ execution.execution_status }}</td>
+                >
+                  {{ execution.execution_status }}
+                </td>
                 <td
                   class="px-2 py-3"
                   :class="getGlobalStatus(execution, 'classes')"
-                >{{ getSpecStatus(execution) }}</td>
+                >
+                  {{ getSpecStatus(execution) }}
+                </td>
                 <td class="px-2 py-3">{{ execution.date }}</td>
               </tr>
             </tbody>

@@ -51,13 +51,13 @@ func TestHooksPlainCreate(t *testing.T) {
 			payload += fmt.Sprintf("&branch=%s", tc.branch)
 			payload += fmt.Sprintf("&specs=%s", tools.RandomValueFromSlice(specs))
 		}
-		w, _ := performRequest(router, headers, "POST", "/api/v1/cypress-parallel-api/hooks/launch/plain", payload)
+		w, _ := performRequest(router, headers, "POST", "/api/v1/hooks/launch/plain", payload)
 		assert.Equal(tc.statusCode, w.Code)
 	}
 
 	payload := fmt.Sprintf("project_name=%s", result["project_name"])
 	payload += "&branch=master"
 	payload += fmt.Sprintf("&specs=bad_%s", tools.RandomValueFromSlice(specs))
-	w, _ := performRequest(router, headers, "POST", "/api/v1/cypress-parallel-api/hooks/launch/plain", payload)
+	w, _ := performRequest(router, headers, "POST", "/api/v1/hooks/launch/plain", payload)
 	assert.Equal(400, w.Code)
 }

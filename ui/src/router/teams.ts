@@ -14,7 +14,7 @@ const routes: Array<RouteRecordRaw> = [
     props: {
       url: {
         api: {
-          default: '/api/v1/cypress-parallel-api/teams',
+          default: '/api/v1/teams',
         },
       },
     },
@@ -29,7 +29,7 @@ const routes: Array<RouteRecordRaw> = [
     props: {
       url: {
         api: {
-          default: '/api/v1/cypress-parallel-api/teams',
+          default: '/api/v1/teams',
         },
       },
     },
@@ -44,7 +44,7 @@ const routes: Array<RouteRecordRaw> = [
     props: {
       url: {
         api: {
-          default: '/api/v1/cypress-parallel-api/teams',
+          default: '/api/v1/teams',
         },
       },
     },
@@ -59,7 +59,7 @@ const routes: Array<RouteRecordRaw> = [
         props: {
           url: {
             api: {
-              default: '/api/v1/cypress-parallel-api/teams',
+              default: '/api/v1/teams',
             },
           },
         },

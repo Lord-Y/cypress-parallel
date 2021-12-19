@@ -25,7 +25,9 @@
             projects.projects.length > 0
           "
         >
-          <table class="table-auto w-full text-left border-collapse divide-y border-t-2">
+          <table
+            class="table-auto w-full text-left border-collapse divide-y border-t-2"
+          >
             <thead>
               <tr>
                 <th class="py-3">{{ $t('teams.name') }}</th>
@@ -49,7 +51,8 @@
                     :class="['cursor-pointer', classes.aLinks]"
                     :title="$t('edit.edit')"
                     :to="'/teams/edit/' + project.team_id"
-                  >{{ project.project_name }}</router-link>
+                    >{{ project.project_name }}</router-link
+                  >
                 </td>
                 <td class="px-2 py-3">{{ project.project_name }}</td>
                 <td class="px-2 py-3">{{ project.branch }}</td>
@@ -60,7 +63,12 @@
                     to
                     @click="launch(project)"
                   >
-                    <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg
+                      class="w-10 h-10"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
                       <path
                         stroke-linecap="round"
                         stroke-linejoin="round"
@@ -83,7 +91,12 @@
                     to
                     @click="duplicate(project.project_id)"
                   >
-                    <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg
+                      class="w-10 h-10"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
                       <path
                         stroke-linecap="round"
                         stroke-linejoin="round"
@@ -149,7 +162,9 @@
             projects.byFilter.length > 0
           "
         >
-          <table class="table-auto w-full text-left border-collapse divide-y border-t-2">
+          <table
+            class="table-auto w-full text-left border-collapse divide-y border-t-2"
+          >
             <thead>
               <tr>
                 <th class="py-3">{{ $t('teams.name') }}</th>
@@ -173,7 +188,8 @@
                     :class="['cursor-pointer', classes.aLinks]"
                     :title="$t('edit.edit')"
                     :to="'/teams/edit/' + project.team_id"
-                  >{{ project.project_name }}</router-link>
+                    >{{ project.project_name }}</router-link
+                  >
                 </td>
                 <td class="px-2 py-3">{{ project.project_name }}</td>
                 <td class="px-2 py-3">{{ project.branch }}</td>
@@ -184,7 +200,12 @@
                     to
                     @click="launch(project)"
                   >
-                    <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg
+                      class="w-10 h-10"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
                       <path
                         stroke-linecap="round"
                         stroke-linejoin="round"
@@ -207,7 +228,12 @@
                     to
                     @click="duplicate(project.project_id)"
                   >
-                    <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg
+                      class="w-10 h-10"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
                       <path
                         stroke-linecap="round"
                         stroke-linejoin="round"

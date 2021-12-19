@@ -23,7 +23,9 @@
             annotations.annotations.length > 0
           "
         >
-          <table class="table-auto w-full text-left border-collapse divide-y border-t-2">
+          <table
+            class="table-auto w-full text-left border-collapse divide-y border-t-2"
+          >
             <thead>
               <tr>
                 <th class="py-3">{{ $t('projects.name') }}</th>
@@ -45,7 +47,8 @@
                     :class="['cursor-pointer', classes.aLinks]"
                     :title="$t('edit.edit')"
                     :to="'/projects/edit/' + annotation.project_id"
-                  >{{ annotation.project_name }}</router-link>
+                    >{{ annotation.project_name }}</router-link
+                  >
                 </td>
                 <td class="px-2 py-3">{{ annotation.key }}</td>
                 <td class="px-2 py-3">{{ annotation.value }}</td>
@@ -107,7 +110,9 @@
             annotations.byFilter.length > 0
           "
         >
-          <table class="table-auto w-full text-left border-collapse divide-y border-t-2">
+          <table
+            class="table-auto w-full text-left border-collapse divide-y border-t-2"
+          >
             <thead>
               <tr>
                 <th class="py-3">{{ $t('projects.name') }}</th>
@@ -129,7 +134,8 @@
                     :class="['cursor-pointer', classes.aLinks]"
                     :title="$t('edit.edit')"
                     :to="'/projects/edit/' + annotation.project_id"
-                  >{{ annotation.project_name }}</router-link>
+                    >{{ annotation.project_name }}</router-link
+                  >
                 </td>
                 <td class="px-2 py-3">{{ annotation.key }}</td>
                 <td class="px-2 py-3">{{ annotation.value }}</td>

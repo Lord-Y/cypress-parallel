@@ -51,7 +51,7 @@ func TestEnvironmentsCreate(t *testing.T) {
 		payload := fmt.Sprintf("projectId=%s", result["project_id"])
 		payload += fmt.Sprintf("&key=%s", tc.key)
 		payload += fmt.Sprintf("&value=%s", tc.value)
-		w, _ := performRequest(router, headers, "POST", "/api/v1/cypress-parallel-api/environments", payload)
+		w, _ := performRequest(router, headers, "POST", "/api/v1/environments", payload)
 		assert.Equal(tc.statusCode, w.Code)
 	}
 }
@@ -73,7 +73,7 @@ func TestEnvironmentsUpdate(t *testing.T) {
 	payload += fmt.Sprintf("&environmentId=%s", result["environment_id"])
 	payload += fmt.Sprintf("&key=%s", fake.Word())
 	payload += fmt.Sprintf("&value=%s", fake.CharactersN(5))
-	w, _ := performRequest(router, headers, "PUT", "/api/v1/cypress-parallel-api/environments", payload)
+	w, _ := performRequest(router, headers, "PUT", "/api/v1/environments", payload)
 	assert.Equal(200, w.Code)
 }
 
@@ -92,7 +92,7 @@ func TestEnvironmentsUpdate_fail(t *testing.T) {
 	router := SetupRouter()
 	payload := fmt.Sprintf("projectId=%s", result["project_id"])
 	payload += fmt.Sprintf("&environmentId=%s", result["environment_id"])
-	w, _ := performRequest(router, headers, "PUT", "/api/v1/cypress-parallel-api/environments", payload)
+	w, _ := performRequest(router, headers, "PUT", "/api/v1/environments", payload)
 	assert.Equal(400, w.Code)
 }
 
@@ -102,7 +102,7 @@ func TestEnvironmentsList(t *testing.T) {
 	headers["Content-Type"] = "application/x-www-form-urlencoded"
 
 	router := SetupRouter()
-	w, _ := performRequest(router, headers, "GET", "/api/v1/cypress-parallel-api/environments/list", "")
+	w, _ := performRequest(router, headers, "GET", "/api/v1/environments/list", "")
 	assert.Contains(w.Body.String(), "environment_id")
 }
 
@@ -119,7 +119,7 @@ func TestEnvironmentsRead(t *testing.T) {
 	}
 
 	router := SetupRouter()
-	w, _ := performRequest(router, headers, "GET", fmt.Sprintf("/api/v1/cypress-parallel-api/environments/%s", result["environment_id"]), "")
+	w, _ := performRequest(router, headers, "GET", fmt.Sprintf("/api/v1/environments/%s", result["environment_id"]), "")
 	assert.Contains(w.Body.String(), "key")
 }
 
@@ -136,7 +136,7 @@ func TestEnvironmentsDelete(t *testing.T) {
 	}
 
 	router := SetupRouter()
-	w, _ := performRequest(router, headers, "DELETE", fmt.Sprintf("/api/v1/cypress-parallel-api/environments/%s", result["environment_id"]), "")
+	w, _ := performRequest(router, headers, "DELETE", fmt.Sprintf("/api/v1/environments/%s", result["environment_id"]), "")
 	assert.Equal(200, w.Code)
 }
 
@@ -153,12 +153,12 @@ func TestEnvironmentsSearch(t *testing.T) {
 	}
 
 	router := SetupRouter()
-	w, _ := performRequest(router, headers, "GET", fmt.Sprintf("/api/v1/cypress-parallel-api/environments/search?q=%s", result["key"]), "")
+	w, _ := performRequest(router, headers, "GET", fmt.Sprintf("/api/v1/environments/search?q=%s", result["key"]), "")
 	if len(result) > 0 {
 		assert.Contains(w.Body.String(), "key")
 		return
 	}
-	w, _ = performRequest(router, headers, "GET", "/api/v1/cypress-parallel-api/environments/search?q=", "")
+	w, _ = performRequest(router, headers, "GET", "/api/v1/environments/search?q=", "")
 	assert.Equal(400, w.Code)
 }
 
@@ -175,6 +175,6 @@ func TestEnvironmentsByProjectID(t *testing.T) {
 	}
 
 	router := SetupRouter()
-	w, _ := performRequest(router, headers, "GET", fmt.Sprintf("/api/v1/cypress-parallel-api/environments/list/by/projectid/%s", result["project_id"]), "")
+	w, _ := performRequest(router, headers, "GET", fmt.Sprintf("/api/v1/environments/list/by/projectid/%s", result["project_id"]), "")
 	assert.Equal(200, w.Code)
 }

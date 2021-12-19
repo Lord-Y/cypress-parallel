@@ -51,7 +51,7 @@ func TestAnnotationsCreate(t *testing.T) {
 		payload := fmt.Sprintf("projectId=%s", result["project_id"])
 		payload += fmt.Sprintf("&key=%s", tc.key)
 		payload += fmt.Sprintf("&value=%s", tc.value)
-		w, _ := performRequest(router, headers, "POST", "/api/v1/cypress-parallel-api/annotations", payload)
+		w, _ := performRequest(router, headers, "POST", "/api/v1/annotations", payload)
 		assert.Equal(tc.statusCode, w.Code)
 	}
 }
@@ -74,7 +74,7 @@ func TestAnnotationsUpdate(t *testing.T) {
 	payload += fmt.Sprintf("&annotationId=%s", result["annotation_id"])
 	payload += fmt.Sprintf("&key=%s", fake.CharactersN(5))
 	payload += fmt.Sprintf("&value=%s", fake.CharactersN(5))
-	w, _ := performRequest(router, headers, "PUT", "/api/v1/cypress-parallel-api/annotations", payload)
+	w, _ := performRequest(router, headers, "PUT", "/api/v1/annotations", payload)
 	assert.Equal(200, w.Code)
 }
 
@@ -93,7 +93,7 @@ func TestAnnotationsUpdate_fail(t *testing.T) {
 	router := SetupRouter()
 	payload := fmt.Sprintf("projectId=%s", result["project_id"])
 	payload += fmt.Sprintf("&annotationId=%s", result["annotation_id"])
-	w, _ := performRequest(router, headers, "PUT", "/api/v1/cypress-parallel-api/annotations", payload)
+	w, _ := performRequest(router, headers, "PUT", "/api/v1/annotations", payload)
 	assert.Equal(400, w.Code)
 }
 
@@ -103,7 +103,7 @@ func TestAnnotationsList(t *testing.T) {
 	headers["Content-Type"] = "application/x-www-form-urlencoded"
 
 	router := SetupRouter()
-	w, _ := performRequest(router, headers, "GET", "/api/v1/cypress-parallel-api/annotations/list", "")
+	w, _ := performRequest(router, headers, "GET", "/api/v1/annotations/list", "")
 	assert.Contains(w.Body.String(), "annotation_id")
 }
 
@@ -120,7 +120,7 @@ func TestAnnotationsRead(t *testing.T) {
 	}
 
 	router := SetupRouter()
-	w, _ := performRequest(router, headers, "GET", fmt.Sprintf("/api/v1/cypress-parallel-api/annotations/%s", result["annotation_id"]), "")
+	w, _ := performRequest(router, headers, "GET", fmt.Sprintf("/api/v1/annotations/%s", result["annotation_id"]), "")
 	assert.Contains(w.Body.String(), "key")
 }
 
@@ -137,7 +137,7 @@ func TestAnnotationsDelete(t *testing.T) {
 	}
 
 	router := SetupRouter()
-	w, _ := performRequest(router, headers, "DELETE", fmt.Sprintf("/api/v1/cypress-parallel-api/annotations/%s", result["annotation_id"]), "")
+	w, _ := performRequest(router, headers, "DELETE", fmt.Sprintf("/api/v1/annotations/%s", result["annotation_id"]), "")
 	assert.Equal(200, w.Code)
 }
 
@@ -154,12 +154,12 @@ func TestAnnotationsSearch(t *testing.T) {
 	}
 
 	router := SetupRouter()
-	w, _ := performRequest(router, headers, "GET", fmt.Sprintf("/api/v1/cypress-parallel-api/annotations/search?q=%s", result["key"]), "")
+	w, _ := performRequest(router, headers, "GET", fmt.Sprintf("/api/v1/annotations/search?q=%s", result["key"]), "")
 	if len(result) > 0 {
 		assert.Contains(w.Body.String(), "key")
 		return
 	}
-	w, _ = performRequest(router, headers, "GET", "/api/v1/cypress-parallel-api/annotations/search?q=", "")
+	w, _ = performRequest(router, headers, "GET", "/api/v1/annotations/search?q=", "")
 	assert.Equal(400, w.Code)
 }
 
@@ -176,6 +176,6 @@ func TestAnnotationsByProjectID(t *testing.T) {
 	}
 
 	router := SetupRouter()
-	w, _ := performRequest(router, headers, "GET", fmt.Sprintf("/api/v1/cypress-parallel-api/annotations/list/by/projectid/%s", result["project_id"]), "")
+	w, _ := performRequest(router, headers, "GET", fmt.Sprintf("/api/v1/annotations/list/by/projectid/%s", result["project_id"]), "")
 	assert.Equal(200, w.Code)
 }

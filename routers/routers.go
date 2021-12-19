@@ -54,7 +54,7 @@ func SetupRouter() *gin.Engine {
 		p.Use(router)
 	}
 
-	v1 := router.Group("/api/v1/cypress-parallel-api")
+	v1 := router.Group("/api/v1")
 	{
 		v1.GET("/health", health.Health)
 

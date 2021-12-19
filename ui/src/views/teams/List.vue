@@ -23,7 +23,9 @@
             teams.teams.length > 0
           "
         >
-          <table class="table-auto w-full text-left border-collapse divide-y border-t-2">
+          <table
+            class="table-auto w-full text-left border-collapse divide-y border-t-2"
+          >
             <thead>
               <tr>
                 <th class="py-3">{{ $t('teams.teams') }}</th>
@@ -96,7 +98,9 @@
             teams.byFilter.length > 0
           "
         >
-          <table class="table-auto w-full text-left border-collapse divide-y border-t-2">
+          <table
+            class="table-auto w-full text-left border-collapse divide-y border-t-2"
+          >
             <thead>
               <tr>
                 <th class="py-3">{{ $t('teams.teams') }}</th>

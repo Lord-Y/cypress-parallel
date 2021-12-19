@@ -26,10 +26,22 @@
               :repository="form.repository"
               v-model:updateRepository="form.repository"
             />
-            <CreateUpdateUsername :username="form.username" v-model:updateUsername="form.username" />
-            <CreateUpdatePassword :password="form.password" v-model:updatePassword="form.password" />
-            <CreateUpdateBranch :branch="form.branch" v-model:updateBranch="form.branch" />
-            <CreateUpdateSpecs :specs="form.specs" v-model:updateSpecs="form.specs" />
+            <CreateUpdateUsername
+              :username="form.username"
+              v-model:updateUsername="form.username"
+            />
+            <CreateUpdatePassword
+              :password="form.password"
+              v-model:updatePassword="form.password"
+            />
+            <CreateUpdateBranch
+              :branch="form.branch"
+              v-model:updateBranch="form.branch"
+            />
+            <CreateUpdateSpecs
+              :specs="form.specs"
+              v-model:updateSpecs="form.specs"
+            />
             <CreateUpdateSchedulingEnabled
               v-model:updateSchedulingEnabled="form.schedulingEnabled"
             />
@@ -37,13 +49,22 @@
               v-if="form.schedulingEnabled"
               v-model:updateScheduling="form.scheduling"
             />
-            <CreateUpdateMaxPods :max-pods="form.maxPods" v-model:updateMaxPods="form.maxPods" />
+            <CreateUpdateMaxPods
+              :max-pods="form.maxPods"
+              v-model:updateMaxPods="form.maxPods"
+            />
             <CreateUpdateCypressDockerVersion
               :docker-version="form.cypress_docker_version"
               v-model:updateDockerVersion="form.cypress_docker_version"
             />
-            <CreateUpdateTimeout :timeout="form.timeout" v-model:updateTimeout="form.timeout" />
-            <CreateUpdateBrowser :browser="form.browser" v-model:updateBrowser="form.browser" />
+            <CreateUpdateTimeout
+              :timeout="form.timeout"
+              v-model:updateTimeout="form.timeout"
+            />
+            <CreateUpdateBrowser
+              :browser="form.browser"
+              v-model:updateBrowser="form.browser"
+            />
             <CreateUpdateConfigFile
               :config-file="form.config_file"
               v-model:updateConfigFile="form.config_file"

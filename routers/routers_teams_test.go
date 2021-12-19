@@ -20,7 +20,7 @@ func TestTeamsCreate(t *testing.T) {
 	payload := fmt.Sprintf("name=%s", fake.CharactersN(10))
 
 	router := SetupRouter()
-	w, _ := performRequest(router, headers, "POST", "/api/v1/cypress-parallel-api/teams", payload)
+	w, _ := performRequest(router, headers, "POST", "/api/v1/teams", payload)
 	assert.Equal(201, w.Code)
 }
 
@@ -36,7 +36,7 @@ func TestTeamsRead(t *testing.T) {
 		return
 	}
 	router := SetupRouter()
-	w, _ := performRequest(router, headers, "GET", fmt.Sprintf("/api/v1/cypress-parallel-api/teams/%s", result["team_id"]), "")
+	w, _ := performRequest(router, headers, "GET", fmt.Sprintf("/api/v1/teams/%s", result["team_id"]), "")
 	assert.Contains(w.Body.String(), "name")
 }
 
@@ -46,7 +46,7 @@ func TestTeamsList(t *testing.T) {
 	headers["Content-Type"] = "application/x-www-form-urlencoded"
 
 	router := SetupRouter()
-	w, _ := performRequest(router, headers, "GET", "/api/v1/cypress-parallel-api/teams/list", "")
+	w, _ := performRequest(router, headers, "GET", "/api/v1/teams/list", "")
 	assert.Contains(w.Body.String(), "name")
 }
 
@@ -60,7 +60,7 @@ func TestTeamsCreateMulti(t *testing.T) {
 		rand.Seed(time.Now().UnixNano())
 		payload := fmt.Sprintf("name=%s", fake.CharactersN(10))
 
-		w, _ := performRequest(router, headers, "POST", "/api/v1/cypress-parallel-api/teams", payload)
+		w, _ := performRequest(router, headers, "POST", "/api/v1/teams", payload)
 		assert.Equal(201, w.Code)
 	}
 }
@@ -80,7 +80,7 @@ func TestTeamsUpdate(t *testing.T) {
 	payload += fmt.Sprintf("&teamId=%s", result["team_id"])
 
 	router := SetupRouter()
-	w, _ := performRequest(router, headers, "PUT", "/api/v1/cypress-parallel-api/teams", payload)
+	w, _ := performRequest(router, headers, "PUT", "/api/v1/teams", payload)
 	assert.Equal(200, w.Code)
 }
 
@@ -97,7 +97,7 @@ func TestTeamsDelete(t *testing.T) {
 	}
 
 	router := SetupRouter()
-	w, _ := performRequest(router, headers, "DELETE", fmt.Sprintf("/api/v1/cypress-parallel-api/teams/%s", result["team_id"]), "")
+	w, _ := performRequest(router, headers, "DELETE", fmt.Sprintf("/api/v1/teams/%s", result["team_id"]), "")
 	assert.Equal(200, w.Code)
 }
 
@@ -114,12 +114,12 @@ func TestTeamsSearch(t *testing.T) {
 	}
 
 	router := SetupRouter()
-	w, _ := performRequest(router, headers, "GET", fmt.Sprintf("/api/v1/cypress-parallel-api/teams/search?q=%s", result["team_name"]), "")
+	w, _ := performRequest(router, headers, "GET", fmt.Sprintf("/api/v1/teams/search?q=%s", result["team_name"]), "")
 	if len(result) > 0 {
 		assert.Contains(w.Body.String(), "team_name")
 		return
 	}
-	w, _ = performRequest(router, headers, "GET", "/api/v1/cypress-parallel-api/teams/search?q=", "")
+	w, _ = performRequest(router, headers, "GET", "/api/v1/teams/search?q=", "")
 	assert.Equal(400, w.Code)
 }
 
@@ -130,6 +130,6 @@ func TestTeamsAll(t *testing.T) {
 
 	TestTeamsCreate(t)
 	router := SetupRouter()
-	w, _ := performRequest(router, headers, "GET", "/api/v1/cypress-parallel-api/teams/all", "")
+	w, _ := performRequest(router, headers, "GET", "/api/v1/teams/all", "")
 	assert.Contains(w.Body.String(), "name")
 }

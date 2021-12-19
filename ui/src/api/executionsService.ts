@@ -24,26 +24,20 @@ export interface Execution {
 
 class ExecutionsService {
   async get(id: number): Promise<any> {
-    return await axiosClient.get<any>(
-      `/api/v1/cypress-parallel-api/executions/${id}`,
-    )
+    return await axiosClient.get<any>(`/api/v1/executions/${id}`)
   }
 
   async list(page = 1): Promise<any> {
-    return await axiosClient.get<any>(
-      `/api/v1/cypress-parallel-api/executions/list?page=${page}`,
-    )
+    return await axiosClient.get<any>(`/api/v1/executions/list?page=${page}`)
   }
 
   async uniqid(id: string): Promise<any> {
-    return await axiosClient.get<any>(
-      `/api/v1/cypress-parallel-api/executions/list/by/uniqid/${id}`,
-    )
+    return await axiosClient.get<any>(`/api/v1/executions/list/by/uniqid/${id}`)
   }
 
   async search(q: string, page = 1): Promise<any> {
     return await axiosClient.get<any>(
-      `/api/v1/cypress-parallel-api/executions/search?q=${q}&page=${page}`,
+      `/api/v1/executions/search?q=${q}&page=${page}`,
     )
   }
 }

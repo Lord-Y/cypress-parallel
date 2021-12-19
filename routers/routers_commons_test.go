@@ -13,7 +13,7 @@ func TestHealth(t *testing.T) {
 	headers["Content-Type"] = "application/x-www-form-urlencoded"
 
 	router := SetupRouter()
-	w, _ := performRequest(router, headers, "GET", "/api/v1/cypress-parallel-api/health", "")
+	w, _ := performRequest(router, headers, "GET", "/api/v1/health", "")
 
 	assert.Equal(200, w.Code, "Failed to perform http GET request")
 	assert.Contains(w.Body.String(), `{"health":"OK"}`, "Failed to get right body content")
@@ -25,7 +25,7 @@ func TestHealth_no_xrequestid(t *testing.T) {
 	headers["Content-Type"] = "application/x-www-form-urlencoded"
 
 	router := SetupRouter()
-	w, _ := performRequest(router, headers, "GET", "/api/v1/cypress-parallel-api/health", "")
+	w, _ := performRequest(router, headers, "GET", "/api/v1/health", "")
 
 	assert.Equal(200, w.Code, "Failed to perform http GET request")
 	assert.Contains(w.Body.String(), `{"health":"OK"}`, "Failed to get right body content")
@@ -38,7 +38,7 @@ func TestHealth_prometheus(t *testing.T) {
 
 	os.Setenv("CYPRESS_PARALLEL_PROMETHEUS", "1")
 	router := SetupRouter()
-	w, _ := performRequest(router, headers, "GET", "/api/v1/cypress-parallel-api/health", "")
+	w, _ := performRequest(router, headers, "GET", "/api/v1/health", "")
 
 	assert.Equal(200, w.Code, "Failed to perform http GET request")
 	assert.Contains(w.Body.String(), `{"health":"OK"}`, "Failed to get right body content")

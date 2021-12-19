@@ -27,10 +27,10 @@ func TestExecutionsList(t *testing.T) {
 	router := SetupRouter()
 	payload := fmt.Sprintf("project_name=%s", result["project_name"])
 	payload += fmt.Sprintf("&specs=%s", tools.RandomValueFromSlice(specs))
-	w, _ := performRequest(router, headers, "POST", "/api/v1/cypress-parallel-api/hooks/launch/plain", payload)
+	w, _ := performRequest(router, headers, "POST", "/api/v1/hooks/launch/plain", payload)
 	assert.Equal(201, w.Code)
 
-	w, _ = performRequest(router, headers, "GET", "/api/v1/cypress-parallel-api/executions/list", "")
+	w, _ = performRequest(router, headers, "GET", "/api/v1/executions/list", "")
 	assert.Equal(200, w.Code)
 }
 
@@ -52,7 +52,7 @@ func TestExecutionsUpdateResult(t *testing.T) {
 	payload += fmt.Sprintf("&spec=%s", resultEx["spec"])
 	payload += fmt.Sprintf("&uniqId=%s", resultEx["uniq_id"])
 
-	w, _ := performRequest(router, headers, "POST", "/api/v1/cypress-parallel-api/executions/update", payload)
+	w, _ := performRequest(router, headers, "POST", "/api/v1/executions/update", payload)
 	if len(resultEx) == 0 {
 		assert.Equal(400, w.Code)
 		return
@@ -66,7 +66,7 @@ func TestExecutionsUpdateResult(t *testing.T) {
 	payload += fmt.Sprintf("&spec=%s", resultEx["spec"])
 	payload += fmt.Sprintf("&uniqId=%s", resultEx["uniq_id"])
 
-	w, _ = performRequest(router, headers, "POST", "/api/v1/cypress-parallel-api/executions/update", payload)
+	w, _ = performRequest(router, headers, "POST", "/api/v1/executions/update", payload)
 	assert.Equal(200, w.Code)
 }
 
@@ -87,7 +87,7 @@ func TestExecutionsUpdateResult_fail(t *testing.T) {
 	payload += fmt.Sprintf("&branch=%s", resultEx["branch"])
 	payload += fmt.Sprintf("&spec=%s", resultEx["spec"])
 
-	w, _ := performRequest(router, headers, "POST", "/api/v1/cypress-parallel-api/executions/update", payload)
+	w, _ := performRequest(router, headers, "POST", "/api/v1/executions/update", payload)
 	assert.Equal(400, w.Code)
 }
 
@@ -103,7 +103,7 @@ func TestExecutionsRead(t *testing.T) {
 		return
 	}
 
-	w, _ := performRequest(router, headers, "GET", fmt.Sprintf("/api/v1/cypress-parallel-api/executions/%s", resultEx["execution_id"]), "")
+	w, _ := performRequest(router, headers, "GET", fmt.Sprintf("/api/v1/executions/%s", resultEx["execution_id"]), "")
 	if len(resultEx) == 0 {
 		assert.Equal(404, w.Code)
 		return
@@ -123,12 +123,12 @@ func TestExecutionsSearch(t *testing.T) {
 	}
 
 	router := SetupRouter()
-	w, _ := performRequest(router, headers, "GET", fmt.Sprintf("/api/v1/cypress-parallel-api/executions/search?q=%s", result["branch"]), "")
+	w, _ := performRequest(router, headers, "GET", fmt.Sprintf("/api/v1/executions/search?q=%s", result["branch"]), "")
 	if len(result) > 0 {
 		assert.Contains(w.Body.String(), "branch")
 		return
 	}
-	w, _ = performRequest(router, headers, "GET", "/api/v1/cypress-parallel-api/executions/search?q=", "")
+	w, _ = performRequest(router, headers, "GET", "/api/v1/executions/search?q=", "")
 	assert.Equal(400, w.Code)
 }
 
@@ -146,11 +146,11 @@ func TestExecutionsUniqID(t *testing.T) {
 	}
 
 	router := SetupRouter()
-	w, _ := performRequest(router, headers, "GET", fmt.Sprintf("/api/v1/cypress-parallel-api/executions/list/by/uniqid/%s", result["uniq_id"]), "")
+	w, _ := performRequest(router, headers, "GET", fmt.Sprintf("/api/v1/executions/list/by/uniqid/%s", result["uniq_id"]), "")
 	if len(result) > 0 {
 		assert.Contains(w.Body.String(), "branch")
 		return
 	}
-	w, _ = performRequest(router, headers, "GET", fmt.Sprintf("/api/v1/cypress-parallel-api/executions/list/by/uniqid/%s", "404"), "")
+	w, _ = performRequest(router, headers, "GET", fmt.Sprintf("/api/v1/executions/list/by/uniqid/%s", "404"), "")
 	assert.Equal(404, w.Code)
 }

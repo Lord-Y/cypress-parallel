@@ -27,46 +27,34 @@ export interface Environment {
 
 class EnvironmentsService {
   async create(data: any): Promise<any> {
-    return await axiosClient.post(
-      '/api/v1/cypress-parallel-api/environments',
-      data,
-    )
+    return await axiosClient.post('/api/v1/environments', data)
   }
 
   async get(id: number): Promise<any> {
-    return await axiosClient.get<any>(
-      `/api/v1/cypress-parallel-api/environments/${id}`,
-    )
+    return await axiosClient.get<any>(`/api/v1/environments/${id}`)
   }
 
   async list(page = 1): Promise<any> {
-    return await axiosClient.get<any>(
-      `/api/v1/cypress-parallel-api/environments/list?page=${page}`,
-    )
+    return await axiosClient.get<any>(`/api/v1/environments/list?page=${page}`)
   }
 
   async update(data: any): Promise<any> {
-    return await axiosClient.put<any>(
-      '/api/v1/cypress-parallel-api/environments',
-      data,
-    )
+    return await axiosClient.put<any>('/api/v1/environments', data)
   }
 
   async delete(id: number): Promise<any> {
-    return await axiosClient.delete<any>(
-      `/api/v1/cypress-parallel-api/environments/${id}`,
-    )
+    return await axiosClient.delete<any>(`/api/v1/environments/${id}`)
   }
 
   async search(q: string, page = 1): Promise<any> {
     return await axiosClient.get<any>(
-      `/api/v1/cypress-parallel-api/environments/search?q=${q}&page=${page}`,
+      `/api/v1/environments/search?q=${q}&page=${page}`,
     )
   }
 
   async projectID(id: number): Promise<any> {
     return await axiosClient.get<any>(
-      `/api/v1/cypress-parallel-api/environments/list/by/projectid/${id}`,
+      `/api/v1/environments/list/by/projectid/${id}`,
     )
   }
 }

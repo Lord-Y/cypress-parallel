@@ -16,7 +16,12 @@
         class="absolute inset-y-0 right-0 flex items-center px-4 font-bold text-white bg-green-500"
         @click="clear"
       >
-        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <svg
+          class="w-6 h-6"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
           <path
             stroke-linecap="round"
             stroke-linejoin="round"

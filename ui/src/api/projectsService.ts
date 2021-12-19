@@ -47,48 +47,37 @@ export interface ProjectOnly {
 
 class ProjectsService {
   async create(data: any): Promise<any> {
-    return await axiosClient.post('/api/v1/cypress-parallel-api/projects', data)
+    return await axiosClient.post('/api/v1/projects', data)
   }
 
   async get(id: number): Promise<any> {
-    return await axiosClient.get<any>(
-      `/api/v1/cypress-parallel-api/projects/${id}`,
-    )
+    return await axiosClient.get<any>(`/api/v1/projects/${id}`)
   }
 
   async list(page = 1): Promise<any> {
-    return await axiosClient.get<any>(
-      `/api/v1/cypress-parallel-api/projects/list?page=${page}`,
-    )
+    return await axiosClient.get<any>(`/api/v1/projects/list?page=${page}`)
   }
 
   async all(): Promise<any> {
-    return await axiosClient.get<any>(
-      `/api/v1/cypress-parallel-api/projects/all`,
-    )
+    return await axiosClient.get<any>(`/api/v1/projects/all`)
   }
 
   async update(data: any): Promise<any> {
-    return await axiosClient.put('/api/v1/cypress-parallel-api/projects', data)
+    return await axiosClient.put('/api/v1/projects', data)
   }
 
   async delete(id: number): Promise<any> {
-    return await axiosClient.delete<any>(
-      `/api/v1/cypress-parallel-api/projects/${id}`,
-    )
+    return await axiosClient.delete<any>(`/api/v1/projects/${id}`)
   }
 
   async search(q: string, page = 1): Promise<any> {
     return await axiosClient.get<any>(
-      `/api/v1/cypress-parallel-api/projects/search?q=${q}&page=${page}`,
+      `/api/v1/projects/search?q=${q}&page=${page}`,
     )
   }
 
   async hook(data: any): Promise<any> {
-    return await axiosClient.post(
-      '/api/v1/cypress-parallel-api/hooks/launch/plain',
-      data,
-    )
+    return await axiosClient.post('/api/v1/hooks/launch/plain', data)
   }
 }
 

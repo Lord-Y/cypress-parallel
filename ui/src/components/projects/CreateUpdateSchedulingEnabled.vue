@@ -14,31 +14,12 @@
         />
         <div
           id="englobe"
-          class="
-            w-12
-            h-8
-            flex
-            items-center
-            bg-gray-300
-            rounded-2xl
-            p-1
-            duration-200
-            ease-in-out
-          "
+          class="w-12 h-8 flex items-center bg-gray-300 rounded-2xl p-1 duration-200 ease-in-out"
           :class="{ 'bg-green-500': local }"
         >
           <div
             id="inner"
-            class="
-              bg-white
-              w-6
-              h-6
-              rounded-2xl
-              shadow-md
-              transform
-              duration-200
-              ease-in-out
-            "
+            class="bg-white w-6 h-6 rounded-2xl shadow-md transform duration-200 ease-in-out"
             :class="{
               'translate-x-4': local,
             }"
