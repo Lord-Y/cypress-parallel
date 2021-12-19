@@ -22,7 +22,7 @@ export default defineConfig({
     strictPort: true,
     proxy: {
       '/api': {
-        target: process.env.API_GATEWAY || 'http://localhost:8080',
+        target: `http://localhost:${process.env.CYPRESS_PARALLEL_PORT}` || 'http://localhost:8080',
       },
     }
   }
