@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"embed"
 	"fmt"
 	"net/http"
 	"os"
@@ -17,6 +18,9 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
+//go:embed sql/postgres
+var Sql embed.FS
+
 // init func
 func init() {
 	customLogger.SetLoggerLogLevel()
@@ -27,7 +31,7 @@ func init() {
 		return
 	}
 
-	postgres.InitDB()
+	postgres.InitDB(Sql)
 }
 
 func main() {
