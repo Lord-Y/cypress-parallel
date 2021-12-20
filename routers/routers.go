@@ -2,6 +2,7 @@
 package routers
 
 import (
+	"embed"
 	"io"
 	"net/http"
 	"os"
@@ -27,6 +28,13 @@ func init() {
 	customLogger.SetLoggerLogLevel()
 }
 
+//go:generate rm -rf ui/* && cp -r ../ui/dist ui
+//go:embed ui/dist/assets
+var assets embed.FS
+
+//go:embed ui
+var ui_ embed.FS
+
 // SetupRouter func handle all routes of the api
 func SetupRouter() *gin.Engine {
 	gin.DisableConsoleColor()
@@ -37,6 +45,7 @@ func SetupRouter() *gin.Engine {
 
 	router := gin.New()
 	router.Use(gin.Recovery())
+	router.RedirectTrailingSlash = true
 
 	router.Use(
 		logger.SetLogger(
@@ -119,15 +128,43 @@ func SetupRouter() *gin.Engine {
 	}
 
 	router.Static("/ui/assets", "ui/dist/assets")
-	router.StaticFile("/ui/logo.png", "ui/dist/logo.png")
-	router.StaticFile("/ui/favicon.ico", "ui/dist/favicon.ico")
+
+	// done like that to avoid trailing slash
+	router.GET("/ui/logo.png", func(c *gin.Context) {
+		f, _ := ui_.ReadFile("ui/dist/logo.png")
+		c.Data(
+			http.StatusOK,
+			"image/png",
+			f,
+		)
+	})
+
+	// done like that to avoid trailing slash
+	router.GET("/ui/favicon.ico", func(c *gin.Context) {
+		f, _ := ui_.ReadFile("ui/dist/favicon.ico")
+		c.Data(
+			http.StatusOK,
+			"image/x-icon",
+			f,
+		)
+	})
 
 	ui := router.Group("/ui", func(c *gin.Context) {
-		c.File("ui/dist/index.html")
+		f, _ := ui_.ReadFile("ui/dist/index.html")
+		c.Data(
+			http.StatusOK,
+			"text/html",
+			f,
+		)
 	})
 	if ui.BasePath() == "/ui" {
 		router.NoRoute(func(c *gin.Context) {
-			c.File("ui/dist/index.html")
+			f, _ := ui_.ReadFile("ui/dist/index.html")
+			c.Data(
+				http.StatusOK,
+				"text/html",
+				f,
+			)
 		})
 	}
 
