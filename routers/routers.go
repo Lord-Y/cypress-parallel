@@ -2,8 +2,10 @@
 package routers
 
 import (
+	"io"
 	"net/http"
 	"os"
+	"time"
 
 	"github.com/Lord-Y/cypress-parallel/annotations"
 	"github.com/Lord-Y/cypress-parallel/environments"
@@ -32,14 +34,30 @@ func SetupRouter() *gin.Engine {
 	requestID := tools.RandStringInt(32)
 
 	log.Logger = zerolog.New(os.Stdout).With().Timestamp().Caller().Logger()
-	subLog := zerolog.New(os.Stdout).With().Timestamp().Str("requestId", requestID).Logger()
 
 	router := gin.New()
 	router.Use(gin.Recovery())
-	router.Use(logger.SetLogger(logger.Config{
-		Logger: &subLog,
-		UTC:    true,
-	}))
+
+	router.Use(
+		logger.SetLogger(
+			logger.WithUTC(true),
+			logger.WithLogger(
+				func(c *gin.Context, w io.Writer, d time.Duration) zerolog.Logger {
+					return zerolog.New(os.Stdout).
+						With().
+						Timestamp().
+						Str("requestId", requestID).
+						Int("status", c.Writer.Status()).
+						Str("method", c.Request.Method).
+						Str("path", c.Request.URL.Path).
+						Str("ip", c.ClientIP()).
+						Dur("latency", d).
+						Str("user_agent", c.Request.UserAgent()).
+						Logger()
+				},
+			),
+		),
+	)
 	headerHandler := func(c *gin.Context) {
 		if c.GetHeader("X-Request-Id") == "" {
 			c.Request.Header.Set("X-Request-Id", requestID)
@@ -47,6 +65,7 @@ func SetupRouter() *gin.Engine {
 		}
 	}
 	router.Use(headerHandler)
+
 	// disable during unit testing
 	if os.Getenv("CYPRESS_PARALLEL_PROMETHEUS") != "" {
 		p := ginprometheus.NewPrometheus("http")
