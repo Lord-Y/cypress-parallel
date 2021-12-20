@@ -10,10 +10,10 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/Lord-Y/cypress-parallel-api/hooks"
-	customLogger "github.com/Lord-Y/cypress-parallel-api/logger"
-	"github.com/Lord-Y/cypress-parallel-api/postgres"
-	"github.com/Lord-Y/cypress-parallel-api/routers"
+	"github.com/Lord-Y/cypress-parallel/hooks"
+	customLogger "github.com/Lord-Y/cypress-parallel/logger"
+	"github.com/Lord-Y/cypress-parallel/postgres"
+	"github.com/Lord-Y/cypress-parallel/routers"
 	"github.com/rs/zerolog/log"
 )
 

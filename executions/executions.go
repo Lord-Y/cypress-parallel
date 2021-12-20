@@ -6,9 +6,9 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/Lord-Y/cypress-parallel-api/commons"
-	"github.com/Lord-Y/cypress-parallel-api/kubernetes"
-	"github.com/Lord-Y/cypress-parallel-api/tools"
+	"github.com/Lord-Y/cypress-parallel/commons"
+	"github.com/Lord-Y/cypress-parallel/kubernetes"
+	"github.com/Lord-Y/cypress-parallel/tools"
 	"github.com/gin-gonic/gin"
 	"github.com/rs/zerolog/log"
 )

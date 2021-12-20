@@ -4,7 +4,7 @@ package teams
 import (
 	"database/sql"
 
-	"github.com/Lord-Y/cypress-parallel-api/commons"
+	"github.com/Lord-Y/cypress-parallel/commons"
 	_ "github.com/lib/pq"
 	"github.com/rs/zerolog/log"
 	"github.com/syyongx/php2go"

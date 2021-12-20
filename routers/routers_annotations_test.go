@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/Lord-Y/cypress-parallel-api/annotations"
-	"github.com/Lord-Y/cypress-parallel-api/projects"
+	"github.com/Lord-Y/cypress-parallel/annotations"
+	"github.com/Lord-Y/cypress-parallel/projects"
 	"github.com/icrowley/fake"
 	"github.com/rs/zerolog/log"
 	"github.com/stretchr/testify/assert"

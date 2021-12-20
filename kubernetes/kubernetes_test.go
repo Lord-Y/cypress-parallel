@@ -6,7 +6,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/Lord-Y/cypress-parallel-api/models"
+	"github.com/Lord-Y/cypress-parallel/models"
 	"github.com/icrowley/fake"
 	"github.com/stretchr/testify/assert"
 )

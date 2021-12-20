@@ -5,8 +5,8 @@ import (
 	"context"
 	"path/filepath"
 
-	"github.com/Lord-Y/cypress-parallel-api/commons"
-	"github.com/Lord-Y/cypress-parallel-api/models"
+	"github.com/Lord-Y/cypress-parallel/commons"
+	"github.com/Lord-Y/cypress-parallel/models"
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"

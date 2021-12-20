@@ -1,4 +1,4 @@
-module github.com/Lord-Y/cypress-parallel-api
+module github.com/Lord-Y/cypress-parallel
 
 go 1.16
 

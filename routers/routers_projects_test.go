@@ -6,9 +6,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/Lord-Y/cypress-parallel-api/projects"
-	"github.com/Lord-Y/cypress-parallel-api/teams"
-	"github.com/Lord-Y/cypress-parallel-api/tools"
+	"github.com/Lord-Y/cypress-parallel/projects"
+	"github.com/Lord-Y/cypress-parallel/teams"
+	"github.com/Lord-Y/cypress-parallel/tools"
 	"github.com/icrowley/fake"
 	"github.com/rs/zerolog/log"
 	"github.com/stretchr/testify/assert"

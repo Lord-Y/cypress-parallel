@@ -8,7 +8,7 @@ import (
 
 	"context"
 
-	customLogger "github.com/Lord-Y/cypress-parallel-api/logger"
+	customLogger "github.com/Lord-Y/cypress-parallel/logger"
 	"github.com/go-redis/redis/v8"
 	"github.com/rs/zerolog/log"
 )

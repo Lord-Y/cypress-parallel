@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/Lord-Y/cypress-parallel-api/commons"
+	"github.com/Lord-Y/cypress-parallel/commons"
 	"github.com/golang-migrate/migrate"
 	"github.com/golang-migrate/migrate/database/postgres"
 	_ "github.com/golang-migrate/migrate/source/file"
