@@ -77,13 +77,6 @@ jobs:
         name: go mod download
         command: go mod download
 
-    - run:
-        name: npm install
-        command: |
-          cd ui
-          npm install
-          cd -
-
     - save_cache:
         key: ${CIRCLE_PROJECT_REPONAME}-{{ checksum "go.mod" }}
         paths:
@@ -91,18 +84,16 @@ jobs:
         - /home/circleci/.kube
 
     - run:
-        name: npm run build
-        command: |
-          cd ui
-          npm run build
-          cd -
-
-    - run:
-        name: Perform unit testing
+        name: npm install and build / perform unit testing
         no_output_timeout: 30m
         command: |
           export CYPRESS_PARALLEL_DB_URI="postgres://cypress_parallel:cypress_parallel@$(hostname -i):5432/cypress_parallel?sslmode=disable"
           export CYPRESS_PARALLEL_URL=http://$(hostname -i):${CYPRESS_PARALLEL_PORT}
+          cd ui
+          npm install
+          npm run build
+          cd -
+          go vet
           go test -v ./... -coverprofile=coverage.out
 
     - run:
