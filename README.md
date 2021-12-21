@@ -1,15 +1,23 @@
-# cypress-parallel-api [![CircleCI](https://circleci.com/gh/Lord-Y/cypress-parallel-api/tree/main.svg?style=svg)](https://circleci.com/gh/Lord-Y/cypress-parallel-api?branch=main)
+# cypress-parallel [![CircleCI](https://circleci.com/gh/Lord-Y/cypress-parallel/tree/main.svg?style=svg)](https://circleci.com/gh/Lord-Y/cypress-parallel?branch=main)
 
-`cypress-parallel-api` is the api used by `cypress-parallel` frontend UI.
-The api permit to create pods inside your kubernetes cluster triggered by curl commands or via UI.
+`cypress-parallel` is a single binary that hold both frontend UI and API athat permit to `cypress unit testing`.
 
-## API url
+It create pods inside your kubernetes cluster triggered by api or via UI.
+
+On this UI you will be able to:
+- create, update and delete teams
+- create, update and delete projects and also trigger new unit testing
+- create, update and delete annotations that will be used by pods
+- create, update and delete environments variables that will be used by pods
+- See execution results of units testing
+
+## API
 
 By default, the api url is `http://127.0.0.1:8080` but it can be override with os environment variable `CYPRESS_PARALLEL_URL`.
 
 ## Database
 
-Our api is developped with PostgresSQL database so the environment variable CYPRESS_PARALLEL_DB_URI must be set:
+Our api is developped with PostgresSQL database so the environment variable `CYPRESS_PARALLEL_DB_URI` must be set:
 ```bash
 export CYPRESS_PARALLEL_DB_URI="postgres://USERNAME:PASSWORD@HOST:PORT/DB_NAME?sslmode=disable"
 ```
@@ -17,7 +25,7 @@ export CYPRESS_PARALLEL_DB_URI="postgres://USERNAME:PASSWORD@HOST:PORT/DB_NAME?s
 ## Development
 ### Kind
 
-During you local development, you must set the variable `CYPRESS_PARALLEL_K8S_CLIENT_OUTSIDE` in order to create to make the api loggued in with your `.kube/config`
+During you local development, you must set the variable `CYPRESS_PARALLEL_K8S_CLIENT_OUTSIDE` in order to make the api loggued in with your `.kube/config`
 
 ```bash
 export CYPRESS_PARALLEL_K8S_CLIENT_OUTSIDE=true
@@ -73,3 +81,9 @@ go tool cover -func=coverage.out
 # https://freshman.tech/linting-golang/
 go install github.com/nametake/golangci-lint-langserver@latest
 ```
+
+## TODO
+
+UI:
+- use:
+  - [highlightjs](https://github.com/highlightjs/vue-plugin) when it will be Vue 3 compatible
