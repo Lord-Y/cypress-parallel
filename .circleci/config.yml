@@ -6,18 +6,18 @@ version: 2.1
 executors:
   golang:
     machine:
-      image: ubuntu-2004:202104-01
+      image: ubuntu-2004:202111-01
 
 jobs:
   build:
     executor: golang
     environment:
       KIND_VERSION: 0.11.0
-      KIND_VERSION_NODE: 1.19.4
+      KIND_VERSION_NODE: 1.22.0
       KIND_CLUSTER_NAME: cypress-parallel
-      HELM_VERSION: 3.6.0
-      IMAGE_NAME: docker.pkg.github.com/lord-y/cypress-parallel-api/cypress-parallel-api
-      CLI_IMAGE: docker.pkg.github.com/lord-y/cypress-parallel-docker-images/cypress-parallel-docker-images:7.2.0-0.0.5
+      HELM_VERSION: 3.7.2
+      IMAGE_NAME: ghcr.io/lord-y/cypress-parallel/cypress-parallel
+      CLI_IMAGE: ghcr.io/lord-y/cypress-parallel-docker-images/cypress-parallel-docker-images:7.4.0-0.1.0
       NAMESPACE: cypress-parallel
       CYPRESS_PARALLEL_K8S_CLIENT_OUTSIDE: "true"
       CYPRESS_PARALLEL_PORT: 40000
@@ -28,7 +28,7 @@ jobs:
 
     - restore_cache:
         keys:
-        - ${CIRCLE_PROJECT_REPONAME}-{{ checksum "go.mod" }}-4
+        - ${CIRCLE_PROJECT_REPONAME}-{{ checksum "go.mod" }}
 
     - run:
         name: Install curl, kind, kubectl, and helm
@@ -81,12 +81,25 @@ jobs:
         name: go vet
         command: go vet
 
+    - run:
+        name: npm install
+        command: |
+          cd ui
+          npm install
+          cd -
+
     - save_cache:
-        key: ${CIRCLE_PROJECT_REPONAME}-{{ checksum "go.mod" }}-4
+        key: ${CIRCLE_PROJECT_REPONAME}-{{ checksum "go.mod" }}
         paths:
         - /home/circleci/.go_workspace/pkg/mod
-        - /var/lib/docker
         - /home/circleci/.kube
+
+    - run:
+        name: npm run build
+        command: |
+          cd ui
+          npm run build
+          cd -
 
     - run:
         name: Perform unit testing
@@ -116,14 +129,14 @@ jobs:
   build-tags-and-publish-prerelease:
     executor: golang
     environment:
-      IMAGE_NAME: docker.pkg.github.com/lord-y/cypress-parallel-api/cypress-parallel-api
+      IMAGE_NAME: ghcr.io/lord-y/cypress-parallel/cypress-parallel
 
     steps:
     - checkout
 
     - restore_cache:
         keys:
-        - ${CIRCLE_PROJECT_REPONAME}-{{ checksum "go.mod" }}-4
+        - ${CIRCLE_PROJECT_REPONAME}-{{ checksum "go.mod" }}
 
     - run:
         name: Build docker image
@@ -137,19 +150,19 @@ jobs:
         command: |
           go get github.com/github-release/github-release
           git checkout .
-          github-release release -t ${CIRCLE_TAG} -u ${CIRCLE_PROJECT_USERNAME} -r ${CIRCLE_PROJECT_REPONAME} -c ${CIRCLE_SHA1} -d "See changelog [here](https://github.com/Lord-Y/cypress-parallel-api/blob/main/CHANGELOG.md)" -p
+          github-release release -t ${CIRCLE_TAG} -u ${CIRCLE_PROJECT_USERNAME} -r ${CIRCLE_PROJECT_REPONAME} -c ${CIRCLE_SHA1} -d "See changelog [here](https://github.com/Lord-Y/cypress-parallel/blob/main/CHANGELOG.md)" -p
 
   build-tags-and-publish-release:
     executor: golang
     environment:
-      IMAGE_NAME: docker.pkg.github.com/lord-y/cypress-parallel-api/cypress-parallel-api
+      IMAGE_NAME: docker.pkg.github.com/lord-y/cypress-parallel/cypress-parallel
 
     steps:
     - checkout
 
     - restore_cache:
         keys:
-        - ${CIRCLE_PROJECT_REPONAME}-{{ checksum "go.mod" }}-4
+        - ${CIRCLE_PROJECT_REPONAME}-{{ checksum "go.mod" }}
 
     - run:
         name: Build docker image
@@ -163,7 +176,7 @@ jobs:
         command: |
           go get github.com/github-release/github-release
           git checkout .
-          github-release release -t ${CIRCLE_TAG} -u ${CIRCLE_PROJECT_USERNAME} -r ${CIRCLE_PROJECT_REPONAME} -c ${CIRCLE_SHA1} -d "See changelog [here](https://github.com/Lord-Y/cypress-parallel-api/blob/main/CHANGELOG.md)"
+          github-release release -t ${CIRCLE_TAG} -u ${CIRCLE_PROJECT_USERNAME} -r ${CIRCLE_PROJECT_REPONAME} -c ${CIRCLE_SHA1} -d "See changelog [here](https://github.com/Lord-Y/cypress-parallel/blob/main/CHANGELOG.md)"
 
 # https://circleci.com/docs/2.0/workflows/#git-tag-job-execution
 workflows:
