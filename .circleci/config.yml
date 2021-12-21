@@ -78,10 +78,6 @@ jobs:
         command: go mod download
 
     - run:
-        name: go vet
-        command: go vet
-
-    - run:
         name: npm install
         command: |
           cd ui
@@ -100,6 +96,10 @@ jobs:
           cd ui
           npm run build
           cd -
+
+    - run:
+        name: go vet
+        command: go vet
 
     - run:
         name: Perform unit testing
