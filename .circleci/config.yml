@@ -98,7 +98,7 @@ jobs:
           cd -
           rm -rf routers/ui 
           mkdir -p routers/ui
-          cp -r ui/dist ui
+          cp -r ui/dist routers/ui
 
     - run:
         name: Perform unit testing
