@@ -98,10 +98,6 @@ jobs:
           cd -
 
     - run:
-        name: go vet
-        command: go vet
-
-    - run:
         name: Perform unit testing
         no_output_timeout: 30m
         command: |
