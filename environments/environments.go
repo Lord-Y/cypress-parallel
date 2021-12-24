@@ -4,6 +4,7 @@ package environments
 import (
 	"net/http"
 	"strconv"
+	"time"
 
 	"github.com/Lord-Y/cypress-parallel/commons"
 	"github.com/Lord-Y/cypress-parallel/tools"
@@ -56,6 +57,36 @@ type searchEnvironments struct {
 // listEnvironmentsByProjectID struct handle requirements to get all environment from project id
 type listEnvironmentsByProjectID struct {
 	ProjectID int `form:"projectId" json:"projectId" binding:"required"`
+}
+
+// dbList struct permit to map data from db
+type dbList struct {
+	Environment_id int       `json:"environment_id"`
+	Key            string    `json:"key"`
+	Value          string    `json:"value"`
+	Project_id     int       `json:"project_id"`
+	Date           time.Time `json:"date"`
+	Total          int       `json:"total"`
+	Project_name   string    `json:"project_name"`
+}
+
+// dbRead struct permit to map data from db
+type dbRead struct {
+	Environment_id int       `json:"environment_id"`
+	Key            string    `json:"key"`
+	Value          string    `json:"value"`
+	Project_id     int       `json:"project_id"`
+	Date           time.Time `json:"date"`
+	Project_name   string    `json:"project_name"`
+}
+
+// dbCommon struct permit to map data from db
+type dbCommon struct {
+	Environment_id int       `json:"environment_id"`
+	Key            string    `json:"key"`
+	Value          string    `json:"value"`
+	Project_id     int       `json:"project_id"`
+	Date           time.Time `json:"date"`
 }
 
 // Create handle requirements to create environments with environments struct
@@ -147,7 +178,7 @@ func Read(c *gin.Context) {
 		return
 	}
 
-	if len(result) == 0 {
+	if result == (dbRead{}) {
 		c.AbortWithStatus(204)
 	} else {
 		c.JSON(http.StatusOK, result)

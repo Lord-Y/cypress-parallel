@@ -19,7 +19,6 @@ import (
 	"github.com/Lord-Y/cypress-parallel/models"
 	"github.com/Lord-Y/cypress-parallel/tools"
 	"github.com/gin-gonic/gin"
-	"github.com/mitchellh/mapstructure"
 	"github.com/rs/zerolog/log"
 )
 
@@ -32,26 +31,6 @@ type plain struct {
 	Browser              string `form:"browser,default=chrome" json:"browser" binding:"max=100,oneof=chrome firefox"`
 	MaxPods              int    `form:"maxPods,default=10" json:"maxPods"`
 	CypressDockerVersion string `form:"cypress_docker_version,default=7.4.0-0.1.0,max=20" json:"cypress_docker_version"`
-}
-
-// projects will be use to "mapstructure" data from db
-type projects struct {
-	Team_id                string
-	Project_id             string
-	Project_name           string
-	Date                   string
-	Repository             string
-	Branch                 string
-	Specs                  string
-	Scheduling             string
-	Scheduling_enabled     string
-	Max_pods               string
-	Cypress_docker_version string
-	Config_file            string
-	Timeout                string
-	Username               string
-	Password               string
-	Browser                string
 }
 
 // execution handle all requirements to insert execution in DB
@@ -71,15 +50,68 @@ type updatePodName struct {
 	spec    string
 }
 
-// executionQueue will be use to "mapstructure" data from db
-type executionQueue struct {
-	Execution_id     string
-	Project_name     string
-	Project_id       string
-	Branch           string
-	Execution_status string
-	Uniq_id          string
-	Spec             string
+// dbProject struct permit to map data from db
+type dbProject struct {
+	Project_id             int       `json:"project_id"`
+	Project_name           string    `json:"project_name"`
+	Date                   time.Time `json:"date"`
+	Team_id                int       `json:"team_id"`
+	Repository             string    `json:"repository"`
+	Branch                 string    `json:"branch"`
+	Specs                  string    `json:"specs"`
+	Scheduling             string    `json:"scheduling"`
+	Scheduling_enabled     bool      `json:"scheduling_enabled"`
+	Max_pods               int       `json:"max_pods"`
+	Cypress_docker_version string    `json:"cypress_docker_version"`
+	Timeout                int       `json:"timeout"`
+	Username               string    `json:"username"`
+	Password               string    `json:"password"`
+	Browser                string    `json:"browser"`
+	Config_file            string    `json:"config_file"`
+}
+
+// dbProjectAnnotation struct permit to map data from db
+type dbProjectAnnotation struct {
+	Annotation_id int       `json:"annotation_id"`
+	Key           string    `json:"key"`
+	Value         string    `json:"value"`
+	Project_id    int       `json:"project_id"`
+	Date          time.Time `json:"date"`
+}
+
+// dbProjectEnvironment struct permit to map data from db
+type dbProjectEnvironment struct {
+	Environment_id int       `json:"environment_id"`
+	Key            string    `json:"key"`
+	Value          string    `json:"value"`
+	Project_id     int       `json:"project_id"`
+	Date           time.Time `json:"date"`
+}
+
+// dbProjectUniqIDExecution struct permit to map data from db
+type dbProjectUniqIDExecution struct {
+	Uniq_id string `json:"uniq_id"`
+}
+
+// dbPGQueue struct permit to map data from db
+type dbPGQueue struct {
+	Execution_id           int       `json:"execution_id"`
+	Project_id             int       `json:"project_id"`
+	Branch                 string    `json:"branch"`
+	Execution_status       string    `json:"execution_status"`
+	Uniq_id                int       `json:"uniq_id"`
+	Spec                   string    `json:"spec"`
+	Result                 string    `json:"result"`
+	Date                   time.Time `json:"date"`
+	Execution_error_output string    `json:"execution_error_output"`
+	Pod_name               string    `json:"pod_name"`
+	Pod_cleaned            bool      `json:"pod_cleaned"`
+	Project_name           string    `json:"project_name"`
+}
+
+// dbCountExecutions struct permit to map data from db
+type dbCountExecutions struct {
+	Count int `json:"count"`
 }
 
 var (
@@ -97,7 +129,6 @@ const (
 func Plain(c *gin.Context) {
 	var (
 		p           plain
-		pj          projects
 		ex          execution
 		pod         models.Pods
 		gitc        git.Repository
@@ -130,12 +161,6 @@ func Plain(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
 		return
 	}
-	err = mapstructure.Decode(result, &pj)
-	if err != nil {
-		log.Error().Err(err).Msg("Error occured while decoding structure")
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
-		return
-	}
 
 	// original branch must remain for POST "executions" with update db otherwise, pod will stay up forever
 	if p.Branch != "" {
@@ -147,17 +172,17 @@ func Plain(c *gin.Context) {
 			branch = p.Branch
 		}
 	} else {
-		if pj.Branch == "master" {
+		if result.Branch == "master" {
 			gitc.Branch = ""
 			branch = "master"
 		} else {
-			gitc.Branch = pj.Branch
-			branch = pj.Branch
+			gitc.Branch = result.Branch
+			branch = result.Branch
 		}
 	}
-	gitc.Repository = pj.Repository
-	gitc.Username = pj.Username
-	gitc.Password = pj.Password
+	gitc.Repository = result.Repository
+	gitc.Username = result.Username
+	gitc.Password = result.Password
 
 	gitdir, statusCode, err := gitc.Clone()
 	defer os.RemoveAll(gitdir)
@@ -174,7 +199,7 @@ func Plain(c *gin.Context) {
 	if p.Specs != "" {
 		targetSpecs = p.Specs
 	} else {
-		targetSpecs = pj.Specs
+		targetSpecs = result.Specs
 	}
 
 	if strings.HasSuffix(targetSpecs, ".spec.js") || strings.HasSuffix(targetSpecs, ".ts") {
@@ -248,7 +273,7 @@ func Plain(c *gin.Context) {
 		}
 	}
 
-	uniqID := md5.Sum([]byte(fmt.Sprintf("%s%s%s", pj.Repository, finalSecs, time.Now())))
+	uniqID := md5.Sum([]byte(fmt.Sprintf("%s%s%s", result.Repository, finalSecs, time.Now())))
 	runidID := fmt.Sprintf("%x", uniqID)
 	uniqID_ := runidID[0:10]
 
@@ -258,16 +283,9 @@ func Plain(c *gin.Context) {
 			tag     string
 			command []string
 		)
-		projecID, err := strconv.Atoi(pj.Project_id)
-		if err != nil {
-			log.Error().Err(err).Msg("Error occured while converting string to int")
-			c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
-			return
-		}
-
 		if count < p.MaxPods {
 			for _, splittedSpec := range strings.Split(spec, ",") {
-				ex.projectID = projecID
+				ex.projectID = result.Project_id
 				ex.uniqID = uniqID_
 				ex.executionStatus = "NOT_STARTED"
 				ex.spec = splittedSpec
@@ -282,7 +300,7 @@ func Plain(c *gin.Context) {
 				}
 			}
 
-			annotations, err := pj.getProjectAnnotations()
+			annotations, err := result.getProjectAnnotations()
 			if err != nil {
 				log.Error().Err(err).Msg("Error occured while performing db query")
 				c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
@@ -291,12 +309,12 @@ func Plain(c *gin.Context) {
 			if len(annotations) > 0 {
 				annotation := make(map[string]string)
 				for _, k := range annotations {
-					annotation[fmt.Sprintf("%s", k["key"])] = fmt.Sprintf("%s", k["value"])
+					annotation[k.Key] = k.Value
 				}
 				pod.Annotations = annotation
 			}
 
-			envVars, err := pj.getProjectEnvironments()
+			envVars, err := result.getProjectEnvironments()
 			if err != nil {
 				log.Error().Err(err).Msg("Error occured while performing db query")
 				c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
@@ -308,8 +326,8 @@ func Plain(c *gin.Context) {
 					envVar models.EnvironmentVar
 				)
 				for _, k := range envVars {
-					envVar.Key = fmt.Sprintf("CYPRESS_%s", k["key"])
-					envVar.Value = fmt.Sprintf("%s", k["value"])
+					envVar.Key = fmt.Sprintf("CYPRESS_%s", k.Key)
+					envVar.Value = k.Value
 					envs = append(envs, envVar)
 				}
 				if strings.TrimSpace(os.Getenv("CYPRESS_PARALLEL_CLI_LOG_LEVEL")) != "" {
@@ -344,19 +362,19 @@ func Plain(c *gin.Context) {
 			command = append(command, commons.GetAPIUrl())
 			command = append(command, "--report-back")
 			command = append(command, "--timeout")
-			command = append(command, pj.Timeout)
-			if pj.Username != "" {
+			command = append(command, strconv.Itoa(result.Timeout))
+			if result.Username != "" {
 				command = append(command, "--username")
-				command = append(command, pj.Username)
+				command = append(command, result.Username)
 			}
-			if pj.Password != "" {
+			if result.Password != "" {
 				command = append(command, "--password")
-				command = append(command, pj.Password)
+				command = append(command, result.Password)
 			}
 			if p.CypressDockerVersion != "" {
 				tag = p.CypressDockerVersion
 			} else {
-				tag = pj.Cypress_docker_version
+				tag = result.Cypress_docker_version
 			}
 
 			pod.Container.Command = command
@@ -385,7 +403,7 @@ func Plain(c *gin.Context) {
 			}
 		} else {
 			for _, splittedSpec := range strings.Split(spec, ",") {
-				ex.projectID = projecID
+				ex.projectID = result.Project_id
 				ex.uniqID = uniqID_
 				ex.executionStatus = "QUEUED"
 				ex.spec = splittedSpec
@@ -417,7 +435,7 @@ func Queued() {
 		log.Debug().Msgf("execution status running %+v length %d", status, len(status))
 		for _, run := range status {
 			wg.Add(1)
-			go func(run map[string]interface{}) {
+			go func(run dbProjectUniqIDExecution) {
 				defer wg.Done()
 				queuing(run)
 			}(run)
@@ -433,7 +451,7 @@ func Queued() {
 			log.Debug().Msgf("execution status queued %+v length %d", status, len(status))
 			for _, run := range status {
 				wg.Add(1)
-				go func(run map[string]interface{}) {
+				go func(run dbProjectUniqIDExecution) {
 					defer wg.Done()
 					queuing(run)
 				}(run)
@@ -442,11 +460,9 @@ func Queued() {
 	}
 }
 
-func queuing(run map[string]interface{}) {
+func queuing(run dbProjectUniqIDExecution) {
 	var (
-		p           plain
-		pj          projects
-		resultQueue []executionQueue
+		p plain
 	)
 
 	clientset, err := kubernetes.Client()
@@ -473,7 +489,7 @@ func queuing(run map[string]interface{}) {
 		}
 	}
 
-	uniqID := fmt.Sprintf("%s", run["uniq_id"])
+	uniqID := run.Uniq_id
 	countExecution, err := countExecutions(uniqID)
 	if err != nil {
 		log.Error().Err(err).Msg("Error occured while performing db query")
@@ -497,15 +513,10 @@ func queuing(run map[string]interface{}) {
 			command   []string
 			pod       models.Pods
 		)
-		err := mapstructure.Decode(queued, &resultQueue)
-		if err != nil {
-			log.Error().Err(err).Msg("Error occured while decoding structure")
-			return
-		}
-		p.ProjectName = resultQueue[0].Project_name
-		p.Branch = resultQueue[0].Branch
+		p.ProjectName = queued[0].Project_name
+		p.Branch = queued[0].Branch
 
-		for k, v := range resultQueue {
+		for k, v := range queued {
 			tmpSecs = append(tmpSecs, v.Spec)
 			if (nbSpec + 1) == commons.GetMaxSpecs() {
 				finalSecs = append(finalSecs, strings.Join(tmpSecs, ","))
@@ -519,7 +530,7 @@ func queuing(run map[string]interface{}) {
 			if nbSpec == 0 {
 				reset = false
 			}
-			if k == len(resultQueue)-1 && commons.GetMaxSpecs()%2 == 1 {
+			if k == len(queued)-1 && commons.GetMaxSpecs()%2 == 1 {
 				finalSecs = append(finalSecs, strings.Join(tmpSecs, ","))
 			}
 		}
@@ -530,28 +541,12 @@ func queuing(run map[string]interface{}) {
 			log.Error().Err(err).Msg("Error occured while performing db query")
 			return
 		}
-		err = mapstructure.Decode(result, &pj)
-		if err != nil {
-			log.Error().Err(err).Msg("Error occured while decoding structure")
-			return
-		}
 
-		count, err := strconv.Atoi(countExecution["count"])
-		if err != nil {
-			log.Error().Err(err).Msg("Error occured while converting string to int")
-			return
-		}
-		count = int(math.Floor(float64(count) / float64(commons.GetMaxSpecs())))
+		count := int(math.Floor(float64(countExecution.Count) / float64(commons.GetMaxSpecs())))
 
-		maxPods, err := strconv.Atoi(pj.Max_pods)
-		if err != nil {
-			log.Error().Err(err).Msg("Error occured while converting string to int")
-			return
-		}
-
-		log.Debug().Msgf("queued %s running pods count %d VS max pods %d", uniqID, count, maxPods)
-		if count < maxPods {
-			annotations, err := pj.getProjectAnnotations()
+		log.Debug().Msgf("queued %s running pods count %d VS max pods %d", uniqID, count, result.Max_pods)
+		if count < result.Max_pods {
+			annotations, err := result.getProjectAnnotations()
 			if err != nil {
 				log.Error().Err(err).Msg("Error occured while performing db query")
 				return
@@ -559,12 +554,12 @@ func queuing(run map[string]interface{}) {
 			if len(annotations) > 0 {
 				annotation := make(map[string]string)
 				for _, k := range annotations {
-					annotation[fmt.Sprintf("%s", k["key"])] = fmt.Sprintf("%s", k["value"])
+					annotation[k.Key] = k.Value
 				}
 				pod.Annotations = annotation
 			}
 
-			envVars, err := pj.getProjectEnvironments()
+			envVars, err := result.getProjectEnvironments()
 			if err != nil {
 				log.Error().Err(err).Msg("Error occured while performing db query")
 				return
@@ -575,8 +570,8 @@ func queuing(run map[string]interface{}) {
 					envVar models.EnvironmentVar
 				)
 				for _, k := range envVars {
-					envVar.Key = fmt.Sprintf("CYPRESS_%s", k["key"])
-					envVar.Value = fmt.Sprintf("%s", k["value"])
+					envVar.Key = fmt.Sprintf("CYPRESS_%s", k.Key)
+					envVar.Value = k.Value
 					envs = append(envs, envVar)
 				}
 				if strings.TrimSpace(os.Getenv("CYPRESS_PARALLEL_CLI_LOG_LEVEL")) != "" {
@@ -596,9 +591,9 @@ func queuing(run map[string]interface{}) {
 			command = append(command, "cypress-parallel-cli")
 			command = append(command, "cypress")
 			command = append(command, "--browser")
-			command = append(command, pj.Browser)
+			command = append(command, result.Browser)
 			command = append(command, "--config-file")
-			command = append(command, pj.Config_file)
+			command = append(command, result.Config_file)
 			command = append(command, "--specs")
 			command = append(command, finalSecs[0])
 			command = append(command, "--uid")
@@ -606,21 +601,21 @@ func queuing(run map[string]interface{}) {
 			command = append(command, "--branch")
 			command = append(command, p.Branch)
 			command = append(command, "--repository")
-			command = append(command, pj.Repository)
+			command = append(command, result.Repository)
 			command = append(command, "--api-url")
 			command = append(command, commons.GetAPIUrl())
 			command = append(command, "--report-back")
 			command = append(command, "--timeout")
-			command = append(command, pj.Timeout)
-			if pj.Username != "" {
+			command = append(command, strconv.Itoa(result.Timeout))
+			if result.Username != "" {
 				command = append(command, "--username")
-				command = append(command, pj.Username)
+				command = append(command, result.Username)
 			}
-			if pj.Password != "" {
+			if result.Password != "" {
 				command = append(command, "--password")
-				command = append(command, pj.Password)
+				command = append(command, result.Password)
 			}
-			tag := pj.Cypress_docker_version
+			tag := result.Cypress_docker_version
 
 			pod.Container.Command = command
 			pod.Container.Name = "cypress-parallel-jobs"

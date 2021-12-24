@@ -4,6 +4,7 @@ package teams
 import (
 	"net/http"
 	"strconv"
+	"time"
 
 	"github.com/Lord-Y/cypress-parallel/commons"
 	"github.com/Lord-Y/cypress-parallel/tools"
@@ -47,6 +48,21 @@ type searchTeams struct {
 	RangeLimit int
 	StartLimit int
 	EndLimit   int
+}
+
+// dbList struct permit to map data from db
+type dbList struct {
+	Team_id   int       `json:"team_id"`
+	Team_name string    `json:"team_name"`
+	Date      time.Time `json:"date"`
+	Total     int       `json:"total"`
+}
+
+// dbCommon struct permit to map data from db
+type dbCommon struct {
+	Team_id   int       `json:"team_id"`
+	Team_name string    `json:"team_name"`
+	Date      time.Time `json:"date"`
 }
 
 // Create handle requirements to create teams with teams struct
@@ -94,7 +110,7 @@ func Read(c *gin.Context) {
 		return
 	}
 
-	if len(result) == 0 {
+	if result == (dbCommon{}) {
 		c.AbortWithStatus(404)
 	} else {
 		c.JSON(http.StatusOK, result)

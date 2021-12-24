@@ -2,541 +2,300 @@
 package executions
 
 import (
-	"database/sql"
+	"context"
 
 	"github.com/Lord-Y/cypress-parallel/commons"
+	"github.com/jackc/pgx/v4"
+	"github.com/jackc/pgx/v4/pgxpool"
 	_ "github.com/lib/pq"
-	"github.com/rs/zerolog/log"
-	"github.com/syyongx/php2go"
 )
 
 // list will return all executions with range limit settings
-func (p *listExecutions) list() (z []map[string]interface{}, err error) {
-	db, err := sql.Open(
-		"postgres",
-		commons.BuildDSN(),
-	)
+func (p *listExecutions) list() (z []dbList, err error) {
+	ctx := context.Background()
+	db, err := pgxpool.Connect(ctx, commons.BuildDSN())
 	if err != nil {
 		return
 	}
 	defer db.Close()
 
-	stmt, err := db.Prepare("SELECT e.*, (SELECT count(e.execution_id) FROM executions e) total, p.project_name FROM executions e LEFT JOIN projects p ON e.project_id = p.project_id ORDER BY e.date DESC OFFSET $1 LIMIT $2")
-	if err != nil && err != sql.ErrNoRows {
-		return
-	}
-	defer stmt.Close()
-
-	rows, err := stmt.Query(
+	rows, err := db.Query(
+		ctx,
+		"SELECT e.*, (SELECT count(e.execution_id) FROM executions e) total, p.project_name FROM executions e LEFT JOIN projects p ON e.project_id = p.project_id ORDER BY e.date DESC OFFSET $1 LIMIT $2",
 		p.StartLimit,
 		p.EndLimit,
 	)
-	if err != nil && err != sql.ErrNoRows {
+	if err != nil && err.Error() != pgx.ErrNoRows.Error() {
 		return
 	}
+	defer rows.Close()
 
-	columns, err := rows.Columns()
-	if err != nil {
-		return
-	}
-
-	values := make([]sql.RawBytes, len(columns))
-	scanArgs := make([]interface{}, len(values))
-	for i := range values {
-		scanArgs[i] = &values[i]
-	}
-
-	m := make([]map[string]interface{}, 0)
 	for rows.Next() {
-		err = rows.Scan(scanArgs...)
-		if err != nil {
+		var x dbList
+		if err = rows.Scan(
+			&x.Execution_id,
+			&x.Project_id,
+			&x.Branch,
+			&x.Execution_status,
+			&x.Uniq_id,
+			&x.Spec,
+			&x.Result,
+			&x.Date,
+			&x.Execution_error_output,
+			&x.Pod_name,
+			&x.Pod_cleaned,
+			&x.Total,
+			&x.Project_name,
+		); err != nil {
 			return
 		}
-		var value string
-		sub := make(map[string]interface{})
-		for i, col := range values {
-			if col == nil {
-				value = ""
-			} else {
-				value = php2go.Stripslashes(string(col))
-			}
-			sub[columns[i]] = value
-		}
-		m = append(m, sub)
+		z = append(z, x)
 	}
-	if err = rows.Err(); err != nil {
-		return
-	}
-	return m, nil
+	return z, nil
 }
 
 // read will return return specific execution content
-func (p *readExecutions) read() (z []interface{}, err error) {
-	db, err := sql.Open(
-		"postgres",
-		commons.BuildDSN(),
-	)
+func (p *readExecutions) read() (z DBRead, err error) {
+	ctx := context.Background()
+	db, err := pgxpool.Connect(ctx, commons.BuildDSN())
 	if err != nil {
-		log.Error().Err(err).Msg("Failed to connect to DB")
-		return z, err
+		return
 	}
 	defer db.Close()
 
-	stmt, err := db.Prepare("SELECT e.*, p.project_name FROM executions e LEFT JOIN projects p ON e.project_id = p.project_id WHERE e.execution_id = $1 LIMIT 1")
-	if err != nil && err != sql.ErrNoRows {
-		return z, err
-	}
-	defer stmt.Close()
-
-	rows, err := stmt.Query(
-		p.ExecutionID,
-	)
-	if err != nil && err != sql.ErrNoRows {
-		return z, err
-	}
-
-	columnTypes, err := rows.ColumnTypes()
+	tx, err := db.Begin(ctx)
 	if err != nil {
-		return z, err
+		return
 	}
+	//golangci-lint fail on this check while the transaction error is checked
+	defer tx.Rollback(ctx) //nolint
 
-	count := len(columnTypes)
-	finalRows := []interface{}{}
-
-	for rows.Next() {
-		scanArgs := make([]interface{}, count)
-		for i, v := range columnTypes {
-			switch v.DatabaseTypeName() {
-			case "VARCHAR", "TEXT", "UUID", "TIMESTAMP":
-				scanArgs[i] = new(sql.NullString)
-				break //nolint:gosimple
-			case "BOOL":
-				scanArgs[i] = new(sql.NullBool)
-				break //nolint:gosimple
-			case "INT4":
-				scanArgs[i] = new(sql.NullInt64)
-				break //nolint:gosimple
-			default:
-				scanArgs[i] = new(sql.NullString)
-			}
-		}
-		err := rows.Scan(scanArgs...)
-		if err != nil {
-			return z, err
-		}
-
-		m := map[string]interface{}{}
-		for i, v := range columnTypes {
-			if z, ok := (scanArgs[i]).(*sql.NullBool); ok {
-				m[v.Name()] = z.Bool
-				continue
-			}
-			if z, ok := (scanArgs[i]).(*sql.NullString); ok {
-				m[v.Name()] = z.String
-				continue
-			}
-			if z, ok := (scanArgs[i]).(*sql.NullInt64); ok {
-				m[v.Name()] = z.Int64
-				continue
-			}
-			if z, ok := (scanArgs[i]).(*sql.NullFloat64); ok {
-				m[v.Name()] = z.Float64
-				continue
-			}
-			if z, ok := (scanArgs[i]).(*sql.NullInt32); ok {
-				m[v.Name()] = z.Int32
-				continue
-			}
-			m[v.Name()] = scanArgs[i]
-		}
-		finalRows = append(finalRows, m)
+	err = tx.QueryRow(
+		ctx,
+		"SELECT e.*, p.project_name FROM executions e LEFT JOIN projects p ON e.project_id = p.project_id WHERE e.execution_id = $1 LIMIT 1",
+		p.ExecutionID,
+	).Scan(
+		&z.Execution_id,
+		&z.Project_id,
+		&z.Branch,
+		&z.Execution_status,
+		&z.Uniq_id,
+		&z.Spec,
+		&z.Result,
+		&z.Date,
+		&z.Execution_error_output,
+		&z.Pod_name,
+		&z.Pod_cleaned,
+		&z.Project_name,
+	)
+	if err = tx.Commit(ctx); err != nil {
+		return
 	}
-
-	if err = rows.Err(); err != nil {
-		return z, err
-	}
-	return finalRows, nil
+	return z, nil
 }
 
 // updateResult will update execution result in DB
 func (p *updateResultExecution) updateResult() (z string, err error) {
-	db, err := sql.Open(
-		"postgres",
-		commons.BuildDSN(),
-	)
+	ctx := context.Background()
+	db, err := pgxpool.Connect(ctx, commons.BuildDSN())
 	if err != nil {
-		log.Error().Err(err).Msg("Failed to connect to DB")
-		return z, err
+		return
 	}
 	defer db.Close()
 
-	stmt, err := db.Prepare("UPDATE executions SET result = $1, execution_status = $2, execution_error_output = $3, pod_cleaned = 'true' WHERE uniq_id = $4 AND spec = $5 AND branch = $6 RETURNING pod_name")
-	if err != nil && err != sql.ErrNoRows {
-		return z, err
+	tx, err := db.Begin(ctx)
+	if err != nil {
+		return
 	}
-	defer stmt.Close()
-	err = stmt.QueryRow(
-		p.Result,
-		php2go.Addslashes(p.ExecutionStatus),
-		php2go.Addslashes(p.ExecutionErrorOutput),
-		php2go.Addslashes(p.UniqID),
-		php2go.Addslashes(p.Spec),
-		php2go.Addslashes(p.Branch),
-	).Scan(&z)
-	if err != nil && err != sql.ErrNoRows {
-		return z, err
+	//golangci-lint fail on this check while the transaction error is checked
+	defer tx.Rollback(ctx) //nolint
+
+	err = tx.QueryRow(
+		ctx,
+		"UPDATE executions SET result = $1, execution_status = $2, execution_error_output = $3, pod_cleaned = 'true' WHERE uniq_id = $4 AND spec = $5 AND branch = $6 RETURNING pod_name",
+		p.ExecutionStatus,
+		p.ExecutionErrorOutput,
+		p.UniqID,
+		p.Spec,
+		p.Branch,
+	).Scan(
+		&z,
+	)
+	if err = tx.Commit(ctx); err != nil {
+		return
 	}
 	return z, nil
 }
 
 // countExecutions will count number of executions not in specified values
-func (p *updateResultExecution) countExecutions() (z map[string]string, err error) {
-	db, err := sql.Open(
-		"postgres",
-		commons.BuildDSN(),
-	)
+func (p *updateResultExecution) countExecutions() (z dbCountExecutions, err error) {
+	ctx := context.Background()
+	db, err := pgxpool.Connect(ctx, commons.BuildDSN())
 	if err != nil {
-		log.Error().Err(err).Msg("Failed to connect to DB")
-		return z, err
+		return
 	}
 	defer db.Close()
 
-	stmt, err := db.Prepare("SELECT pod_name, execution_status FROM executions WHERE uniq_id = $1 AND execution_status = 'RUNNING' AND pod_name = (SELECT pod_name FROM executions WHERE uniq_id = $1 AND spec = $2)")
-	if err != nil && err != sql.ErrNoRows {
-		return z, err
-	}
-	defer stmt.Close()
-
-	rows, err := stmt.Query(
-		php2go.Addslashes(p.UniqID),
-		php2go.Addslashes(p.Spec),
+	err = db.QueryRow(
+		ctx,
+		"SELECT pod_name, execution_status FROM executions WHERE uniq_id = $1 AND execution_status = 'RUNNING' AND pod_name = (SELECT pod_name FROM executions WHERE uniq_id = $1 AND spec = $2)",
+		p.UniqID,
+		p.Spec,
+	).Scan(
+		&z.Pod_name,
+		&z.Execution_status,
 	)
-	if err != nil && err != sql.ErrNoRows {
-		return z, err
+	if err != nil && err.Error() != pgx.ErrNoRows.Error() {
+		return
 	}
-
-	columns, err := rows.Columns()
-	if err != nil {
-		return z, err
-	}
-
-	values := make([]sql.RawBytes, len(columns))
-	scanArgs := make([]interface{}, len(values))
-	for i := range values {
-		scanArgs[i] = &values[i]
-	}
-
-	m := make(map[string]string)
-	for rows.Next() {
-		err = rows.Scan(scanArgs...)
-		if err != nil {
-			return
-		}
-		var value string
-		for i, col := range values {
-			if col == nil {
-				value = ""
-			} else {
-				value = php2go.Stripslashes(string(col))
-			}
-			m[columns[i]] = value
-		}
-	}
-	if err = rows.Err(); err != nil {
-		return z, err
-	}
-	return m, nil
+	return z, nil
 }
 
 // countExecutionsInverted will count number of executions not in specified values
-func (p *updateResultExecution) countExecutionsInverted() (z map[string]string, err error) {
-	db, err := sql.Open(
-		"postgres",
-		commons.BuildDSN(),
-	)
+func (p *updateResultExecution) countExecutionsInverted() (z dbCountExecutions, err error) {
+	ctx := context.Background()
+	db, err := pgxpool.Connect(ctx, commons.BuildDSN())
 	if err != nil {
-		log.Error().Err(err).Msg("Failed to connect to DB")
-		return z, err
+		return
 	}
 	defer db.Close()
 
-	stmt, err := db.Prepare("SELECT pod_name, execution_status FROM executions WHERE uniq_id = $1 AND spec = $2")
-	if err != nil && err != sql.ErrNoRows {
-		return z, err
-	}
-	defer stmt.Close()
-
-	rows, err := stmt.Query(
-		php2go.Addslashes(p.UniqID),
-		php2go.Addslashes(p.Spec),
+	err = db.QueryRow(
+		ctx,
+		"SELECT pod_name, execution_status FROM executions WHERE uniq_id = $1 AND spec = $2",
+		p.UniqID,
+		p.Spec,
+	).Scan(
+		&z.Pod_name,
+		&z.Execution_status,
 	)
-	if err != nil && err != sql.ErrNoRows {
-		return z, err
+	if err != nil && err.Error() != pgx.ErrNoRows.Error() {
+		return
 	}
-
-	columns, err := rows.Columns()
-	if err != nil {
-		return z, err
-	}
-
-	values := make([]sql.RawBytes, len(columns))
-	scanArgs := make([]interface{}, len(values))
-	for i := range values {
-		scanArgs[i] = &values[i]
-	}
-
-	m := make(map[string]string)
-	for rows.Next() {
-		err = rows.Scan(scanArgs...)
-		if err != nil {
-			return
-		}
-		var value string
-		for i, col := range values {
-			if col == nil {
-				value = ""
-			} else {
-				value = php2go.Stripslashes(string(col))
-			}
-			m[columns[i]] = value
-		}
-	}
-	if err = rows.Err(); err != nil {
-		return z, err
-	}
-	return m, nil
+	return z, nil
 }
 
-// GetExecutionIDForUnitTesting in only for unit testing purpose and will return annotation_id field
-func GetExecutionIDForUnitTesting() (z map[string]string, err error) {
-	db, err := sql.Open(
-		"postgres",
-		commons.BuildDSN(),
-	)
+// GetExecutionIDForUnitTesting will fetch data from db
+func GetExecutionIDForUnitTesting() (z DBRead, err error) {
+	ctx := context.Background()
+	db, err := pgxpool.Connect(ctx, commons.BuildDSN())
 	if err != nil {
-		log.Error().Err(err).Msg("Failed to connect to DB")
-		return z, err
+		return
 	}
 	defer db.Close()
 
-	stmt, err := db.Prepare("SELECT * FROM executions LIMIT 1")
-	if err != nil && err != sql.ErrNoRows {
-		return z, err
-	}
-	defer stmt.Close()
-
-	rows, err := stmt.Query()
-	if err != nil && err != sql.ErrNoRows {
-		return z, err
-	}
-
-	columns, err := rows.Columns()
+	tx, err := db.Begin(ctx)
 	if err != nil {
-		return z, err
+		return
 	}
+	//golangci-lint fail on this check while the transaction error is checked
+	defer tx.Rollback(ctx) //nolint
 
-	values := make([]sql.RawBytes, len(columns))
-	scanArgs := make([]interface{}, len(values))
-	for i := range values {
-		scanArgs[i] = &values[i]
+	err = tx.QueryRow(
+		ctx,
+		"SELECT * FROM executions LIMIT 1",
+	).Scan(
+		&z.Execution_id,
+		&z.Project_id,
+		&z.Branch,
+		&z.Execution_status,
+		&z.Uniq_id,
+		&z.Spec,
+		&z.Result,
+		&z.Date,
+		&z.Execution_error_output,
+		&z.Pod_name,
+		&z.Pod_cleaned,
+		&z.Project_name,
+	)
+	if err = tx.Commit(ctx); err != nil {
+		return
 	}
-
-	m := make(map[string]string)
-	for rows.Next() {
-		err = rows.Scan(scanArgs...)
-		if err != nil {
-			return
-		}
-		var value string
-		for i, col := range values {
-			if col == nil {
-				value = ""
-			} else {
-				value = php2go.Stripslashes(string(col))
-			}
-			m[columns[i]] = value
-		}
-	}
-	if err = rows.Err(); err != nil {
-		return z, err
-	}
-	return m, nil
+	return z, nil
 }
 
 // search will return all projects
-func (p *searchExecutions) search() (z []interface{}, err error) {
-	db, err := sql.Open(
-		"postgres",
-		commons.BuildDSN(),
-	)
+func (p *searchExecutions) search() (z []dbList, err error) {
+	ctx := context.Background()
+	db, err := pgxpool.Connect(ctx, commons.BuildDSN())
 	if err != nil {
-		log.Error().Err(err).Msg("Failed to connect to DB")
-		return z, err
+		return
 	}
 	defer db.Close()
 
-	stmt, err := db.Prepare("SELECT e.*, (SELECT count(execution_id) FROM executions WHERE branch LIKE '%' || $1 || '%' OR uniq_id LIKE '%' || $1 || '%' OR spec LIKE '%' || $1 || '%') total, p.project_name FROM executions e LEFT JOIN projects p ON e.project_id = p.project_id WHERE e.branch LIKE '%' || $1 || '%' OR e.uniq_id LIKE '%' || $1 || '%' OR e.spec LIKE '%' || $1 || '%' ORDER BY e.date DESC OFFSET $2 LIMIT $3")
-	if err != nil && err != sql.ErrNoRows {
-		return z, err
-	}
-	defer stmt.Close()
-
-	rows, err := stmt.Query(
-		p.Q,
+	rows, err := db.Query(
+		ctx,
+		"SELECT e.*, (SELECT count(execution_id) FROM executions WHERE branch ILIKE '%' || $1 || '%' OR uniq_id ILIKE '%' || $1 || '%' OR spec ILIKE '%' || $1 || '%') total, p.project_name FROM executions e LEFT JOIN projects p ON e.project_id = p.project_id WHERE e.branch ILIKE '%' || $1 || '%' OR e.uniq_id ILIKE '%' || $1 || '%' OR e.spec ILIKE '%' || $1 || '%' ORDER BY e.date DESC OFFSET $2 LIMIT $3",
 		p.StartLimit,
 		p.EndLimit,
 	)
-
-	if err != nil && err != sql.ErrNoRows {
-		return z, err
+	if err != nil && err.Error() != pgx.ErrNoRows.Error() {
+		return
 	}
-
-	columnTypes, err := rows.ColumnTypes()
-	if err != nil {
-		return z, err
-	}
-
-	count := len(columnTypes)
-	finalRows := []interface{}{}
+	defer rows.Close()
 
 	for rows.Next() {
-		scanArgs := make([]interface{}, count)
-		for i, v := range columnTypes {
-			switch v.DatabaseTypeName() {
-			case "VARCHAR", "TEXT", "UUID", "TIMESTAMP":
-				scanArgs[i] = new(sql.NullString)
-				break //nolint:gosimple
-			case "BOOL":
-				scanArgs[i] = new(sql.NullBool)
-				break //nolint:gosimple
-			case "INT4":
-				scanArgs[i] = new(sql.NullInt64)
-				break //nolint:gosimple
-			default:
-				scanArgs[i] = new(sql.NullString)
-			}
+		var x dbList
+		if err = rows.Scan(
+			&x.Execution_id,
+			&x.Project_id,
+			&x.Branch,
+			&x.Execution_status,
+			&x.Uniq_id,
+			&x.Spec,
+			&x.Result,
+			&x.Date,
+			&x.Execution_error_output,
+			&x.Pod_name,
+			&x.Pod_cleaned,
+			&x.Total,
+			&x.Project_name,
+		); err != nil {
+			return
 		}
-		err := rows.Scan(scanArgs...)
-		if err != nil {
-			return z, err
-		}
-
-		m := map[string]interface{}{}
-		for i, v := range columnTypes {
-			if z, ok := (scanArgs[i]).(*sql.NullBool); ok {
-				m[v.Name()] = z.Bool
-				continue
-			}
-			if z, ok := (scanArgs[i]).(*sql.NullString); ok {
-				m[v.Name()] = z.String
-				continue
-			}
-			if z, ok := (scanArgs[i]).(*sql.NullInt64); ok {
-				m[v.Name()] = z.Int64
-				continue
-			}
-			if z, ok := (scanArgs[i]).(*sql.NullFloat64); ok {
-				m[v.Name()] = z.Float64
-				continue
-			}
-			if z, ok := (scanArgs[i]).(*sql.NullInt32); ok {
-				m[v.Name()] = z.Int32
-				continue
-			}
-			m[v.Name()] = scanArgs[i]
-		}
-		finalRows = append(finalRows, m)
+		z = append(z, x)
 	}
-
-	if err = rows.Err(); err != nil {
-		return z, err
-	}
-	return finalRows, nil
+	return z, nil
 }
 
 // uniqId will return all executions of the uniq id provided
-func (p *uniqIDExecutions) uniqId() (z []interface{}, err error) {
-	db, err := sql.Open(
-		"postgres",
-		commons.BuildDSN(),
-	)
+func (p *uniqIDExecutions) uniqId() (z []DBRead, err error) {
+	ctx := context.Background()
+	db, err := pgxpool.Connect(ctx, commons.BuildDSN())
 	if err != nil {
 		return
 	}
 	defer db.Close()
 
-	stmt, err := db.Prepare("SELECT e.*, p.project_name FROM executions e LEFT JOIN projects p ON e.project_id = p.project_id WHERE e.uniq_id = $1 ORDER BY e.date DESC")
-	if err != nil && err != sql.ErrNoRows {
-		return
-	}
-	defer stmt.Close()
-
-	rows, err := stmt.Query(
-		php2go.Addslashes(p.UniqID),
+	rows, err := db.Query(
+		ctx,
+		"SELECT e.*, p.project_name FROM executions e LEFT JOIN projects p ON e.project_id = p.project_id WHERE e.uniq_id = $1 ORDER BY e.date DESC",
+		p.UniqID,
 	)
-	if err != nil && err != sql.ErrNoRows {
+	if err != nil && err.Error() != pgx.ErrNoRows.Error() {
 		return
 	}
-
-	columnTypes, err := rows.ColumnTypes()
-	if err != nil {
-		return z, err
-	}
-
-	count := len(columnTypes)
-	finalRows := []interface{}{}
+	defer rows.Close()
 
 	for rows.Next() {
-		scanArgs := make([]interface{}, count)
-		for i, v := range columnTypes {
-			switch v.DatabaseTypeName() {
-			case "VARCHAR", "TEXT", "UUID", "TIMESTAMP":
-				scanArgs[i] = new(sql.NullString)
-				break //nolint:gosimple
-			case "BOOL":
-				scanArgs[i] = new(sql.NullBool)
-				break //nolint:gosimple
-			case "INT4":
-				scanArgs[i] = new(sql.NullInt64)
-				break //nolint:gosimple
-			default:
-				scanArgs[i] = new(sql.NullString)
-			}
+		var x DBRead
+		if err = rows.Scan(
+			&x.Execution_id,
+			&x.Project_id,
+			&x.Branch,
+			&x.Execution_status,
+			&x.Uniq_id,
+			&x.Spec,
+			&x.Result,
+			&x.Date,
+			&x.Execution_error_output,
+			&x.Pod_name,
+			&x.Pod_cleaned,
+			&x.Project_name,
+		); err != nil {
+			return
 		}
-		err := rows.Scan(scanArgs...)
-		if err != nil {
-			return z, err
-		}
-
-		m := map[string]interface{}{}
-		for i, v := range columnTypes {
-			if z, ok := (scanArgs[i]).(*sql.NullBool); ok {
-				m[v.Name()] = z.Bool
-				continue
-			}
-			if z, ok := (scanArgs[i]).(*sql.NullString); ok {
-				m[v.Name()] = z.String
-				continue
-			}
-			if z, ok := (scanArgs[i]).(*sql.NullInt64); ok {
-				m[v.Name()] = z.Int64
-				continue
-			}
-			if z, ok := (scanArgs[i]).(*sql.NullFloat64); ok {
-				m[v.Name()] = z.Float64
-				continue
-			}
-			if z, ok := (scanArgs[i]).(*sql.NullInt32); ok {
-				m[v.Name()] = z.Int32
-				continue
-			}
-			m[v.Name()] = scanArgs[i]
-		}
-		finalRows = append(finalRows, m)
+		z = append(z, x)
 	}
-
-	if err = rows.Err(); err != nil {
-		return z, err
-	}
-	return finalRows, nil
+	return z, nil
 }

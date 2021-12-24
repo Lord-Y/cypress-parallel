@@ -46,7 +46,7 @@ func TestHooksPlainCreate(t *testing.T) {
 	}
 
 	for _, tc := range tests {
-		payload := fmt.Sprintf("project_name=%s", result["project_name"])
+		payload := fmt.Sprintf("project_name=%s", result.Project_name)
 		if tc.branch != "" {
 			payload += fmt.Sprintf("&branch=%s", tc.branch)
 			payload += fmt.Sprintf("&specs=%s", tools.RandomValueFromSlice(specs))
@@ -55,7 +55,7 @@ func TestHooksPlainCreate(t *testing.T) {
 		assert.Equal(tc.statusCode, w.Code)
 	}
 
-	payload := fmt.Sprintf("project_name=%s", result["project_name"])
+	payload := fmt.Sprintf("project_name=%s", result.Project_name)
 	payload += "&branch=master"
 	payload += fmt.Sprintf("&specs=bad_%s", tools.RandomValueFromSlice(specs))
 	w, _ := performRequest(router, headers, "POST", "/api/v1/hooks/launch/plain", payload)

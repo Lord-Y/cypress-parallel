@@ -2,421 +2,282 @@
 package hooks
 
 import (
-	"database/sql"
+	"context"
 
 	"github.com/Lord-Y/cypress-parallel/commons"
+	"github.com/jackc/pgx/v4"
+	"github.com/jackc/pgx/v4/pgxpool"
 	_ "github.com/lib/pq"
-	"github.com/rs/zerolog/log"
-	"github.com/syyongx/php2go"
 )
 
 // getProjectInfos collect requirements to start the unit testing
-func (p *plain) getProjectInfos() (z map[string]string, err error) {
-	db, err := sql.Open(
-		"postgres",
-		commons.BuildDSN(),
-	)
+func (p *plain) getProjectInfos() (z dbProject, err error) {
+	ctx := context.Background()
+	db, err := pgxpool.Connect(ctx, commons.BuildDSN())
 	if err != nil {
-		log.Error().Err(err).Msg("Failed to connect to DB")
-		return z, err
+		return
 	}
 	defer db.Close()
 
-	stmt, err := db.Prepare("SELECT * FROM projects WHERE project_name = $1 LIMIT 1")
-	if err != nil && err != sql.ErrNoRows {
-		return z, err
-	}
-	defer stmt.Close()
-
-	rows, err := stmt.Query(
-		php2go.Addslashes(p.ProjectName),
+	err = db.QueryRow(
+		ctx,
+		"SELECT * FROM projects WHERE project_name = $1 LIMIT 1",
+		p.ProjectName,
+	).Scan(
+		&z.Project_id,
+		&z.Project_name,
+		&z.Date,
+		&z.Team_id,
+		&z.Repository,
+		&z.Branch,
+		&z.Specs,
+		&z.Scheduling,
+		&z.Scheduling_enabled,
+		&z.Max_pods,
+		&z.Cypress_docker_version,
+		&z.Timeout,
+		&z.Username,
+		&z.Password,
+		&z.Browser,
+		&z.Config_file,
 	)
-	if err != nil && err != sql.ErrNoRows {
-		return z, err
-	}
-
-	columns, err := rows.Columns()
-	if err != nil {
-		return z, err
-	}
-
-	values := make([]sql.RawBytes, len(columns))
-	scanArgs := make([]interface{}, len(values))
-	for i := range values {
-		scanArgs[i] = &values[i]
-	}
-
-	m := make(map[string]string)
-	for rows.Next() {
-		err = rows.Scan(scanArgs...)
-		if err != nil {
-			return
-		}
-		var value string
-		for i, col := range values {
-			if col == nil {
-				value = ""
-			} else {
-				value = php2go.Stripslashes(string(col))
-			}
-			m[columns[i]] = value
-		}
-	}
-	if err = rows.Err(); err != nil {
-		return z, err
-	}
-	return m, nil
-}
-
-// create will insert executions in DB
-func (p *execution) create() (z int64, err error) {
-	db, err := sql.Open(
-		"postgres",
-		commons.BuildDSN(),
-	)
-	if err != nil {
-		log.Error().Err(err).Msg("Failed to connect to DB")
-		return z, err
-	}
-	defer db.Close()
-
-	stmt, err := db.Prepare("INSERT INTO executions(project_id, branch, execution_status, uniq_id, spec, result) VALUES($1, $2, $3, $4, $5, $6) RETURNING execution_id")
-	if err != nil && err != sql.ErrNoRows {
-		return z, err
-	}
-	defer stmt.Close()
-	err = stmt.QueryRow(
-		p.projectID,
-		php2go.Addslashes(p.branch),
-		php2go.Addslashes(p.executionStatus),
-		php2go.Addslashes(p.uniqID),
-		php2go.Addslashes(p.spec),
-		php2go.Addslashes(p.result),
-	).Scan(&z)
-	if err != nil && err != sql.ErrNoRows {
-		return z, err
+	if err != nil && err.Error() != pgx.ErrNoRows.Error() {
+		return
 	}
 	return z, nil
 }
 
-// getProjectAnnotations collect requirements to start the unit testing
-func (p *projects) getProjectAnnotations() (z []map[string]interface{}, err error) {
-	db, err := sql.Open(
-		"postgres",
-		commons.BuildDSN(),
-	)
+// create will insert executions in DB
+func (p *execution) create() (z int64, err error) {
+	ctx := context.Background()
+	db, err := pgxpool.Connect(ctx, commons.BuildDSN())
 	if err != nil {
 		return
 	}
 	defer db.Close()
 
-	stmt, err := db.Prepare("SELECT * FROM annotations WHERE project_id = $1 LIMIT 1")
-	if err != nil && err != sql.ErrNoRows {
-		return
-	}
-	defer stmt.Close()
-
-	rows, err := stmt.Query(
-		p.Project_id,
-	)
-	if err != nil && err != sql.ErrNoRows {
-		return
-	}
-
-	columns, err := rows.Columns()
+	tx, err := db.Begin(ctx)
 	if err != nil {
 		return
 	}
+	//golangci-lint fail on this check while the transaction error is checked
+	defer tx.Rollback(ctx) //nolint
 
-	values := make([]sql.RawBytes, len(columns))
-	scanArgs := make([]interface{}, len(values))
-	for i := range values {
-		scanArgs[i] = &values[i]
-	}
-
-	m := make([]map[string]interface{}, 0)
-	for rows.Next() {
-		err = rows.Scan(scanArgs...)
-		if err != nil {
-			return
-		}
-		var value string
-		sub := make(map[string]interface{})
-		for i, col := range values {
-			if col == nil {
-				value = ""
-			} else {
-				value = php2go.Stripslashes(string(col))
-			}
-			sub[columns[i]] = value
-		}
-		m = append(m, sub)
-	}
-	if err = rows.Err(); err != nil {
+	err = tx.QueryRow(
+		ctx,
+		"INSERT INTO executions(project_id, branch, execution_status, uniq_id, spec, result) VALUES($1, $2, $3, $4, $5, $6) RETURNING execution_id",
+		p.projectID,
+		p.branch,
+		p.executionStatus,
+		p.uniqID,
+		p.spec,
+		p.result,
+	).Scan(
+		&z,
+	)
+	if err = tx.Commit(ctx); err != nil {
 		return
 	}
-	return m, nil
+	return z, nil
 }
 
-// getProjectEnvironments collect requirements to start the unit testing
-func (p *projects) getProjectEnvironments() (z []map[string]interface{}, err error) {
-	db, err := sql.Open(
-		"postgres",
-		commons.BuildDSN(),
-	)
+// getProjectAnnotations collect annotatons
+func (p *dbProject) getProjectAnnotations() (z []dbProjectAnnotation, err error) {
+	ctx := context.Background()
+	db, err := pgxpool.Connect(ctx, commons.BuildDSN())
 	if err != nil {
 		return
 	}
 	defer db.Close()
 
-	stmt, err := db.Prepare("SELECT * FROM environments WHERE project_id = $1 LIMIT 1")
-	if err != nil && err != sql.ErrNoRows {
-		return
-	}
-	defer stmt.Close()
-
-	rows, err := stmt.Query(
+	rows, err := db.Query(
+		ctx,
+		"SELECT * FROM annotations WHERE project_id = $1 LIMIT 1",
 		p.Project_id,
 	)
-	if err != nil && err != sql.ErrNoRows {
+	if err != nil && err.Error() != pgx.ErrNoRows.Error() {
 		return
 	}
+	defer rows.Close()
 
-	columns, err := rows.Columns()
+	for rows.Next() {
+		var x dbProjectAnnotation
+		if err = rows.Scan(
+			&x.Annotation_id,
+			&x.Key,
+			&x.Value,
+			&x.Project_id,
+			&x.Date,
+		); err != nil {
+			return
+		}
+		z = append(z, x)
+	}
+	return z, nil
+}
+
+// getProjectEnvironments collect requirements
+func (p *dbProject) getProjectEnvironments() (z []dbProjectEnvironment, err error) {
+	ctx := context.Background()
+	db, err := pgxpool.Connect(ctx, commons.BuildDSN())
 	if err != nil {
 		return
 	}
+	defer db.Close()
 
-	values := make([]sql.RawBytes, len(columns))
-	scanArgs := make([]interface{}, len(values))
-	for i := range values {
-		scanArgs[i] = &values[i]
-	}
-
-	m := make([]map[string]interface{}, 0)
-	for rows.Next() {
-		err = rows.Scan(scanArgs...)
-		if err != nil {
-			return
-		}
-		var value string
-		sub := make(map[string]interface{})
-		for i, col := range values {
-			if col == nil {
-				value = ""
-			} else {
-				value = php2go.Stripslashes(string(col))
-			}
-			sub[columns[i]] = value
-		}
-		m = append(m, sub)
-	}
-	if err = rows.Err(); err != nil {
+	rows, err := db.Query(
+		ctx,
+		"SELECT * FROM environments WHERE project_id = $1",
+		p.Project_id,
+	)
+	if err != nil && err.Error() != pgx.ErrNoRows.Error() {
 		return
 	}
-	return m, nil
+	defer rows.Close()
+
+	for rows.Next() {
+		var x dbProjectEnvironment
+		if err = rows.Scan(
+			&x.Environment_id,
+			&x.Key,
+			&x.Value,
+			&x.Project_id,
+			&x.Date,
+		); err != nil {
+			return
+		}
+		z = append(z, x)
+	}
+	return z, nil
 }
 
 // update will update pod_name field in DB
 func (p *updatePodName) update() (err error) {
-	db, err := sql.Open(
-		"postgres",
-		commons.BuildDSN(),
-	)
+	ctx := context.Background()
+	db, err := pgxpool.Connect(ctx, commons.BuildDSN())
 	if err != nil {
-		log.Error().Err(err).Msg("Failed to connect to DB")
-		return err
+		return
 	}
 	defer db.Close()
 
-	stmt, err := db.Prepare("UPDATE executions SET pod_name = $1, execution_status = 'RUNNING' WHERE uniq_id = $2 AND spec = $3")
-	if err != nil && err != sql.ErrNoRows {
-		return err
+	tx, err := db.Begin(ctx)
+	if err != nil {
+		return
 	}
-	defer stmt.Close()
-	err = stmt.QueryRow(
-		php2go.Addslashes(p.podName),
-		php2go.Addslashes(p.uniqID),
-		php2go.Addslashes(p.spec),
-	).Scan()
-	if err != nil && err != sql.ErrNoRows {
-		return err
+	//golangci-lint fail on this check while the transaction error is checked
+	defer tx.Rollback(ctx) //nolint
+
+	_, err = tx.Exec(
+		ctx,
+		"UPDATE executions SET pod_name = $1, execution_status = 'RUNNING' WHERE uniq_id = $2 AND spec = $3",
+		p.podName,
+		p.uniqID,
+		p.spec,
+	)
+	if err = tx.Commit(ctx); err != nil {
+		return
 	}
 	return nil
 }
 
 // executionStatus get executions by status
-func executionStatus(execution_status string) (z []map[string]interface{}, err error) {
-	db, err := sql.Open(
-		"postgres",
-		commons.BuildDSN(),
-	)
+func executionStatus(execution_status string) (z []dbProjectUniqIDExecution, err error) {
+	ctx := context.Background()
+	db, err := pgxpool.Connect(ctx, commons.BuildDSN())
 	if err != nil {
 		return
 	}
 	defer db.Close()
 
-	stmt, err := db.Prepare("SELECT DISTINCT uniq_id FROM executions WHERE execution_status = $1")
-	if err != nil && err != sql.ErrNoRows {
-		return
-	}
-	defer stmt.Close()
-
-	rows, err := stmt.Query(
+	rows, err := db.Query(
+		ctx,
+		"SELECT DISTINCT uniq_id FROM executions WHERE execution_status = $1",
 		execution_status,
 	)
-	if err != nil && err != sql.ErrNoRows {
+	if err != nil && err.Error() != pgx.ErrNoRows.Error() {
 		return
 	}
+	defer rows.Close()
 
-	columns, err := rows.Columns()
-	if err != nil {
-		return
-	}
-
-	values := make([]sql.RawBytes, len(columns))
-	scanArgs := make([]interface{}, len(values))
-	for i := range values {
-		scanArgs[i] = &values[i]
-	}
-
-	m := make([]map[string]interface{}, 0)
 	for rows.Next() {
-		err = rows.Scan(scanArgs...)
-		if err != nil {
+		var x dbProjectUniqIDExecution
+		if err = rows.Scan(
+			&x.Uniq_id,
+		); err != nil {
 			return
 		}
-		var value string
-		sub := make(map[string]interface{})
-		for i, col := range values {
-			if col == nil {
-				value = ""
-			} else {
-				value = php2go.Stripslashes(string(col))
-			}
-			sub[columns[i]] = value
-		}
-		m = append(m, sub)
+		z = append(z, x)
 	}
-	if err = rows.Err(); err != nil {
-		return
-	}
-	return m, nil
+	return z, nil
 }
 
 // pgqueued get queued executions
-func pgqueued(uniqId string) (z []map[string]interface{}, err error) {
-	db, err := sql.Open(
-		"postgres",
-		commons.BuildDSN(),
-	)
+func pgqueued(uniqId string) (z []dbPGQueue, err error) {
+	ctx := context.Background()
+	db, err := pgxpool.Connect(ctx, commons.BuildDSN())
 	if err != nil {
 		return
 	}
 	defer db.Close()
 
-	stmt, err := db.Prepare("SELECT e.*, p.project_name FROM executions e LEFT JOIN projects p ON e.project_id = p.project_id WHERE e.execution_status = 'QUEUED' AND e.uniq_id = $1")
-	if err != nil && err != sql.ErrNoRows {
-		return
-	}
-	defer stmt.Close()
-
-	rows, err := stmt.Query(
-		php2go.Addslashes(uniqId),
+	rows, err := db.Query(
+		ctx,
+		"SELECT e.*, p.project_name FROM executions e LEFT JOIN projects p ON e.project_id = p.project_id WHERE e.execution_status = 'QUEUED' AND e.uniq_id = $1",
+		uniqId,
 	)
-	if err != nil && err != sql.ErrNoRows {
+	if err != nil && err.Error() != pgx.ErrNoRows.Error() {
 		return
 	}
+	defer rows.Close()
 
-	columns, err := rows.Columns()
-	if err != nil {
-		return
-	}
-
-	values := make([]sql.RawBytes, len(columns))
-	scanArgs := make([]interface{}, len(values))
-	for i := range values {
-		scanArgs[i] = &values[i]
-	}
-
-	m := make([]map[string]interface{}, 0)
 	for rows.Next() {
-		err = rows.Scan(scanArgs...)
-		if err != nil {
+		var x dbPGQueue
+		if err = rows.Scan(
+			&x.Execution_id,
+			&x.Project_id,
+			&x.Branch,
+			&x.Execution_status,
+			&x.Uniq_id,
+			&x.Spec,
+			&x.Result,
+			&x.Date,
+			&x.Execution_error_output,
+			&x.Pod_name,
+			&x.Pod_cleaned,
+			&x.Project_name,
+		); err != nil {
 			return
 		}
-		var value string
-		sub := make(map[string]interface{})
-		for i, col := range values {
-			if col == nil {
-				value = ""
-			} else {
-				value = php2go.Stripslashes(string(col))
-			}
-			sub[columns[i]] = value
-		}
-		m = append(m, sub)
+		z = append(z, x)
 	}
-	if err = rows.Err(); err != nil {
-		return
-	}
-	return m, nil
+	return z, nil
 }
 
 // countExecutions will count number of executions not in specified values
-func countExecutions(uniq_id string) (z map[string]string, err error) {
-	db, err := sql.Open(
-		"postgres",
-		commons.BuildDSN(),
-	)
+func countExecutions(uniq_id string) (z dbCountExecutions, err error) {
+	ctx := context.Background()
+	db, err := pgxpool.Connect(ctx, commons.BuildDSN())
 	if err != nil {
-		log.Error().Err(err).Msg("Failed to connect to DB")
-		return z, err
+		return
 	}
 	defer db.Close()
 
-	stmt, err := db.Prepare("SELECT COUNT(execution_id) FROM executions WHERE uniq_id = $1 AND execution_status = 'RUNNING'")
-	if err != nil && err != sql.ErrNoRows {
-		return z, err
-	}
-	defer stmt.Close()
-
-	rows, err := stmt.Query(
-		php2go.Addslashes(uniq_id),
-	)
-	if err != nil && err != sql.ErrNoRows {
-		return z, err
-	}
-
-	columns, err := rows.Columns()
+	tx, err := db.Begin(ctx)
 	if err != nil {
-		return z, err
+		return
 	}
+	//golangci-lint fail on this check while the transaction error is checked
+	defer tx.Rollback(ctx) //nolint
 
-	values := make([]sql.RawBytes, len(columns))
-	scanArgs := make([]interface{}, len(values))
-	for i := range values {
-		scanArgs[i] = &values[i]
+	err = tx.QueryRow(
+		ctx,
+		"SELECT COUNT(execution_id) FROM executions WHERE uniq_id = $1 AND execution_status = 'RUNNING'",
+		uniq_id,
+	).Scan(
+		&z.Count,
+	)
+	if err = tx.Commit(ctx); err != nil {
+		return
 	}
-
-	m := make(map[string]string)
-	for rows.Next() {
-		err = rows.Scan(scanArgs...)
-		if err != nil {
-			return
-		}
-		var value string
-		for i, col := range values {
-			if col == nil {
-				value = ""
-			} else {
-				value = php2go.Stripslashes(string(col))
-			}
-			m[columns[i]] = value
-		}
-	}
-	if err = rows.Err(); err != nil {
-		return z, err
-	}
-	return m, nil
+	return z, nil
 }

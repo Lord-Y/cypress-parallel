@@ -48,7 +48,7 @@ func TestAnnotationsCreate(t *testing.T) {
 	}
 
 	for _, tc := range tests {
-		payload := fmt.Sprintf("projectId=%s", result["project_id"])
+		payload := fmt.Sprintf("projectId=%d", result.Project_id)
 		payload += fmt.Sprintf("&key=%s", tc.key)
 		payload += fmt.Sprintf("&value=%s", tc.value)
 		w, _ := performRequest(router, headers, "POST", "/api/v1/annotations", payload)
@@ -70,8 +70,8 @@ func TestAnnotationsUpdate(t *testing.T) {
 
 	router := SetupRouter()
 
-	payload := fmt.Sprintf("projectId=%s", result["project_id"])
-	payload += fmt.Sprintf("&annotationId=%s", result["annotation_id"])
+	payload := fmt.Sprintf("projectId=%d", result.Project_id)
+	payload += fmt.Sprintf("&annotationId=%d", result.Annotation_id)
 	payload += fmt.Sprintf("&key=%s", fake.CharactersN(5))
 	payload += fmt.Sprintf("&value=%s", fake.CharactersN(5))
 	w, _ := performRequest(router, headers, "PUT", "/api/v1/annotations", payload)
@@ -91,8 +91,8 @@ func TestAnnotationsUpdate_fail(t *testing.T) {
 	}
 
 	router := SetupRouter()
-	payload := fmt.Sprintf("projectId=%s", result["project_id"])
-	payload += fmt.Sprintf("&annotationId=%s", result["annotation_id"])
+	payload := fmt.Sprintf("projectId=%d", result.Project_id)
+	payload += fmt.Sprintf("&annotationId=%d", result.Annotation_id)
 	w, _ := performRequest(router, headers, "PUT", "/api/v1/annotations", payload)
 	assert.Equal(400, w.Code)
 }
@@ -120,7 +120,7 @@ func TestAnnotationsRead(t *testing.T) {
 	}
 
 	router := SetupRouter()
-	w, _ := performRequest(router, headers, "GET", fmt.Sprintf("/api/v1/annotations/%s", result["annotation_id"]), "")
+	w, _ := performRequest(router, headers, "GET", fmt.Sprintf("/api/v1/annotations/%d", result.Annotation_id), "")
 	assert.Contains(w.Body.String(), "key")
 }
 
@@ -137,7 +137,7 @@ func TestAnnotationsDelete(t *testing.T) {
 	}
 
 	router := SetupRouter()
-	w, _ := performRequest(router, headers, "DELETE", fmt.Sprintf("/api/v1/annotations/%s", result["annotation_id"]), "")
+	w, _ := performRequest(router, headers, "DELETE", fmt.Sprintf("/api/v1/annotations/%d", result.Annotation_id), "")
 	assert.Equal(200, w.Code)
 }
 
@@ -154,11 +154,8 @@ func TestAnnotationsSearch(t *testing.T) {
 	}
 
 	router := SetupRouter()
-	w, _ := performRequest(router, headers, "GET", fmt.Sprintf("/api/v1/annotations/search?q=%s", result["key"]), "")
-	if len(result) > 0 {
-		assert.Contains(w.Body.String(), "key")
-		return
-	}
+	w, _ := performRequest(router, headers, "GET", fmt.Sprintf("/api/v1/annotations/search?q=%s", result.Key), "")
+	assert.Contains(w.Body.String(), "key")
 	w, _ = performRequest(router, headers, "GET", "/api/v1/annotations/search?q=", "")
 	assert.Equal(400, w.Code)
 }
@@ -176,6 +173,6 @@ func TestAnnotationsByProjectID(t *testing.T) {
 	}
 
 	router := SetupRouter()
-	w, _ := performRequest(router, headers, "GET", fmt.Sprintf("/api/v1/annotations/list/by/projectid/%s", result["project_id"]), "")
+	w, _ := performRequest(router, headers, "GET", fmt.Sprintf("/api/v1/annotations/list/by/projectid/%d", result.Project_id), "")
 	assert.Equal(200, w.Code)
 }

@@ -36,7 +36,7 @@ func TestTeamsRead(t *testing.T) {
 		return
 	}
 	router := SetupRouter()
-	w, _ := performRequest(router, headers, "GET", fmt.Sprintf("/api/v1/teams/%s", result["team_id"]), "")
+	w, _ := performRequest(router, headers, "GET", fmt.Sprintf("/api/v1/teams/%d", result.Team_id), "")
 	assert.Contains(w.Body.String(), "name")
 }
 
@@ -77,7 +77,7 @@ func TestTeamsUpdate(t *testing.T) {
 		return
 	}
 	payload := fmt.Sprintf("name=%s", fake.CharactersN(10))
-	payload += fmt.Sprintf("&teamId=%s", result["team_id"])
+	payload += fmt.Sprintf("&teamId=%d", result.Team_id)
 
 	router := SetupRouter()
 	w, _ := performRequest(router, headers, "PUT", "/api/v1/teams", payload)
@@ -97,7 +97,7 @@ func TestTeamsDelete(t *testing.T) {
 	}
 
 	router := SetupRouter()
-	w, _ := performRequest(router, headers, "DELETE", fmt.Sprintf("/api/v1/teams/%s", result["team_id"]), "")
+	w, _ := performRequest(router, headers, "DELETE", fmt.Sprintf("/api/v1/teams/%d", result.Team_id), "")
 	assert.Equal(200, w.Code)
 }
 
@@ -114,11 +114,8 @@ func TestTeamsSearch(t *testing.T) {
 	}
 
 	router := SetupRouter()
-	w, _ := performRequest(router, headers, "GET", fmt.Sprintf("/api/v1/teams/search?q=%s", result["team_name"]), "")
-	if len(result) > 0 {
-		assert.Contains(w.Body.String(), "team_name")
-		return
-	}
+	w, _ := performRequest(router, headers, "GET", fmt.Sprintf("/api/v1/teams/search?q=%s", result.Team_name), "")
+	assert.Contains(w.Body.String(), "team_name")
 	w, _ = performRequest(router, headers, "GET", "/api/v1/teams/search?q=", "")
 	assert.Equal(400, w.Code)
 }

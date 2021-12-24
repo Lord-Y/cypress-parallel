@@ -25,7 +25,7 @@ func TestExecutionsList(t *testing.T) {
 	}
 
 	router := SetupRouter()
-	payload := fmt.Sprintf("project_name=%s", result["project_name"])
+	payload := fmt.Sprintf("project_name=%s", result.Project_name)
 	payload += fmt.Sprintf("&specs=%s", tools.RandomValueFromSlice(specs))
 	w, _ := performRequest(router, headers, "POST", "/api/v1/hooks/launch/plain", payload)
 	assert.Equal(201, w.Code)
@@ -48,12 +48,12 @@ func TestExecutionsUpdateResult(t *testing.T) {
 	}
 	payload := `result={"key": "key", "value": "value", "environment_id": 35}`
 	payload += "&executionStatus=DONE"
-	payload += fmt.Sprintf("&branch=%s", resultEx["branch"])
-	payload += fmt.Sprintf("&spec=%s", resultEx["spec"])
-	payload += fmt.Sprintf("&uniqId=%s", resultEx["uniq_id"])
+	payload += fmt.Sprintf("&branch=%s", resultEx.Branch)
+	payload += fmt.Sprintf("&spec=%s", resultEx.Spec)
+	payload += fmt.Sprintf("&uniqId=%s", resultEx.Uniq_id)
 
 	w, _ := performRequest(router, headers, "POST", "/api/v1/executions/update", payload)
-	if len(resultEx) == 0 {
+	if resultEx == (executions.DBRead{}) {
 		assert.Equal(400, w.Code)
 		return
 	}
@@ -62,9 +62,9 @@ func TestExecutionsUpdateResult(t *testing.T) {
 	// rollback
 	payload = `result={}`
 	payload += "&executionStatus=NOT_STARTED"
-	payload += fmt.Sprintf("&branch=%s", resultEx["branch"])
-	payload += fmt.Sprintf("&spec=%s", resultEx["spec"])
-	payload += fmt.Sprintf("&uniqId=%s", resultEx["uniq_id"])
+	payload += fmt.Sprintf("&branch=%s", resultEx.Branch)
+	payload += fmt.Sprintf("&spec=%s", resultEx.Spec)
+	payload += fmt.Sprintf("&uniqId=%s", resultEx.Uniq_id)
 
 	w, _ = performRequest(router, headers, "POST", "/api/v1/executions/update", payload)
 	assert.Equal(200, w.Code)
@@ -84,8 +84,8 @@ func TestExecutionsUpdateResult_fail(t *testing.T) {
 	}
 	payload := `result={"key": "key", "value": "value", "environment_id": 35}`
 	payload += "&executionStatus=DONE"
-	payload += fmt.Sprintf("&branch=%s", resultEx["branch"])
-	payload += fmt.Sprintf("&spec=%s", resultEx["spec"])
+	payload += fmt.Sprintf("&branch=%s", resultEx.Branch)
+	payload += fmt.Sprintf("&spec=%s", resultEx.Spec)
 
 	w, _ := performRequest(router, headers, "POST", "/api/v1/executions/update", payload)
 	assert.Equal(400, w.Code)
@@ -103,8 +103,8 @@ func TestExecutionsRead(t *testing.T) {
 		return
 	}
 
-	w, _ := performRequest(router, headers, "GET", fmt.Sprintf("/api/v1/executions/%s", resultEx["execution_id"]), "")
-	if len(resultEx) == 0 {
+	w, _ := performRequest(router, headers, "GET", fmt.Sprintf("/api/v1/executions/%d", resultEx.Execution_id), "")
+	if resultEx == (executions.DBRead{}) {
 		assert.Equal(404, w.Code)
 		return
 	}
@@ -123,8 +123,8 @@ func TestExecutionsSearch(t *testing.T) {
 	}
 
 	router := SetupRouter()
-	w, _ := performRequest(router, headers, "GET", fmt.Sprintf("/api/v1/executions/search?q=%s", result["branch"]), "")
-	if len(result) > 0 {
+	w, _ := performRequest(router, headers, "GET", fmt.Sprintf("/api/v1/executions/search?q=%s", result.Branch), "")
+	if result != (executions.DBRead{}) {
 		assert.Contains(w.Body.String(), "branch")
 		return
 	}
@@ -146,8 +146,8 @@ func TestExecutionsUniqID(t *testing.T) {
 	}
 
 	router := SetupRouter()
-	w, _ := performRequest(router, headers, "GET", fmt.Sprintf("/api/v1/executions/list/by/uniqid/%s", result["uniq_id"]), "")
-	if len(result) > 0 {
+	w, _ := performRequest(router, headers, "GET", fmt.Sprintf("/api/v1/executions/list/by/uniqid/%s", result.Uniq_id), "")
+	if result != (executions.DBRead{}) {
 		assert.Contains(w.Body.String(), "branch")
 		return
 	}

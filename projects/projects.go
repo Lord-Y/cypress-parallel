@@ -4,6 +4,7 @@ package projects
 import (
 	"net/http"
 	"strconv"
+	"time"
 
 	"github.com/Lord-Y/cypress-parallel/commons"
 	"github.com/Lord-Y/cypress-parallel/tools"
@@ -75,6 +76,80 @@ type searchProjects struct {
 	EndLimit   int
 }
 
+// dbRead struct permit to map data from db
+type dbRead struct {
+	Project_id             int       `json:"project_id"`
+	Project_name           string    `json:"project_name"`
+	Date                   time.Time `json:"date"`
+	Team_id                int       `json:"team_id"`
+	Repository             string    `json:"repository"`
+	Branch                 string    `json:"branch"`
+	Specs                  string    `json:"specs"`
+	Scheduling             string    `json:"scheduling"`
+	Scheduling_enabled     bool      `json:"scheduling_enabled"`
+	Max_pods               int       `json:"max_pods"`
+	Cypress_docker_version string    `json:"cypress_docker_version"`
+	Timeout                int       `json:"timeout"`
+	Username               string    `json:"username"`
+	Password               string    `json:"password"`
+	Browser                string    `json:"browser"`
+	Config_file            string    `json:"config_file"`
+	Team_name              string    `json:"team_name"`
+}
+
+// dbList struct permit to map data from db
+type dbList struct {
+	Project_id             int       `json:"project_id"`
+	Project_name           string    `json:"project_name"`
+	Date                   time.Time `json:"date"`
+	Team_id                int       `json:"team_id"`
+	Repository             string    `json:"repository"`
+	Branch                 string    `json:"branch"`
+	Specs                  string    `json:"specs"`
+	Scheduling             string    `json:"scheduling"`
+	Scheduling_enabled     bool      `json:"scheduling_enabled"`
+	Max_pods               int       `json:"max_pods"`
+	Cypress_docker_version string    `json:"cypress_docker_version"`
+	Timeout                int       `json:"timeout"`
+	Username               string    `json:"username"`
+	Password               string    `json:"password"`
+	Browser                string    `json:"browser"`
+	Config_file            string    `json:"config_file"`
+	Total                  int       `json:"total"`
+	Team_name              string    `json:"team_name"`
+}
+
+// dbAll struct permit to map data from db
+type dbAll struct {
+	Project_id             int    `json:"project_id"`
+	Project_name           string `json:"project_name"`
+	Branch                 string `json:"branch"`
+	Cypress_docker_version string `json:"cypress_docker_version"`
+	Browser                string `json:"browser"`
+	Config_file            string `json:"config_file"`
+	Total                  int    `json:"total"`
+}
+
+// dbCommon struct permit to map data from db
+type dbCommon struct {
+	Project_id             int       `json:"project_id"`
+	Project_name           string    `json:"project_name"`
+	Date                   time.Time `json:"date"`
+	Team_id                int       `json:"team_id"`
+	Repository             string    `json:"repository"`
+	Branch                 string    `json:"branch"`
+	Specs                  string    `json:"specs"`
+	Scheduling             string    `json:"scheduling"`
+	Scheduling_enabled     bool      `json:"scheduling_enabled"`
+	Max_pods               int       `json:"max_pods"`
+	Cypress_docker_version string    `json:"cypress_docker_version"`
+	Timeout                int       `json:"timeout"`
+	Username               string    `json:"username"`
+	Password               string    `json:"password"`
+	Browser                string    `json:"browser"`
+	Config_file            string    `json:"config_file"`
+}
+
 // Create handle requirements to create projects with projects struct
 func Create(c *gin.Context) {
 	var (
@@ -133,7 +208,7 @@ func Read(c *gin.Context) {
 		return
 	}
 
-	if len(result) == 0 {
+	if result == (dbRead{}) {
 		c.AbortWithStatus(404)
 	} else {
 		c.JSON(http.StatusOK, result)

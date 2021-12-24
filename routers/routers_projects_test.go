@@ -27,7 +27,7 @@ func TestProjectsCreate(t *testing.T) {
 		return
 	}
 	payload := fmt.Sprintf("name=%s", fake.CharactersN(10))
-	payload += fmt.Sprintf("&teamId=%s", result["team_id"])
+	payload += fmt.Sprintf("&teamId=%d", result.Team_id)
 	payload += "&repository=https://github.com/cypress-io/cypress-example-kitchensink.git"
 	payload += "&branch=master"
 	payload += fmt.Sprintf("&specs=%s", tools.RandomValueFromSlice(specs))
@@ -55,7 +55,7 @@ func TestProjectsCreate_fail(t *testing.T) {
 		return
 	}
 	payload := fmt.Sprintf("name=%s", fake.CharactersN(10))
-	payload += fmt.Sprintf("&teamId=%s", result["team_id"])
+	payload += fmt.Sprintf("&teamId=%d", result.Team_id)
 	payload += "&repository=https://github.com/cypress-io/cypress-example-kitchensink.git"
 	payload += "&branch=master"
 	payload += fmt.Sprintf("&specs=%s", tools.RandomValueFromSlice(specs))
@@ -81,7 +81,7 @@ func TestProjectsRead(t *testing.T) {
 		return
 	}
 	router := SetupRouter()
-	w, _ := performRequest(router, headers, "GET", fmt.Sprintf("/api/v1/projects/%s", result["project_id"]), "")
+	w, _ := performRequest(router, headers, "GET", fmt.Sprintf("/api/v1/projects/%d", result.Project_id), "")
 	assert.Contains(w.Body.String(), "name")
 }
 
@@ -110,7 +110,7 @@ func TestProjectsCreateMulti(t *testing.T) {
 	for i := 1; i < 5; i++ {
 		rand.Seed(time.Now().UnixNano())
 		payload := fmt.Sprintf("name=%s", fake.CharactersN(10))
-		payload += fmt.Sprintf("&teamId=%s", result["team_id"])
+		payload += fmt.Sprintf("&teamId=%d", result.Team_id)
 		payload += "&repository=https://github.com/cypress-io/cypress-example-kitchensink.git"
 		payload += "&branch=master"
 		payload += fmt.Sprintf("&specs=%s", tools.RandomValueFromSlice(specs))
@@ -136,15 +136,15 @@ func TestProjectsUpdate(t *testing.T) {
 		return
 	}
 	payload := fmt.Sprintf("name=%s", fake.CharactersN(10))
-	payload += fmt.Sprintf("&projectId=%s", result["project_id"])
-	payload += fmt.Sprintf("&teamId=%s", result["team_id"])
+	payload += fmt.Sprintf("&projectId=%d", result.Project_id)
+	payload += fmt.Sprintf("&teamId=%d", result.Team_id)
 	payload += "&repository=https://github.com/cypress-io/cypress-example-kitchensink.git"
 	payload += "&branch=master"
 	payload += fmt.Sprintf("&specs=%s", tools.RandomValueFromSlice(specs))
 	payload += "&scheduling="
 	payload += "&schedulingEnabled=false"
 	payload += fmt.Sprintf("&maxPods=%d", fake.MonthNum())
-	payload += fmt.Sprintf("&browser=%s", result["browser"])
+	payload += fmt.Sprintf("&browser=%s", result.Browser)
 
 	router := SetupRouter()
 	w, _ := performRequest(router, headers, "PUT", "/api/v1/projects", payload)
@@ -164,7 +164,7 @@ func TestProjectsDelete(t *testing.T) {
 	}
 
 	router := SetupRouter()
-	w, _ := performRequest(router, headers, "DELETE", fmt.Sprintf("/api/v1/projects/%s", result["project_id"]), "")
+	w, _ := performRequest(router, headers, "DELETE", fmt.Sprintf("/api/v1/projects/%d", result.Project_id), "")
 	assert.Equal(200, w.Code)
 }
 
@@ -181,11 +181,8 @@ func TestProjectsSearch(t *testing.T) {
 	}
 
 	router := SetupRouter()
-	w, _ := performRequest(router, headers, "GET", fmt.Sprintf("/api/v1/projects/search?q=%s", result["project_name"]), "")
-	if len(result) > 0 {
-		assert.Contains(w.Body.String(), "project_name")
-		return
-	}
+	w, _ := performRequest(router, headers, "GET", fmt.Sprintf("/api/v1/projects/search?q=%s", result.Project_name), "")
+	assert.Contains(w.Body.String(), "project_name")
 	w, _ = performRequest(router, headers, "GET", "/api/v1/projects/search?q=", "")
 	assert.Equal(400, w.Code)
 }

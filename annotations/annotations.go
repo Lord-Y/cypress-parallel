@@ -4,6 +4,7 @@ package annotations
 import (
 	"net/http"
 	"strconv"
+	"time"
 
 	"github.com/Lord-Y/cypress-parallel/commons"
 	"github.com/Lord-Y/cypress-parallel/tools"
@@ -56,6 +57,36 @@ type searchAnnotations struct {
 // listAnnotationsByProjectID struct handle requirements to get all annotations from project id
 type listAnnotationsByProjectID struct {
 	ProjectID int `form:"projectId" json:"projectId" binding:"required"`
+}
+
+// dbList struct permit to map data from db
+type dbList struct {
+	Annotation_id int       `json:"annotation_id"`
+	Key           string    `json:"key"`
+	Value         string    `json:"value"`
+	Project_id    int       `json:"project_id"`
+	Date          time.Time `json:"date"`
+	Total         int       `json:"total"`
+	Project_name  string    `json:"project_name"`
+}
+
+// dbRead struct permit to map data from db
+type dbRead struct {
+	Annotation_id int       `json:"annotation_id"`
+	Key           string    `json:"key"`
+	Value         string    `json:"value"`
+	Project_id    int       `json:"project_id"`
+	Date          time.Time `json:"date"`
+	Project_name  string    `json:"project_name"`
+}
+
+// dbCommon struct permit to map data from db
+type dbCommon struct {
+	Annotation_id int       `json:"annotation_id"`
+	Key           string    `json:"key"`
+	Value         string    `json:"value"`
+	Project_id    int       `json:"project_id"`
+	Date          time.Time `json:"date"`
 }
 
 // Create handle requirements to create annotations with annotation struct
@@ -147,7 +178,7 @@ func Read(c *gin.Context) {
 		return
 	}
 
-	if len(result) == 0 {
+	if result == (dbRead{}) {
 		c.AbortWithStatus(204)
 	} else {
 		c.JSON(http.StatusOK, result)

@@ -5,6 +5,7 @@ import (
 	"encoding/hex"
 	"net/http"
 	"strconv"
+	"time"
 
 	"github.com/Lord-Y/cypress-parallel/commons"
 	"github.com/Lord-Y/cypress-parallel/kubernetes"
@@ -49,6 +50,45 @@ type searchExecutions struct {
 // uniqIDExecutions struct handle requirements to get uniq id executions
 type uniqIDExecutions struct {
 	UniqID string `form:"uniqId" json:"uniqId" binding:"required"`
+}
+
+// dbList struct permit to map data from db
+type dbList struct {
+	Execution_id           int       `json:"execution_id"`
+	Project_id             int       `json:"project_id"`
+	Branch                 string    `json:"branch"`
+	Execution_status       string    `json:"execution_status"`
+	Uniq_id                string    `json:"uniq_id"`
+	Spec                   string    `json:"spec"`
+	Result                 string    `json:"result"`
+	Date                   time.Time `json:"date"`
+	Execution_error_output string    `json:"execution_error_output"`
+	Pod_name               string    `json:"pod_name"`
+	Pod_cleaned            bool      `json:"pod_cleaned"`
+	Total                  int       `json:"total"`
+	Project_name           string    `json:"project_name"`
+}
+
+// DBRead struct permit to map data from db
+type DBRead struct {
+	Execution_id           int       `json:"execution_id"`
+	Project_id             int       `json:"project_id"`
+	Branch                 string    `json:"branch"`
+	Execution_status       string    `json:"execution_status"`
+	Uniq_id                string    `json:"uniq_id"`
+	Spec                   string    `json:"spec"`
+	Result                 string    `json:"result"`
+	Date                   time.Time `json:"date"`
+	Execution_error_output string    `json:"execution_error_output"`
+	Pod_name               string    `json:"pod_name"`
+	Pod_cleaned            bool      `json:"pod_cleaned"`
+	Project_name           string    `json:"project_name"`
+}
+
+// dbCountExecutions struct permit to map data from db
+type dbCountExecutions struct {
+	Pod_name         string `json:"pod_name"`
+	Execution_status string `json:"execution_status"`
 }
 
 // List permit to retrieve executions with pagination
@@ -101,10 +141,10 @@ func Read(c *gin.Context) {
 		return
 	}
 
-	if len(result) == 0 {
+	if result == (DBRead{}) {
 		c.AbortWithStatus(404)
 	} else {
-		c.JSON(http.StatusOK, result[0])
+		c.JSON(http.StatusOK, result)
 	}
 }
 
@@ -144,21 +184,21 @@ func UpdateResultExecution(c *gin.Context) {
 	}
 	log.Debug().Msgf("remaining %+v", remaining)
 
-	if len(remaining) == 0 {
+	if remaining == (dbCountExecutions{}) {
 		pod, err := p.countExecutionsInverted()
 		if err != nil {
 			log.Error().Err(err).Msg("Error occured while performing db query")
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
 		}
-		if len(pod) > 0 {
+		if pod != (dbCountExecutions{}) {
 			clientset, err := kubernetes.Client()
 			if err != nil {
 				log.Error().Err(err).Msg("Error occured while initializing kubernetes client")
 				return
 			}
-			err = kubernetes.DeletePod(clientset, commons.GetKubernetesJobsNamespace(), pod["pod_name"])
+			err = kubernetes.DeletePod(clientset, commons.GetKubernetesJobsNamespace(), pod.Pod_name)
 			if err != nil {
-				log.Error().Err(err).Msgf("Error occured while trying to delete pod name: %s", pod["pod_name"])
+				log.Error().Err(err).Msgf("Error occured while trying to delete pod name: %s", pod.Pod_name)
 				return
 			}
 		}
