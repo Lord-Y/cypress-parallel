@@ -4,6 +4,7 @@ go 1.17
 
 require (
 	github.com/gin-contrib/logger v0.2.0
+	github.com/gin-contrib/static v0.0.1
 	github.com/gin-gonic/gin v1.7.7
 	github.com/go-git/go-git/v5 v5.4.2
 	github.com/golang-migrate/migrate/v4 v4.15.1

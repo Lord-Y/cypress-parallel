@@ -4,6 +4,7 @@ package routers
 import (
 	"embed"
 	"io"
+	"io/fs"
 	"net/http"
 	"os"
 	"time"
@@ -18,6 +19,7 @@ import (
 	"github.com/Lord-Y/cypress-parallel/teams"
 	"github.com/Lord-Y/cypress-parallel/tools"
 	"github.com/gin-contrib/logger"
+	"github.com/gin-contrib/static"
 	"github.com/gin-gonic/gin"
 	ginprometheus "github.com/mcuadros/go-gin-prometheus"
 	"github.com/rs/zerolog"
@@ -127,7 +129,7 @@ func SetupRouter() *gin.Engine {
 		v1.GET("/executions/search", executions.Search)
 	}
 
-	router.Static("/ui/assets", "ui/dist/assets")
+	router.StaticFS("/ui/assets", EmbedFolder(assets, "ui/dist/assets"))
 
 	// done like that to avoid trailing slash
 	router.GET("/ui/logo.png", func(c *gin.Context) {
@@ -173,4 +175,33 @@ func SetupRouter() *gin.Engine {
 	})
 
 	return router
+}
+
+type embedFileSystem struct {
+	http.FileSystem
+	indexes bool
+}
+
+func (e embedFileSystem) Exists(prefix string, path string) bool {
+	f, err := e.Open(path)
+	if err != nil {
+		return false
+	}
+
+	s, _ := f.Stat()
+	if s.IsDir() && !e.indexes {
+		return false
+	}
+
+	return true
+}
+
+func EmbedFolder(fsEmbed embed.FS, targetPath string) static.ServeFileSystem {
+	fsys, err := fs.Sub(fsEmbed, targetPath)
+	if err != nil {
+		panic(err)
+	}
+	return embedFileSystem{
+		FileSystem: http.FS(fsys),
+	}
 }
