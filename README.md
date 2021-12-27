@@ -78,8 +78,8 @@ go tool cover -func=coverage.out
 
 ## Linter
 ```bash
-# https://freshman.tech/linting-golang/
-go install github.com/nametake/golangci-lint-langserver@latest
+# https://golangci-lint.run/usage/install/
+go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest
 ```
 
 ## TODO
