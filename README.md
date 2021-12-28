@@ -1,6 +1,6 @@
 # cypress-parallel [![CircleCI](https://circleci.com/gh/Lord-Y/cypress-parallel/tree/main.svg?style=svg)](https://circleci.com/gh/Lord-Y/cypress-parallel?branch=main)
 
-`cypress-parallel` is a single binary that hold both frontend UI and API athat permit to `cypress unit testing`.
+`cypress-parallel` is a single binary that hold both frontend UI and API that permit to `cypress unit testing`.
 
 It create pods inside your kubernetes cluster triggered by api or via UI.
 
@@ -36,7 +36,7 @@ Please read `Kind` setup [here](./_developments/README.md)
 ### Start your postgres sql instance
 
 ```bash
-sudo docker-compose up -d -f docker-compose.yml.yaml
+sudo docker-compose up -d -f docker-compose.yaml
 ```
 
 ### Debugging
