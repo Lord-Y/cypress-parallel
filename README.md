@@ -23,6 +23,15 @@ export CYPRESS_PARALLEL_DB_URI="postgres://USERNAME:PASSWORD@HOST:PORT/DB_NAME?s
 ```
 
 ## Development
+
+### Git hooks
+
+Add githook like so:
+
+```bash
+git config core.hooksPath .githooks
+```
+
 ### Kind
 
 During you local development, you must set the variable `CYPRESS_PARALLEL_K8S_CLIENT_OUTSIDE` in order to make the api loggued in with your `.kube/config`
