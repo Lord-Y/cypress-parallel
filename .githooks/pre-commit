@@ -6,5 +6,5 @@ NB=$(git status ui | grep -v dist | wc -l)
 if [ $NB -gt 0 ]
 then
   cd ui
-  eslint --fix --ext .js,.vue,.ts src
+  npm run lint
 fi
