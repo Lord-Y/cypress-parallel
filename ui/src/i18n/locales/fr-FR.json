@@ -100,6 +100,10 @@
       },
       "hook": {
         "created": "Une nouvelle séquence de tests unitaires pour le projet \"{field}\" a bien été démarré"
+      },
+      "create": {
+        "team": "Veuillez créer une équipe",
+        "project": "Veuillez créer un project"
       }
     }
   },

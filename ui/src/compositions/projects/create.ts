@@ -70,6 +70,10 @@ export default function () {
         case 200:
           state.teams = response.data
           break
+        case 204:
+          state.alert.class = 'red'
+          state.alert.message = t('alert.http.create.team')
+          break
         default:
           state.alert.class = 'red'
           state.alert.message = t('alert.http.errorOccured')

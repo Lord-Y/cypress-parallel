@@ -58,6 +58,10 @@ export default function () {
         case 200:
           state.projects = response.data
           break
+        case 204:
+          state.alert.class = 'red'
+          state.alert.message = t('alert.http.create.project')
+          break
         default:
           state.alert.class = 'red'
           state.alert.message = t('alert.http.errorOccured')
