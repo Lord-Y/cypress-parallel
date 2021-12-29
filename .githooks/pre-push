@@ -1,0 +1,14 @@
+#!/bin/bash
+
+LAST_COMMITTED_FILES=$(git show --pretty="" --name-only $(git rev-parse HEAD))
+NB=$(echo $LAST_COMMITTED_FILES |grep '^ui' | wc -l)
+if [ $NB -gt 0 ]
+then
+  BRANCH=$(git rev-parse --abbrev-ref HEAD)
+  if [ "$BRANCH" != "main" ]
+  then
+    cd ui
+    npm run build
+    git checkout dist/.gitignore
+  fi
+fi
