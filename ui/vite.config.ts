@@ -3,6 +3,13 @@ import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import vueI18n from '@intlify/vite-plugin-vue-i18n'
 
+let api_url: string
+if (process.env.CYPRESS_PARALLEL_PORT) {
+  api_url = `http://localhost:${process.env.CYPRESS_PARALLEL_PORT}`
+} else {
+  api_url = 'http://localhost:8080'
+}
+
 // https://vitejs.dev/config/
 export default defineConfig({
   base: '/ui/',
@@ -22,9 +29,7 @@ export default defineConfig({
     strictPort: true,
     proxy: {
       '/api': {
-        target:
-          `http://localhost:${process.env.CYPRESS_PARALLEL_PORT}` ||
-          'http://localhost:8080',
+        target: api_url,
       },
     },
   },
