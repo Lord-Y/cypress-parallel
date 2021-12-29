@@ -104,6 +104,10 @@
       "create": {
         "team": "Veuillez créer une équipe",
         "project": "Veuillez créer un project"
+      },
+      "conflict": {
+        "team": "L'équipe \"{field}\" existe déjà",
+        "project": "Le project \"{field}\" existe déjà"
       }
     }
   },

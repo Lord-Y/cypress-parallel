@@ -33,7 +33,7 @@ export default function () {
       scheduling: '',
       schedulingEnabled: false,
       maxPods: 10,
-      cypress_docker_version: '7.2.0-0.0.3',
+      cypress_docker_version: '7.4.0-0.1.1',
       timeout: 10,
       browser: 'chrome',
       config_file: 'cypress.json',
@@ -107,12 +107,21 @@ export default function () {
       state.loading.loading.active = false
     })
     .catch((error: any) => {
-      if (error.response.status === 404) {
-        state.alert.class = 'mute'
-        state.alert.message = t('alert.http.pageNotFound')
-      } else {
-        state.alert.class = 'red'
-        state.alert.message = t('alert.http.errorOccured')
+      switch (error.response.status) {
+        case 404:
+          state.alert.class = 'mute'
+          state.alert.message = t('alert.http.pageNotFound')
+          break
+        case 409:
+          state.alert.class = 'red'
+          state.alert.message = t('alert.http.conflict.project', {
+            field: state.form.project_name,
+          })
+          break
+        default:
+          state.alert.class = 'red'
+          state.alert.message = t('alert.http.errorOccured')
+          break
       }
       state.loading.loading.active = false
       throw error

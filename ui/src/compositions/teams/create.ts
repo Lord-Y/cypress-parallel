@@ -67,8 +67,18 @@ export default function () {
         state.loading.loading.active = false
       })
       .catch((error: any) => {
-        state.alert.class = 'red'
-        state.alert.message = t('alert.http.errorOccured')
+        switch (error.response.status) {
+          case 409:
+            state.alert.class = 'red'
+            state.alert.message = t('alert.http.conflict.team', {
+              field: state.form.name,
+            })
+            break
+          default:
+            state.alert.class = 'red'
+            state.alert.message = t('alert.http.errorOccured')
+            break
+        }
         state.loading.loading.active = false
         throw error
       })

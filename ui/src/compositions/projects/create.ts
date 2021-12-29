@@ -31,7 +31,7 @@ export default function () {
       scheduling: '',
       schedulingEnabled: false,
       maxPods: 10,
-      cypress_docker_version: '7.2.0-0.0.3',
+      cypress_docker_version: '7.4.0-0.1.1',
       timeout: 10,
       browser: 'chrome',
       config_file: 'cypress.json',
@@ -109,7 +109,7 @@ export default function () {
       .then((response: any) => {
         if (response.status === 201) {
           state.alert.class = 'green'
-          state.alert.message = t('alert.http.team.created', {
+          state.alert.message = t('alert.http.project.created', {
             field: state.form.project_name,
           })
         } else {
@@ -119,8 +119,18 @@ export default function () {
         state.loading.loading.active = false
       })
       .catch((error: any) => {
-        state.alert.class = 'red'
-        state.alert.message = t('alert.http.errorOccured')
+        switch (error.response.status) {
+          case 409:
+            state.alert.class = 'red'
+            state.alert.message = t('alert.http.conflict.project', {
+              field: state.form.project_name,
+            })
+            break
+          default:
+            state.alert.class = 'red'
+            state.alert.message = t('alert.http.errorOccured')
+            break
+        }
         state.loading.loading.active = false
         throw error
       })

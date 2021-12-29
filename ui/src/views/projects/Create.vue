@@ -13,7 +13,7 @@
           <Form @submit="submit">
             <CreateUpdateTeam
               :teams="teams"
-              :team-id="form.team_id"
+              :team-id="form.team_id.toString()"
               v-model:updateTeam="form.team_id"
             />
             <CreateUpdateName
