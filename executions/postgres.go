@@ -113,6 +113,7 @@ func (p *updateResultExecution) updateResult() (z string, err error) {
 	err = tx.QueryRow(
 		ctx,
 		"UPDATE executions SET result = $1, execution_status = $2, execution_error_output = $3, pod_cleaned = 'true' WHERE uniq_id = $4 AND spec = $5 AND branch = $6 RETURNING pod_name",
+		p.Result,
 		p.ExecutionStatus,
 		p.ExecutionErrorOutput,
 		p.UniqID,
