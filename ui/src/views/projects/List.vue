@@ -51,7 +51,7 @@
                     :class="['cursor-pointer', classes.aLinks]"
                     :title="$t('edit.edit')"
                     :to="'/teams/edit/' + project.team_id"
-                    >{{ project.project_name }}</router-link
+                    >{{ project.team_name }}</router-link
                   >
                 </td>
                 <td class="px-2 py-3">{{ project.project_name }}</td>
