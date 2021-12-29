@@ -175,6 +175,11 @@ func Create(c *gin.Context) {
 
 	result, err := p.create()
 	if err != nil {
+		if err.Error() == "already_exist" {
+			c.JSON(http.StatusConflict, gin.H{"error": "Already exist"})
+			log.Error().Err(err).Msgf("Project %s with teamID %d already exist", p.Name, p.TeamID)
+			return
+		}
 		log.Error().Err(err).Msg("Error occured while performing db query")
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
 	} else {
@@ -281,6 +286,11 @@ func Update(c *gin.Context) {
 
 	err := p.update()
 	if err != nil {
+		if err.Error() == "already_exist" {
+			c.JSON(http.StatusConflict, gin.H{"error": "Already exist"})
+			log.Error().Err(err).Msgf("Project %s with teamID %d already exist", p.Name, p.TeamID)
+			return
+		}
 		log.Error().Err(err).Msg("Error occured while performing db query")
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
 	} else {

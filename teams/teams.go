@@ -77,6 +77,11 @@ func Create(c *gin.Context) {
 
 	result, err := p.create()
 	if err != nil {
+		if err.Error() == "already_exist" {
+			c.JSON(http.StatusConflict, gin.H{"error": "Already exist"})
+			log.Error().Err(err).Msgf("Team %s already exist", p.Name)
+			return
+		}
 		log.Error().Err(err).Msg("Error occured while performing db query")
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
 	} else {

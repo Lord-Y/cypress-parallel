@@ -3,6 +3,7 @@ package teams
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/Lord-Y/cypress-parallel/commons"
 	"github.com/jackc/pgx/v4"
@@ -18,6 +19,19 @@ func (p *teams) create() (z int64, err error) {
 		return
 	}
 	defer db.Close()
+
+	var count int
+	err = db.QueryRow(
+		ctx,
+		"SELECT COUNT(team_id) FROM teams WHERE team_name = $1",
+		p.Name,
+	).Scan(
+		&count,
+	)
+
+	if count > 0 {
+		return z, fmt.Errorf("already_exist")
+	}
 
 	tx, err := db.Begin(ctx)
 	if err != nil {

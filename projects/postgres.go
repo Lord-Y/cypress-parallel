@@ -3,6 +3,7 @@ package projects
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/Lord-Y/cypress-parallel/commons"
 	"github.com/jackc/pgx/v4"
@@ -18,6 +19,20 @@ func (p *projects) create() (z int64, err error) {
 		return
 	}
 	defer db.Close()
+
+	var count int
+	err = db.QueryRow(
+		ctx,
+		"SELECT COUNT(project_id) FROM projects WHERE project_name = $1 AND team_id = $2",
+		p.Name,
+		p.TeamID,
+	).Scan(
+		&count,
+	)
+
+	if count > 0 {
+		return z, fmt.Errorf("already_exist")
+	}
 
 	tx, err := db.Begin(ctx)
 	if err != nil {
@@ -219,6 +234,20 @@ func (p *updateProjects) update() (err error) {
 		return
 	}
 	defer db.Close()
+
+	var count int
+	err = db.QueryRow(
+		ctx,
+		"SELECT COUNT(project_id) FROM projects WHERE project_name = $1 AND team_id = $2",
+		p.Name,
+		p.TeamID,
+	).Scan(
+		&count,
+	)
+
+	if count > 0 {
+		return fmt.Errorf("already_exist")
+	}
 
 	tx, err := db.Begin(ctx)
 	if err != nil {
