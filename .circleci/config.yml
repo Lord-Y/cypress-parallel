@@ -17,7 +17,7 @@ jobs:
       KIND_CLUSTER_NAME: cypress-parallel
       HELM_VERSION: 3.7.2
       IMAGE_NAME: ghcr.io/lord-y/cypress-parallel/cypress-parallel
-      CLI_IMAGE: ghcr.io/lord-y/cypress-parallel-docker-images/cypress-parallel-docker-images:7.4.0-0.1.0
+      CLI_IMAGE: ghcr.io/lord-y/cypress-parallel-docker-images/cypress-parallel-docker-images:7.4.0-0.1.1
       NAMESPACE: cypress-parallel
       CYPRESS_PARALLEL_K8S_CLIENT_OUTSIDE: "true"
       CYPRESS_PARALLEL_PORT: 40000
