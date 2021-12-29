@@ -65,7 +65,7 @@ jobs:
     - run:
         name: Load CLI docker image in kind cluster
         command: |
-          echo "$GITHUB_TOKEN" | docker login https://docker.pkg.github.com -u ${CIRCLE_USERNAME} --password-stdin
+          echo "$GITHUB_TOKEN" | docker login https://ghcr.io -u ${CIRCLE_USERNAME} --password-stdin
           docker pull ${CLI_IMAGE}
           for i in cypress-parallel-worker cypress-parallel-worker2; do sudo kind load docker-image ${CLI_IMAGE} --name ${KIND_CLUSTER_NAME} --nodes $i;done
 
@@ -144,7 +144,7 @@ jobs:
     - run:
         name: Build docker image
         command: |
-          echo "$GITHUB_TOKEN" | docker login https://docker.pkg.github.com -u ${CIRCLE_USERNAME} --password-stdin
+          echo "$GITHUB_TOKEN" | docker login https://ghcr.io -u ${CIRCLE_USERNAME} --password-stdin
           docker build -t ${IMAGE_NAME}:${CIRCLE_TAG} .
           docker push ${IMAGE_NAME}:${CIRCLE_TAG}
 
@@ -158,7 +158,7 @@ jobs:
   build-tags-and-publish-release:
     executor: golang
     environment:
-      IMAGE_NAME: docker.pkg.github.com/lord-y/cypress-parallel/cypress-parallel
+      IMAGE_NAME: ghcr.io/lord-y/cypress-parallel/cypress-parallel
 
     steps:
     - checkout
@@ -170,7 +170,7 @@ jobs:
     - run:
         name: Build docker image
         command: |
-          echo "$GITHUB_TOKEN" | docker login https://docker.pkg.github.com -u ${CIRCLE_USERNAME} --password-stdin
+          echo "$GITHUB_TOKEN" | docker login https://ghcr.io -u ${CIRCLE_USERNAME} --password-stdin
           docker build -t ${IMAGE_NAME}:${CIRCLE_TAG} .
           docker push ${IMAGE_NAME}:${CIRCLE_TAG}
 
