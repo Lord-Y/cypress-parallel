@@ -136,9 +136,6 @@ export default function () {
     })
   state.loading.loading.active = false
 
-  const { projects, loading, alert, pagination, search, classes } =
-    toRefs(state)
-
   function deleteItem(index: number, type: string, id: number): void {
     if (confirm(t('confirm.sure'))) {
       state.alert.message = ''
