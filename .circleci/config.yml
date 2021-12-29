@@ -193,8 +193,8 @@ workflows:
             only: /.*/
     - build-tags-and-publish-prerelease:
         context: GITHUB
-        requires:
-        - build
+        # requires:
+        # - build
         filters:
           tags:
             only: /^v\d+\.\d+\.\d+-(.*)$/
@@ -202,8 +202,8 @@ workflows:
             ignore: /.*/
     - build-tags-and-publish-release:
         context: GITHUB
-        requires:
-        - build
+        # requires:
+        # - build
         filters:
           tags:
             only: /^v\d+\.\d+\.\d+$/
