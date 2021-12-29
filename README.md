@@ -90,9 +90,3 @@ go tool cover -func=coverage.out
 # https://golangci-lint.run/usage/install/
 go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest
 ```
-
-## TODO
-
-UI:
-- use:
-  - [highlightjs](https://github.com/highlightjs/vue-plugin) when it will be Vue 3 compatible
