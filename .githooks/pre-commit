@@ -2,7 +2,7 @@
 
 golangci-lint run
 
-NB=$(git status ui | grep -v dist | wc -l)
+NB=$(git status --short ui | grep -v dist | wc -l)
 if [ $NB -gt 0 ]
 then
   cd ui
