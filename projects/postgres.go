@@ -319,7 +319,7 @@ func (p *searchProjects) search() (z []dbList, err error) {
 
 	rows, err := db.Query(
 		ctx,
-		"SELECT p.*, (SELECT count(project_id) FROM projects WHERE project_name ILIKE '%' || $1 || '%') total, t.team_name FROM projects p LEFT JOIN teams t ON p.team_id = t.team_id WHERE p.project_name ILIKE '%' || $1 || '%' ORDER BY p.date DESC OFFSET $2 LIMIT $3",
+		"SELECT p.*, (SELECT COUNT(p.project_id) FROM projects p LEFT JOIN teams t ON p.team_id = t.team_id WHERE p.project_name ILIKE '%' || $1 || '%' OR t.team_name ILIKE '%' || $1 || '%') total, t.team_name FROM projects p LEFT JOIN teams t ON p.team_id = t.team_id WHERE p.project_name ILIKE '%' || $1 || '%' OR t.team_name ILIKE '%' || $1 || '%' ORDER BY p.date DESC OFFSET $2 LIMIT $3",
 		p.Q,
 		p.StartLimit,
 		p.EndLimit,

@@ -226,7 +226,8 @@ func (p *searchExecutions) search() (z []dbList, err error) {
 
 	rows, err := db.Query(
 		ctx,
-		"SELECT e.*, (SELECT count(execution_id) FROM executions WHERE branch ILIKE '%' || $1 || '%' OR uniq_id ILIKE '%' || $1 || '%' OR spec ILIKE '%' || $1 || '%') total, p.project_name FROM executions e LEFT JOIN projects p ON e.project_id = p.project_id WHERE e.branch ILIKE '%' || $1 || '%' OR e.uniq_id ILIKE '%' || $1 || '%' OR e.spec ILIKE '%' || $1 || '%' ORDER BY e.date DESC OFFSET $2 LIMIT $3",
+		"SELECT e.*, (SELECT COUNT(e.execution_id) FROM executions e LEFT JOIN projects p ON e.project_id = p.project_id WHERE e.branch ILIKE '%' || $1 || '%' OR e.uniq_id ILIKE '%' || $1 || '%' OR e.spec ILIKE '%' || $1 || '%' OR p.project_name ILIKE '%' || $1 || '%') total, p.project_name FROM executions e LEFT JOIN projects p ON e.project_id = p.project_id WHERE e.branch ILIKE '%' || $1 || '%' OR e.uniq_id ILIKE '%' || $1 || '%' OR e.spec ILIKE '%' || $1 || '%' OR p.project_name ILIKE '%' || $1 || '%' ORDER BY e.date DESC OFFSET $2 LIMIT $3",
+		p.Q,
 		p.StartLimit,
 		p.EndLimit,
 	)

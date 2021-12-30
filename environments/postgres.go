@@ -199,7 +199,7 @@ func (p *searchEnvironments) search() (z []dbList, err error) {
 
 	rows, err := db.Query(
 		ctx,
-		"SELECT e.*, (SELECT COUNT(environment_id) FROM environments WHERE key LIKE '%' || $1 || '%' OR value ILIKE '%' || $1 || '%') total, p.project_name FROM environments e LEFT JOIN projects p ON e.project_id = p.project_id WHERE e.key ILIKE '%' || $1 || '%' OR e.value ILIKE '%' || $1 || '%' ORDER BY e.date DESC OFFSET $2 LIMIT $3",
+		"SELECT e.*, (SELECT COUNT(e.environment_id) FROM environments e LEFT JOIN projects p ON e.project_id = p.project_id WHERE e.key LIKE '%' || $1 || '%' OR e.value ILIKE '%' || $1 || '%' OR p.project_name ILIKE '%' || $1 || '%') total, p.project_name FROM environments e LEFT JOIN projects p ON e.project_id = p.project_id WHERE e.key ILIKE '%' || $1 || '%' OR e.value ILIKE '%' || $1 || '%' OR p.project_name ILIKE '%' || $1 || '%' ORDER BY e.date DESC OFFSET $2 LIMIT $3",
 		p.Q,
 		p.StartLimit,
 		p.EndLimit,
