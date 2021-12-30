@@ -1,6 +1,6 @@
 # cypress-parallel [![CircleCI](https://circleci.com/gh/Lord-Y/cypress-parallel/tree/main.svg?style=svg)](https://circleci.com/gh/Lord-Y/cypress-parallel?branch=main)
 
-`cypress-parallel` is a single binary that hold both frontend UI and API that permit to `cypress unit testing`.
+`cypress-parallel` is a single binary that hold both frontend UI and API that permit to run `cypress unit testing`.
 
 It create pods inside your kubernetes cluster triggered by api or via UI.
 
@@ -10,6 +10,10 @@ On this UI you will be able to:
 - create, update and delete annotations that will be used by pods
 - create, update and delete environments variables that will be used by pods
 - See execution results of units testing
+
+ `cypress-parallel` use also 2 sub-components:
+ - [cypress-parallel-cli](https://github.com/Lord-Y/cypress-parallel-cli)
+ - [cypress-parallel-docker-images](https://github.com/Lord-Y/cypress-parallel-docker-images)
 
 ## API
 
