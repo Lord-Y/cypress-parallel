@@ -21,6 +21,30 @@ v0.2.0 release
   - Refactoring postgresql queries
   - Update assets requirements
   - Update execution status
+  - Improve search query
+- ui:
+  - Update packages
+  - Update alert message when team or project exist
+  - Fix team name in project
+
+## [v0.2.0-beta2](https://github.com/Lord-Y/cypress-parallel/releases/tag/v0.2.0-beta2) - 2021-12-30
+
+v0.2.0 release
+
+### Added
+- global:
+  - Add git hooks
+
+### Changed
+- global:
+  - Update default docker image version to 7.4.0-0.1.1
+  - Avoid duplicate team or project creation
+- api:
+  - Enforce not null data
+  - Refactoring postgresql queries
+  - Update assets requirements
+  - Update execution status
+  - Improve search query
 - ui:
   - Update packages
   - Update alert message when team or project exist
