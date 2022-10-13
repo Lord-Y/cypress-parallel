@@ -202,7 +202,7 @@ func Plain(c *gin.Context) {
 		targetSpecs = result.Specs
 	}
 
-	if strings.HasSuffix(targetSpecs, ".spec.js") || strings.HasSuffix(targetSpecs, ".ts") {
+	if strings.HasSuffix(targetSpecs, ".spec.js") || strings.HasSuffix(targetSpecs, ".cy.js") || strings.HasSuffix(targetSpecs, ".spec.ts") || strings.HasSuffix(targetSpecs, ".cy.ts") {
 		err := tools.CheckIsFile(fmt.Sprintf("%s/%s", gitdir, targetSpecs))
 		if err != nil {
 			msg := fmt.Sprintf("Error occured while retrieving specs, error: %s", err.Error())
