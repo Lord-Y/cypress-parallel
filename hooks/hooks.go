@@ -165,18 +165,18 @@ func Plain(c *gin.Context) {
 	// original branch must remain for POST "executions" with update db otherwise, pod will stay up forever
 	if p.Branch != "" {
 		if p.Branch == "master" {
-			gitc.Branch = ""
+			gitc.Ref = ""
 			branch = "master"
 		} else {
-			gitc.Branch = p.Branch
+			gitc.Ref = p.Branch
 			branch = p.Branch
 		}
 	} else {
 		if result.Branch == "master" {
-			gitc.Branch = ""
+			gitc.Ref = ""
 			branch = "master"
 		} else {
-			gitc.Branch = result.Branch
+			gitc.Ref = result.Branch
 			branch = result.Branch
 		}
 	}
