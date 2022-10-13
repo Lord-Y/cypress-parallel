@@ -21,7 +21,7 @@ func TestClone_fail_branch(t *testing.T) {
 	c := &Repository{}
 
 	c.Repository = "https://github.com/cypress-io/cypress-example-kitchensink.git"
-	c.Branch = "test"
+	c.Ref = "test"
 
 	z, _, err := c.Clone()
 	defer os.RemoveAll(z)
@@ -46,7 +46,7 @@ func TestClone_fail_user_branch(t *testing.T) {
 
 	c.Repository = "https://github.com/cypress-io/cypress-example-kitchensink.git"
 	c.Username = "test"
-	c.Branch = "test"
+	c.Ref = "test"
 
 	z, _, err := c.Clone()
 	defer os.RemoveAll(z)
@@ -69,7 +69,7 @@ func TestClone_success_master(t *testing.T) {
 	c := &Repository{}
 
 	c.Repository = "https://github.com/cypress-io/cypress-example-kitchensink.git"
-	c.Branch = "master"
+	c.Ref = "master"
 
 	z, _, err := c.Clone()
 	defer os.RemoveAll(z)
