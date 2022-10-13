@@ -15,33 +15,33 @@ type Repository struct {
 	Repository string // HTTP(s) git repository
 	Username   string // Username to use to fetch repository if required
 	Password   string // Password to use to fetch repository if required
-	Branch     string // Branch in which specs are hold
+	Ref        string // Ref in which branch e.g test or refs/head/test
 }
 
 // Clone permit to clone git repository
 func (c *Repository) Clone() (z string, statusCode int, err error) {
 	var (
-		targetBranch string
-		result       *git.Repository
+		targetRef string
+		result    *git.Repository
 	)
 
-	if c.Branch != "" {
-		if c.Branch == "master" {
-			targetBranch = ""
+	if c.Ref != "" {
+		if c.Ref == "master" || c.Ref == "refs/heads/master" {
+			targetRef = ""
 		} else {
-			targetBranch = c.Branch
+			targetRef = c.Ref
 		}
 	} else {
-		targetBranch = ""
+		targetRef = ""
 	}
-	log.Debug().Msgf("branch %s", targetBranch)
+	log.Debug().Msgf("Branch or tag %s", targetRef)
 
 	z, err = os.MkdirTemp(os.TempDir(), fake.CharactersN(10))
 	if err != nil {
 		return z, 500, err
 	}
 
-	if targetBranch != "" {
+	if targetRef != "" {
 		if c.Username != "" {
 			result, err = git.PlainClone(z, false, &git.CloneOptions{
 				URL: c.Repository,
@@ -49,6 +49,9 @@ func (c *Repository) Clone() (z string, statusCode int, err error) {
 					Username: c.Username,
 					Password: c.Password,
 				},
+				ReferenceName: plumbing.ReferenceName(targetRef),
+				SingleBranch:  true,
+				Depth:         1,
 			})
 		} else {
 			result, err = git.PlainClone(z, false, &git.CloneOptions{
@@ -65,7 +68,7 @@ func (c *Repository) Clone() (z string, statusCode int, err error) {
 			return z, 500, err
 		}
 		err = w.Checkout(&git.CheckoutOptions{
-			Branch: plumbing.ReferenceName(targetBranch),
+			Branch: plumbing.ReferenceName(targetRef),
 		})
 		if err != nil {
 			log.Debug().Msgf("Checkout %s", err.Error())
@@ -79,10 +82,16 @@ func (c *Repository) Clone() (z string, statusCode int, err error) {
 					Username: c.Username,
 					Password: c.Password,
 				},
+				ReferenceName: plumbing.ReferenceName(targetRef),
+				SingleBranch:  true,
+				Depth:         1,
 			})
 		} else {
 			_, err = git.PlainClone(z, false, &git.CloneOptions{
-				URL: c.Repository,
+				URL:           c.Repository,
+				ReferenceName: plumbing.ReferenceName(targetRef),
+				SingleBranch:  true,
+				Depth:         1,
 			})
 		}
 		if err != nil {
