@@ -27,10 +27,10 @@ type plain struct {
 	ProjectName          string `form:"project_name" json:"project_name" binding:"required,max=100"`
 	Branch               string `form:"branch" json:"branch"`
 	Specs                string `form:"specs" json:"specs"`
-	ConfigFile           string `form:"config_file,default=cypress.json" json:"config_file" binding:"max=100"`
+	ConfigFile           string `form:"config_file,default=cypress.config.js" json:"config_file" binding:"max=100"`
 	Browser              string `form:"browser,default=chrome" json:"browser" binding:"max=100,oneof=chrome firefox"`
 	MaxPods              int    `form:"maxPods,default=10" json:"maxPods"`
-	CypressDockerVersion string `form:"cypress_docker_version,default=9.7.0-0.2.0,max=20" json:"cypress_docker_version"`
+	CypressDockerVersion string `form:"cypress_docker_version,default=10.10.0-0.3.0,max=20" json:"cypress_docker_version"`
 }
 
 // execution handle all requirements to insert execution in DB
@@ -146,10 +146,10 @@ func Plain(c *gin.Context) {
 	}
 
 	if p.CypressDockerVersion == "" {
-		p.CypressDockerVersion = "9.7.0-0.2.0"
+		p.CypressDockerVersion = "10.10.0-0.3.0"
 	}
 	if p.ConfigFile == "" {
-		p.ConfigFile = "cypress.json"
+		p.ConfigFile = "cypress.config.js"
 	}
 	if p.MaxPods == 0 {
 		p.MaxPods = 10
@@ -215,7 +215,7 @@ func Plain(c *gin.Context) {
 			if err != nil {
 				return err
 			}
-			if info.Mode().IsRegular() && (strings.HasSuffix(file, ".spec.js") || strings.HasSuffix(file, ".ts")) {
+			if info.Mode().IsRegular() && (strings.HasSuffix(file, ".spec.js") || strings.HasSuffix(file, ".cy.js") || strings.HasSuffix(file, ".spec.ts") || strings.HasSuffix(file, ".cy.ts")) {
 				specs = append(specs, strings.ReplaceAll(file, fmt.Sprintf("%s/", gitdir), ""))
 			}
 			return nil

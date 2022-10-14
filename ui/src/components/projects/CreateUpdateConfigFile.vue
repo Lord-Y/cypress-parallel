@@ -30,7 +30,7 @@ export default defineComponent({
     },
     configFile: {
       type: String,
-      default: 'cypress.json',
+      default: 'cypress.config.js',
     },
   },
   emits: ['update:updateConfigFile'],
