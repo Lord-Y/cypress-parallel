@@ -31,10 +31,10 @@ export default function () {
       scheduling: '',
       schedulingEnabled: false,
       maxPods: 10,
-      cypress_docker_version: '9.7.0-0.2.0',
+      cypress_docker_version: '10.10.0-0.3.0',
       timeout: 10,
       browser: 'chrome',
-      config_file: 'cypress.json',
+      config_file: 'cypress.config.js',
     },
   })
 

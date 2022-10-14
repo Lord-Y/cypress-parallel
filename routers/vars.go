@@ -18,6 +18,6 @@ var (
 	// https://github.com/cypress-io/cypress-docker-images/tree/master/included
 	// cypress docker images https://hub.docker.com/r/cypress/included
 	cypressVersions = []string{
-		"9.7.0-0.2.0",
+		"10.10.0-0.3.0",
 	}
 )

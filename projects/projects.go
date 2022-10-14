@@ -22,12 +22,12 @@ type projects struct {
 	Scheduling           string `form:"scheduling" json:"scheduling" binding:"max=15"`
 	SchedulingEnabled    bool   `form:"schedulingEnabled" json:"schedulingEnabled"`
 	MaxPods              int    `form:"maxPods,default=10" json:"maxPods"`
-	CypressDockerVersion string `form:"cypress_docker_version,default=9.7.0-0.2.0" json:"cypress_docker_version"`
+	CypressDockerVersion string `form:"cypress_docker_version,default=10.10.0-0.3.0" json:"cypress_docker_version"`
 	Timeout              int    `form:"timeout,default=10" json:"timeout"`
 	Username             string `form:"username" json:"username"`
 	Password             string `form:"password" json:"password"`
 	Browser              string `form:"browser,default=chrome" json:"browser" binding:"max=100,oneof=chrome firefox"`
-	ConfigFile           string `form:"config_file,default=cypress.json" json:"config_file" binding:"max=100"`
+	ConfigFile           string `form:"config_file,default=cypress.config.js" json:"config_file" binding:"max=100"`
 }
 
 // getProjects struct handle requirements to get projects
@@ -54,12 +54,12 @@ type updateProjects struct {
 	Scheduling           string `form:"scheduling" json:"scheduling" binding:"max=15"`
 	SchedulingEnabled    bool   `form:"schedulingEnabled" json:"schedulingEnabled"`
 	MaxPods              int    `form:"maxPods,default=10" json:"maxPods"`
-	CypressDockerVersion string `form:"cypress_docker_version,default=9.7.0-0.2.0" json:"cypress_docker_version"`
+	CypressDockerVersion string `form:"cypress_docker_version,default=10.10.0-0.3.0" json:"cypress_docker_version"`
 	Timeout              int    `form:"timeout,default=10" json:"timeout"`
 	Username             string `form:"username" json:"username" binding:"max=100"`
 	Password             string `form:"password" json:"password" binding:"max=100"`
 	Browser              string `form:"browser,default=chrome" json:"browser" binding:"max=100,oneof=chrome firefox"`
-	ConfigFile           string `form:"config_file,default=cypress.json" json:"config_file" binding:"max=100"`
+	ConfigFile           string `form:"config_file,default=cypress.config.js" json:"config_file" binding:"max=100"`
 }
 
 // deleteProject struct handle requirements to delete project
@@ -161,13 +161,13 @@ func Create(c *gin.Context) {
 	}
 	// default value not supported yet with json
 	if p.CypressDockerVersion == "" {
-		p.CypressDockerVersion = "9.7.0-0.2.0"
+		p.CypressDockerVersion = "10.10.0-0.3.0"
 	}
 	if p.Timeout == 0 {
 		p.Timeout = 10
 	}
 	if p.ConfigFile == "" {
-		p.ConfigFile = "cypress.json"
+		p.ConfigFile = "cypress.config.js"
 	}
 	if p.MaxPods == 0 {
 		p.MaxPods = 10
@@ -272,13 +272,13 @@ func Update(c *gin.Context) {
 	}
 	// default value not supported yet with json
 	if p.CypressDockerVersion == "" {
-		p.CypressDockerVersion = "9.7.0-0.2.0"
+		p.CypressDockerVersion = "10.10.0-0.3.0"
 	}
 	if p.Timeout == 0 {
 		p.Timeout = 10
 	}
 	if p.ConfigFile == "" {
-		p.ConfigFile = "cypress.json"
+		p.ConfigFile = "cypress.config.js"
 	}
 	if p.MaxPods == 0 {
 		p.MaxPods = 10
