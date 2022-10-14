@@ -22,7 +22,7 @@ type projects struct {
 	Scheduling           string `form:"scheduling" json:"scheduling" binding:"max=15"`
 	SchedulingEnabled    bool   `form:"schedulingEnabled" json:"schedulingEnabled"`
 	MaxPods              int    `form:"maxPods,default=10" json:"maxPods"`
-	CypressDockerVersion string `form:"cypress_docker_version,default=9.7.0-0.1.1" json:"cypress_docker_version"`
+	CypressDockerVersion string `form:"cypress_docker_version,default=9.7.0-0.2.0" json:"cypress_docker_version"`
 	Timeout              int    `form:"timeout,default=10" json:"timeout"`
 	Username             string `form:"username" json:"username"`
 	Password             string `form:"password" json:"password"`
@@ -54,7 +54,7 @@ type updateProjects struct {
 	Scheduling           string `form:"scheduling" json:"scheduling" binding:"max=15"`
 	SchedulingEnabled    bool   `form:"schedulingEnabled" json:"schedulingEnabled"`
 	MaxPods              int    `form:"maxPods,default=10" json:"maxPods"`
-	CypressDockerVersion string `form:"cypress_docker_version,default=9.7.0-0.1.1" json:"cypress_docker_version"`
+	CypressDockerVersion string `form:"cypress_docker_version,default=9.7.0-0.2.0" json:"cypress_docker_version"`
 	Timeout              int    `form:"timeout,default=10" json:"timeout"`
 	Username             string `form:"username" json:"username" binding:"max=100"`
 	Password             string `form:"password" json:"password" binding:"max=100"`
@@ -161,7 +161,7 @@ func Create(c *gin.Context) {
 	}
 	// default value not supported yet with json
 	if p.CypressDockerVersion == "" {
-		p.CypressDockerVersion = "9.7.0-0.1.1"
+		p.CypressDockerVersion = "9.7.0-0.2.0"
 	}
 	if p.Timeout == 0 {
 		p.Timeout = 10
@@ -272,7 +272,7 @@ func Update(c *gin.Context) {
 	}
 	// default value not supported yet with json
 	if p.CypressDockerVersion == "" {
-		p.CypressDockerVersion = "9.7.0-0.1.1"
+		p.CypressDockerVersion = "9.7.0-0.2.0"
 	}
 	if p.Timeout == 0 {
 		p.Timeout = 10
@@ -286,11 +286,6 @@ func Update(c *gin.Context) {
 
 	err := p.update()
 	if err != nil {
-		if err.Error() == "already_exist" {
-			c.JSON(http.StatusConflict, gin.H{"error": "Already exist"})
-			log.Error().Err(err).Msgf("Project %s with teamID %d already exist", p.Name, p.TeamID)
-			return
-		}
 		log.Error().Err(err).Msg("Error occured while performing db query")
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
 	} else {
