@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "scripts": {
     "dev": "vite --host",
-    "build": "vue-tsc --noEmit && vite build",
+    "build": "npm run lint && vue-tsc --noEmit && vite build",
     "serve": "vite preview --host 0.0.0.0 --port 3000",
     "lint": "eslint ./ --ext .vue,.js,.jsx,.cjs,.mjs,.ts,.tsx,.cts,.mts --fix"
   },
@@ -20,6 +20,7 @@
     "vue-router": "^4.1.5"
   },
   "devDependencies": {
+    "@babel/types": "^7.19.4",
     "@intlify/vite-plugin-vue-i18n": "^6.0.3",
     "@rushstack/eslint-patch": "^1.1.4",
     "@types/node": "^16.11.56",

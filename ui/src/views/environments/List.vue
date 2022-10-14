@@ -77,7 +77,7 @@
                   <router-link
                     class="cursor-pointer"
                     :title="$t('delete.delete')"
-                    to
+                    to=""
                     @click="
                       deleteItem(
                         index,
@@ -168,7 +168,7 @@
                   <router-link
                     class="cursor-pointer"
                     :title="$t('delete.delete')"
-                    to
+                    to=""
                     @click="
                       deleteItem(
                         index,
