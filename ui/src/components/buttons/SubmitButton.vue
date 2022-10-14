@@ -17,7 +17,7 @@ export default defineComponent({
     },
     classes: {
       type: String,
-      default: 'w-full p-3 bg-gray-900 text-white hover:text-green-500',
+      default: 'w-full p-3 bg-gray-900 text-white hover:text-emerald-500',
     },
   },
 })

@@ -36,13 +36,13 @@ export default function () {
           state.menu.isOpen.executions = true
           break
       }
-      return 'bg-green-500'
+      return 'bg-emerald-500'
     }
   }
 
   function getActiveLink(data: string): string | undefined {
     if (route.meta.activeLink === data) {
-      return 'border-l-4 border-green-500'
+      return 'border-l-4 border-emerald-500'
     }
   }
 

@@ -9,7 +9,7 @@
         </div>
         <div class="px-2 pt-2 pb-4">
           <router-link
-            class="block text-green-500 font-semibold hover:text-white px-2 py-1 uppercase"
+            class="block text-emerald-500 font-semibold hover:text-white px-2 py-1 uppercase"
             to="/"
             :title="$t('brand.name')"
             >{{ $t('brand.name') }}</router-link
@@ -19,7 +19,7 @@
           <button
             type="button"
             @click="isOpen = !isOpen"
-            class="block text-green-500 focus:text-white focus:outline-none"
+            class="block text-emerald-500 focus:text-white focus:outline-none"
           >
             <svg class="h-6 w-6 fill-current" viewBox="0 0 24 24">
               <path
@@ -49,19 +49,19 @@
             </button>
             <div class="bg-black" v-if="menu.isOpen.teams">
               <router-link
-                class="block text-white hover:text-green-500 hover:font-extrabold p-2"
+                class="block text-white hover:text-emerald-500 hover:font-extrabold p-2"
                 :class="getActiveLink('/teams/create')"
                 to="/teams/create"
                 :title="$t('teams.create')"
                 >{{ $t('teams.create') }}</router-link
               >
               <router-link
-                class="block text-white hover:text-green-500 hover:font-extrabold p-2"
+                class="block text-white hover:text-emerald-500 hover:font-extrabold p-2"
                 :class="getActiveLink('/teams/list')"
                 to="/teams/list"
                 :title="$t('teams.list')"
-                >{{ $t('teams.list') }}</router-link
-              >
+                >{{ $t('teams.list') }}
+              </router-link>
             </div>
           </div>
           <div>
@@ -75,14 +75,14 @@
             </button>
             <div class="bg-black" v-if="menu.isOpen.projects">
               <router-link
-                class="block text-white hover:text-green-500 hover:font-extrabold p-2"
+                class="block text-white hover:text-emerald-500 hover:font-extrabold p-2"
                 :class="getActiveLink('/projects/create')"
                 to="/projects/create"
                 :title="$t('projects.create')"
                 >{{ $t('projects.create') }}</router-link
               >
               <router-link
-                class="block text-white hover:text-green-500 hover:font-extrabold p-2"
+                class="block text-white hover:text-emerald-500 hover:font-extrabold p-2"
                 :class="getActiveLink('/projects/list')"
                 to="/projects/list"
                 :title="$t('projects.list')"
@@ -101,14 +101,14 @@
             </button>
             <div class="bg-black" v-if="menu.isOpen.annotations">
               <router-link
-                class="block text-white hover:text-green-500 hover:font-extrabold p-2"
+                class="block text-white hover:text-emerald-500 hover:font-extrabold p-2"
                 :class="getActiveLink('/annotations/create')"
                 to="/annotations/create"
                 :title="$t('annotations.create')"
                 >{{ $t('annotations.create') }}</router-link
               >
               <router-link
-                class="block text-white hover:text-green-500 hover:font-extrabold p-2"
+                class="block text-white hover:text-emerald-500 hover:font-extrabold p-2"
                 :class="getActiveLink('/annotations/list')"
                 to="/annotations/list"
                 :title="$t('annotations.list')"
@@ -127,14 +127,14 @@
             </button>
             <div class="bg-black" v-if="menu.isOpen.environments">
               <router-link
-                class="block text-white hover:text-green-500 hover:font-extrabold p-2"
+                class="block text-white hover:text-emerald-500 hover:font-extrabold p-2"
                 :class="getActiveLink('/environments/create')"
                 to="/environments/create"
                 :title="$t('environments.create')"
                 >{{ $t('environments.create') }}</router-link
               >
               <router-link
-                class="block text-white hover:text-green-500 hover:font-extrabold p-2"
+                class="block text-white hover:text-emerald-500 hover:font-extrabold p-2"
                 :class="getActiveLink('/environments/list')"
                 to="/environments/list"
                 :title="$t('environments.list')"
@@ -153,7 +153,7 @@
             </button>
             <div class="bg-black" v-if="menu.isOpen.executions">
               <router-link
-                class="block text-white hover:text-green-500 hover:font-extrabold p-2"
+                class="block text-white hover:text-emerald-500 hover:font-extrabold p-2"
                 :class="getActiveLink('/executions/list')"
                 to="/executions/list"
                 :title="$t('executions.list')"

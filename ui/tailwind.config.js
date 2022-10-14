@@ -2,23 +2,12 @@ var flattenColorPalette =
   require('tailwindcss/lib/util/flattenColorPalette').default
 
 module.exports = {
-  purge: {
-    enabled: process.env.NODE_ENV === 'production',
-    content: ['./src/**/*.{vue,js,ts,jsx,tsx}'],
-  },
-  darkMode: false, // or 'media' or 'class'
+  content: ['./index.html', './src/**/*.{vue,js,ts,jsx,tsx}'],
   theme: {
     extend: {
       animation: {
         'spin-fast': 'spin 0.60s linear infinite',
       },
-    },
-  },
-  variants: {
-    extend: {
-      backgroundColor: ['responsive', 'hover', 'focus', 'active', 'checked'],
-      fontSize: ['responsive', 'hover'],
-      borderColor: ['checked'],
     },
   },
   plugins: [

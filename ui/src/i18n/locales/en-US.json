@@ -102,8 +102,8 @@
         "created": "Hook has been successfully triggered on project \"{field}\""
       },
       "create": {
-        "team": "Veuillez créer une équipe",
-        "project": "Veuillez créer un project"
+        "team": "Create a team before proceeding to this action",
+        "project": "Create a project before proceeding to this action"
       },
       "conflict": {
         "team": "Team \"{field}\" already exist",

@@ -15,7 +15,7 @@
         <div
           id="englobe"
           class="w-12 h-8 flex items-center bg-gray-300 rounded-2xl p-1 duration-200 ease-in-out"
-          :class="{ 'bg-green-500': local }"
+          :class="{ 'bg-emerald-500': local }"
         >
           <div
             id="inner"
@@ -59,10 +59,10 @@ export default defineComponent({
       inner = document.querySelector('#inner')
       if (englobe !== null && inner !== null) {
         if (event.target.checked) {
-          englobe.classList.add('bg-green-500')
+          englobe.classList.add('bg-emerald-500')
           inner.classList.add('translate-x-4')
         } else {
-          englobe.classList.remove('bg-green-500')
+          englobe.classList.remove('bg-emerald-500')
           inner.classList.remove('translate-x-4')
         }
         emit('update:updateSchedulingEnabled', event.target.checked)

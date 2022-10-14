@@ -58,7 +58,7 @@ export default function () {
       },
     },
     classes: {
-      aLinks: 'hover:text-green-500 hover:font-extrabold',
+      aLinks: 'hover:text-emerald-500 hover:font-extrabold',
     },
     status: {
       annoations: {

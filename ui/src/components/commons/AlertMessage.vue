@@ -25,7 +25,7 @@ export default defineComponent({
           c = 'text-red-500 text-xl font-normal'
           break
         case 'green':
-          c = 'text-green-500 text-xl font-normal'
+          c = 'text-emerald-500 text-xl font-normal'
           break
         case 'mute':
           c = 'text-gray-500 text-xl font-normal'

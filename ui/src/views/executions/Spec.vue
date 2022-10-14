@@ -99,7 +99,7 @@
                           class="w-8 h-8"
                           :class="
                             result.state === 'passed'
-                              ? 'text-green-500'
+                              ? 'text-emerald-500'
                               : 'text-red-500'
                           "
                           fill="none"

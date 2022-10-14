@@ -21,7 +21,7 @@ export default defineComponent({
   data() {
     return {
       local: {
-        classes: 'font-normal text-green-500 text-4xl',
+        classes: 'font-normal text-emerald-500 text-4xl',
       },
     }
   },
