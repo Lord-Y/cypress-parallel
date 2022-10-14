@@ -235,20 +235,6 @@ func (p *updateProjects) update() (err error) {
 	}
 	defer db.Close()
 
-	var count int
-	err = db.QueryRow(
-		ctx,
-		"SELECT COUNT(project_id) FROM projects WHERE project_name = $1 AND team_id = $2",
-		p.Name,
-		p.TeamID,
-	).Scan(
-		&count,
-	)
-
-	if count > 0 {
-		return fmt.Errorf("already_exist")
-	}
-
 	tx, err := db.Begin(ctx)
 	if err != nil {
 		return
