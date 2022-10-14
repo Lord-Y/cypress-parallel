@@ -24,7 +24,7 @@ export default function () {
     isOpen: false,
     execution: {} as Execution,
     classes: {
-      aLinks: 'hover:text-green-500 hover:font-extrabold',
+      aLinks: 'hover:text-emerald-500 hover:font-extrabold',
     },
   })
 
@@ -93,7 +93,7 @@ export default function () {
     let classes: string
     switch (s) {
       case 'DONE':
-        classes = 'text-green-500 font-semibold'
+        classes = 'text-emerald-500 font-semibold'
         break
       case 'NOT_STARTED':
       case 'QUEUED':
@@ -113,7 +113,7 @@ export default function () {
     const status = Statuses.global(execution)
     switch (status) {
       case 'PASSED':
-        classes = 'text-green-500 font-semibold'
+        classes = 'text-emerald-500 font-semibold'
         break
       case 'NOT_STARTED':
       case 'QUEUED':

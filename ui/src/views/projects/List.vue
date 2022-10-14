@@ -60,7 +60,7 @@
                   <router-link
                     :class="['cursor-pointer', classes.aLinks]"
                     :title="$t('projects.hooks.launch')"
-                    to
+                    to=""
                     @click="launch(project)"
                   >
                     <svg
@@ -88,7 +88,7 @@
                   <router-link
                     :class="['cursor-pointer', classes.aLinks]"
                     :title="$t('projects.duplicate')"
-                    to
+                    to=""
                     @click="duplicate(project.project_id)"
                   >
                     <svg
@@ -113,7 +113,7 @@
                     :to="'/projects/edit/' + project.project_id"
                   >
                     <svg
-                      class="w-10 h-10 hover:text-green-500"
+                      class="w-10 h-10 hover:text-emerald-500"
                       fill="none"
                       stroke="currentColor"
                       viewBox="0 0 24 24"
@@ -131,11 +131,11 @@
                   <router-link
                     class="cursor-pointer"
                     :title="$t('delete.delete')"
-                    to
+                    to=""
                     @click="deleteItem(index, 'projects', project.project_id)"
                   >
                     <svg
-                      class="w-10 h-10 hover:text-green-500"
+                      class="w-10 h-10 hover:text-emerald-500"
                       fill="none"
                       stroke="currentColor"
                       viewBox="0 0 24 24"
@@ -197,7 +197,7 @@
                   <router-link
                     :class="['cursor-pointer', classes.aLinks]"
                     :title="$t('projects.hooks.launch')"
-                    to
+                    to=""
                     @click="launch(project)"
                   >
                     <svg
@@ -225,7 +225,7 @@
                   <router-link
                     :class="['cursor-pointer', classes.aLinks]"
                     :title="$t('projects.duplicate')"
-                    to
+                    to=""
                     @click="duplicate(project.project_id)"
                   >
                     <svg
@@ -250,7 +250,7 @@
                     :to="'/projects/edit/' + project.project_id"
                   >
                     <svg
-                      class="w-10 h-10 hover:text-green-500"
+                      class="w-10 h-10 hover:text-emerald-500"
                       fill="none"
                       stroke="currentColor"
                       viewBox="0 0 24 24"
@@ -268,11 +268,11 @@
                   <router-link
                     class="cursor-pointer"
                     :title="$t('delete.delete')"
-                    to
+                    to=""
                     @click="deleteItem(index, 'projectsf', project.project_id)"
                   >
                     <svg
-                      class="w-10 h-10 hover:text-green-500"
+                      class="w-10 h-10 hover:text-emerald-500"
                       fill="none"
                       stroke="currentColor"
                       viewBox="0 0 24 24"

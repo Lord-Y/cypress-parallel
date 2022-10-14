@@ -14,7 +14,7 @@
       <select
         v-bind="field"
         :id="id"
-        class="block w-full border-gray-300 focus:outline-none focus:border-green-500 focus:ring-green-500"
+        class="block w-full border-gray-300 focus:outline-none focus:border-emerald-500 focus:ring-emerald-500"
         :class="getValidationClass(meta)"
       >
         <option value disabled>{{ $t('select.selectYourChoice') }}</option>
@@ -68,7 +68,7 @@ export default defineComponent({
 
     function getValidationClass(meta: any): string {
       if (meta.valid && meta.validated && meta.dirty) {
-        return 'outline-none border-green-500'
+        return 'outline-none border-emerald-500'
       }
       if (!meta.valid && meta.validated && !meta.dirty) {
         return 'outline-none border-red-500'

@@ -48,7 +48,7 @@
                     :to="'/teams/edit/' + team.team_id"
                   >
                     <svg
-                      class="w-10 h-10 hover:text-green-500"
+                      class="w-10 h-10 hover:text-emerald-500"
                       fill="none"
                       stroke="currentColor"
                       viewBox="0 0 24 24"
@@ -71,7 +71,7 @@
                     @click="deleteItem(index, 'teams', team.team_id)"
                   >
                     <svg
-                      class="w-10 h-10 hover:text-green-500"
+                      class="w-10 h-10 hover:text-emerald-500"
                       fill="none"
                       stroke="currentColor"
                       viewBox="0 0 24 24"
@@ -123,7 +123,7 @@
                     :to="'/teams/edit/' + team.team_id"
                   >
                     <svg
-                      class="w-10 h-10 hover:text-green-500"
+                      class="w-10 h-10 hover:text-emerald-500"
                       fill="none"
                       stroke="currentColor"
                       viewBox="0 0 24 24"
@@ -145,7 +145,7 @@
                     @click="deleteItem(index, 'teamsf', team.team_id)"
                   >
                     <svg
-                      class="w-10 h-10 hover:text-green-500"
+                      class="w-10 h-10 hover:text-emerald-500"
                       fill="none"
                       stroke="currentColor"
                       viewBox="0 0 24 24"

@@ -5,7 +5,7 @@
         type="text"
         :id="id"
         name="searchByFilter"
-        class="block w-full border-gray-300 focus:outline-none focus:border-green-500 focus:ring-green-500 text-center"
+        class="block w-full border-gray-300 focus:outline-none focus:border-emerald-500 focus:ring-emerald-500 text-center"
         :placeholder="$t('annotations.search')"
         autocomplete="off"
         v-model.trim="search.byFilter"
@@ -13,7 +13,7 @@
       />
       <button
         type="button"
-        class="absolute inset-y-0 right-0 flex items-center px-4 font-bold text-white bg-green-500"
+        class="absolute inset-y-0 right-0 flex items-center px-4 font-bold text-white bg-emerald-500"
         @click="clear"
       >
         <svg

@@ -6,9 +6,8 @@ module.exports = {
   extends: [
     'plugin:vue/vue3-strongly-recommended',
     'eslint:recommended',
-    '@vue/typescript/recommended',
-    '@vue/prettier',
-    '@vue/prettier/@typescript-eslint',
+    '@vue/eslint-config-typescript',
+    '@vue/eslint-config-prettier',
   ],
   rules: {
     'no-console': process.env.NODE_ENV === 'production' ? 'warn' : 'off',
