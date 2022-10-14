@@ -77,7 +77,7 @@
                   <router-link
                     class="cursor-pointer"
                     :title="$t('delete.delete')"
-                    to
+                    to=""
                     @click="
                       deleteItem(index, 'annotations', annotation.annotation_id)
                     "
@@ -164,7 +164,7 @@
                   <router-link
                     class="cursor-pointer"
                     :title="$t('delete.delete')"
-                    to
+                    to=""
                     @click="
                       deleteItem(
                         index,

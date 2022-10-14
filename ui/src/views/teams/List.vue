@@ -67,7 +67,7 @@
                   <router-link
                     class="cursor-pointer"
                     :title="$t('delete.delete')"
-                    to
+                    to=""
                     @click="deleteItem(index, 'teams', team.team_id)"
                   >
                     <svg
@@ -141,7 +141,7 @@
                   <router-link
                     class="cursor-pointer"
                     :title="$t('delete.delete')"
-                    to
+                    to=""
                     @click="deleteItem(index, 'teamsf', team.team_id)"
                   >
                     <svg
