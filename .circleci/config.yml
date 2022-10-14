@@ -15,9 +15,9 @@ jobs:
       KIND_VERSION: 0.11.0
       KIND_VERSION_NODE: 1.22.0
       KIND_CLUSTER_NAME: cypress-parallel
-      HELM_VERSION: 3.7.2
+      HELM_VERSION: 3.10.1
       IMAGE_NAME: ghcr.io/lord-y/cypress-parallel/cypress-parallel
-      CLI_IMAGE: ghcr.io/lord-y/cypress-parallel-docker-images/cypress-parallel-docker-images:7.4.0-0.1.1
+      CLI_IMAGE: ghcr.io/lord-y/cypress-parallel-docker-images/cypress-parallel-docker-images:9.7.0-0.1.1
       NAMESPACE: cypress-parallel
       CYPRESS_PARALLEL_K8S_CLIENT_OUTSIDE: "true"
       CYPRESS_PARALLEL_PORT: 40000
@@ -151,7 +151,7 @@ jobs:
     - run:
         name: Publish prerelease
         command: |
-          go get github.com/github-release/github-release
+          go install github.com/github-release/github-release
           git checkout .
           github-release release -t ${CIRCLE_TAG} -u ${CIRCLE_PROJECT_USERNAME} -r ${CIRCLE_PROJECT_REPONAME} -c ${CIRCLE_SHA1} -d "See changelog [here](https://github.com/Lord-Y/cypress-parallel/blob/main/CHANGELOG.md)" -p
 
@@ -177,7 +177,7 @@ jobs:
     - run:
         name: Publish release
         command: |
-          go get github.com/github-release/github-release
+          go install github.com/github-release/github-release
           git checkout .
           github-release release -t ${CIRCLE_TAG} -u ${CIRCLE_PROJECT_USERNAME} -r ${CIRCLE_PROJECT_REPONAME} -c ${CIRCLE_SHA1} -d "See changelog [here](https://github.com/Lord-Y/cypress-parallel/blob/main/CHANGELOG.md)"
 
