@@ -75,7 +75,9 @@ jobs:
 
     - run:
         name: go mod download
-        command: go mod download
+        command: |
+          go version
+          go mod download
 
     - run:
         name: npm install
@@ -151,7 +153,7 @@ jobs:
     - run:
         name: Publish prerelease
         command: |
-          go install github.com/github-release/github-release
+          go get github.com/github-release/github-release
           git checkout .
           github-release release -t ${CIRCLE_TAG} -u ${CIRCLE_PROJECT_USERNAME} -r ${CIRCLE_PROJECT_REPONAME} -c ${CIRCLE_SHA1} -d "See changelog [here](https://github.com/Lord-Y/cypress-parallel/blob/main/CHANGELOG.md)" -p
 
@@ -177,7 +179,7 @@ jobs:
     - run:
         name: Publish release
         command: |
-          go install github.com/github-release/github-release
+          go get github.com/github-release/github-release
           git checkout .
           github-release release -t ${CIRCLE_TAG} -u ${CIRCLE_PROJECT_USERNAME} -r ${CIRCLE_PROJECT_REPONAME} -c ${CIRCLE_SHA1} -d "See changelog [here](https://github.com/Lord-Y/cypress-parallel/blob/main/CHANGELOG.md)"
 
