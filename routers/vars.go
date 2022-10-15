@@ -2,17 +2,17 @@
 package routers
 
 var (
-	// https://github.com/cypress-io/cypress-example-kitchensink/tree/master/cypress/integration/2-advanced-examples
+	// https://github.com/cypress-io/cypress-example-kitchensink/tree/master/cypress/e2e/2-advanced-examples
 	specs = []string{
-		"cypress/integration/2-advanced-examples/actions.spec.js",
-		"cypress/integration/2-advanced-examples/aliasing.spec.js",
-		"cypress/integration/2-advanced-examples/assertions.spec.js",
-		"cypress/integration/2-advanced-examples/connectors.spec.js",
-		"cypress/integration/2-advanced-examples/cookies.spec.js",
-		"cypress/integration/2-advanced-examples/files.spec.js",
-		"cypress/integration/2-advanced-examples/location.spec.js",
-		"cypress/integration/2-advanced-examples",
-		"cypress/integration/1-getting-started",
+		"cypress/e2e/2-advanced-examples/actions.cy.js",
+		"cypress/e2e/2-advanced-examples/aliasing.cy.js",
+		"cypress/e2e/2-advanced-examples/assertions.cy.js",
+		"cypress/e2e/2-advanced-examples/connectors.cy.js",
+		"cypress/e2e/2-advanced-examples/cookies.cy.js",
+		"cypress/e2e/2-advanced-examples/files.cy.js",
+		"cypress/e2e/2-advanced-examples/location.cy.js",
+		"cypress/e2e/2-advanced-examples",
+		"cypress/e2e/1-getting-started",
 	}
 
 	// https://github.com/cypress-io/cypress-docker-images/tree/master/included
