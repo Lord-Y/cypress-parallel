@@ -154,6 +154,7 @@ jobs:
         name: Publish prerelease
         command: |
           go get github.com/github-release/github-release
+          go install github.com/github-release/github-release
           git checkout .
           github-release release -t ${CIRCLE_TAG} -u ${CIRCLE_PROJECT_USERNAME} -r ${CIRCLE_PROJECT_REPONAME} -c ${CIRCLE_SHA1} -d "See changelog [here](https://github.com/Lord-Y/cypress-parallel/blob/main/CHANGELOG.md)" -p
 
@@ -180,6 +181,7 @@ jobs:
         name: Publish release
         command: |
           go get github.com/github-release/github-release
+          go install github.com/github-release/github-release
           git checkout .
           github-release release -t ${CIRCLE_TAG} -u ${CIRCLE_PROJECT_USERNAME} -r ${CIRCLE_PROJECT_REPONAME} -c ${CIRCLE_SHA1} -d "See changelog [here](https://github.com/Lord-Y/cypress-parallel/blob/main/CHANGELOG.md)"
 
