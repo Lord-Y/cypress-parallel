@@ -21,12 +21,28 @@ By default, the api url is `http://127.0.0.1:8080` but it can be override with o
 
 ## Database
 
-Our api is developped with PostgresSQL database so the environment variable `CYPRESS_PARALLEL_DB_URI` must be set:
+Our api is developped with PostgresSQL 10+ database so the environment variable `CYPRESS_PARALLEL_DB_URI` must be set:
 ```bash
 export CYPRESS_PARALLEL_DB_URI="postgres://USERNAME:PASSWORD@HOST:PORT/DB_NAME?sslmode=disable"
 ```
 
 ## Development
+
+### Running UI and API seperatly during development
+
+In a shell, start the `UI`:
+```bash
+export CYPRESS_PARALLEL_PORT=8080
+cd ui
+npm run dev
+```
+
+In an another shell, start the `API`:
+```bash
+export CYPRESS_PARALLEL_K8S_CLIENT_OUTSIDE=true
+export CYPRESS_PARALLEL_PORT=8080
+go run main.go
+```
 
 ### Git hooks
 
@@ -49,7 +65,7 @@ Please read `Kind` setup [here](./_developments/README.md)
 ### Start your postgres sql instance
 
 ```bash
-sudo docker-compose up -d -f docker-compose.yaml
+sudo docker-compose up -d
 ```
 
 ### Debugging

@@ -4,6 +4,20 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v.3.0](https://github.com/Lord-Y/cypress-parallel/releases/tag/v0.3.0) - 2022-10-15
+
+### Changed
+- global:
+  - Update default docker image version to 10.10.0-0.3.0
+- ci:
+  - Update ci requirements
+- api:
+  - Upgrade to golang version 1.19
+  - Fix project update
+- ui:
+  - Update nodejs version to 16
+  - Update packages
+
 ## [v0.2.0](https://github.com/Lord-Y/cypress-parallel/releases/tag/v0.2.0) - 2021-12-30
 
 v0.2.0 release
